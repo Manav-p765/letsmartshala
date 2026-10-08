@@ -1,0 +1,286 @@
+.hero {
+  --margin-x: 6%;
+  padding-block: 0;
+  overflow: clip;
+}
+
+/* The stage is the arc's coordinate space: the SVG, the sun and the cards
+   are all positioned in its pixels. */
+.hero__stage {
+  position: relative;
+  height: clamp(660px, calc(100svh - 7.5rem), 900px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+/* ---- The arc ---- */
+.arc {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+}
+.arc path { stroke-linecap: round; }
+.arc__glow {
+  stroke: var(--blue);
+  stroke-width: 140;
+  opacity: 0.07;
+  filter: blur(40px);
+}
+.arc__band {
+  stroke-width: clamp(44px, 5vw, 76px);
+  stroke-dasharray: 1 1;
+}
+.arc__track {
+  stroke: var(--blue);
+  stroke-opacity: 0.22;
+  stroke-width: 1.25;
+  stroke-dasharray: 1 1;
+}
+.arc__progress {
+  stroke: var(--blue);
+  stroke-width: 2.5;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+.arc__tick { fill: var(--paper); stroke: var(--blue); stroke-opacity: 0.45; stroke-width: 1.5; }
+.arc__pin line { stroke: var(--blue); stroke-opacity: 0.35; stroke-width: 1; stroke-dasharray: 3 3; }
+.arc__pin circle { fill: var(--blue); }
+
+/* ---- The sun ---- */
+.arc__sun {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
+}
+.arc__sun-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 5px rgba(0, 61, 229, 0.16), 0 0 24px 4px rgba(0, 61, 229, 0.35);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arc__sun-dot::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1.5px solid var(--blue);
+    animation: sun-ping 2.2s var(--ease-out) infinite;
+  }
+}
+@keyframes sun-ping { to { transform: scale(2.6); opacity: 0; } }
+.arc__clock {
+  position: absolute;
+  left: 0;
+  bottom: 18px;
+  transform: translateX(-50%);
+  transition: transform 0.4s var(--ease-out), left 0.4s var(--ease-out), bottom 0.4s var(--ease-out);
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.arc__sun[data-clock='left'] .arc__clock { left: -18px; bottom: 0; transform: translate(-100%, 50%); }
+.arc__sun[data-clock='right'] .arc__clock { left: 18px; bottom: 0; transform: translate(0, 50%); }
+
+/* ---- Copy, sitting inside the arch ---- */
+.hero__copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: clamp(2.5rem, 6vh, 4.5rem);
+}
+.hero__eyebrow { color: var(--hi); }
+.hero__title {
+  margin-top: 1.25rem;
+  /* Width sets the size, but short laptop screens cap it by height so the
+     arch still has room for its cards above the headline. */
+  font-size: min(clamp(2.6rem, 1rem + 4.4vw, 5.5rem), 9vh);
+  text-wrap: balance;
+}
+.hero__title .serif {
+  font-size: 1.12em;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  padding-right: 0.04em;
+}
+.hero__lede {
+  max-width: 38rem;
+  text-wrap: balance;
+  margin-top: 1.5rem;
+}
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+.hero__ctas .btn--ghost { background: rgba(255, 255, 255, 0.6); }
+
+/* ---- Floating cards on the arc ---- */
+.day-cards { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.day-card {
+  position: absolute;
+  width: 13.5rem;
+  transform: translate(-50%, -50%);
+}
+.day-card__float { pointer-events: auto; }
+.day-card.is-off { visibility: hidden; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Idle bob uses the separate `translate` property so it composes with
+     GSAP's pointer parallax on `transform`. */
+  .day-card__float { animation: bob 6s ease-in-out infinite; animation-delay: calc(var(--i) * -1.3s); }
+}
+@keyframes bob { 50% { translate: 0 -7px; } }
+
+.day-card__body {
+  padding: 0.8rem 0.9rem 0.85rem;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-2);
+  text-align: left;
+}
+.day-card__body header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.day-card__time {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: var(--fg-3);
+}
+.day-card__title {
+  margin-top: 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--fg-2);
+  line-height: 1.3;
+}
+.day-card__value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--fg);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.chip--ok { color: var(--ok); background: rgba(15, 138, 74, 0.1); }
+.chip--warn { color: var(--warn); background: rgba(185, 90, 0, 0.1); }
+.chip--info { color: var(--blue-2); background: rgba(36, 86, 230, 0.1); }
+
+/* ---- Role switch ---- */
+.hero__roles {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  padding-block: 1.25rem 1.75rem;
+  border-top: 1px solid var(--line);
+}
+.role-switch {
+  display: inline-flex;
+  padding: 0.25rem;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-1);
+}
+.role-switch__btn {
+  position: relative;
+  overflow: hidden;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--fg-2);
+  transition: color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
+}
+.role-switch__btn:hover { color: var(--fg); }
+.role-switch__btn[aria-pressed='true'] { color: #fff; background: var(--ink); }
+/* The active role fills left→right as its day plays (--day is set from JS). */
+.role-switch__fill {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 5px;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.85);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.role-switch__btn[aria-pressed='true'] .role-switch__fill { transform: scaleX(var(--day, 0)); }
+.hero__note {
+  font-size: var(--fs-small);
+  color: var(--fg-3);
+}
+
+/* ---- Narrow: arc behind the copy, cards become a swipeable row ---- */
+.hero__stage.is-narrow {
+  height: auto;
+  min-height: calc(100svh - 9rem);
+  justify-content: flex-start;
+  padding-top: calc(var(--nav-h) + 4.5rem);
+}
+.is-narrow .arc__band { stroke-width: 34px; }
+.is-narrow .arc__glow { stroke-width: 70px; }
+/* Room under the buttons for the shallow arch that sits on the card row. */
+.is-narrow .hero__copy { padding-bottom: calc(min(110px, 26vw) + 2.5rem); }
+.is-narrow .day-cards { margin-top: 0; }
+.is-narrow .day-cards {
+  position: relative;
+  inset: auto;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.75rem var(--pad-x) 1.5rem;
+  scrollbar-width: none;
+}
+.is-narrow .day-cards::-webkit-scrollbar { display: none; }
+.is-narrow .day-card {
+  position: relative;
+  flex: 0 0 13rem;
+  transform: none;
+  scroll-snap-align: center;
+}
+@media (max-width: 900px) {
+  .hero__roles { flex-direction: column; gap: 0.6rem; }
+}
+@media (max-width: 560px) {
+  .hero__eyebrow-more { display: none; }
+}

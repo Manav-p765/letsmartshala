@@ -1,0 +1,116 @@
+/* ============================================
+   TOKENS — palette taken from the SmartShala CRM
+   (frontend/src/app/globals.css) plus the logo's own blue,
+   so the marketing site and the product feel like one thing.
+   ============================================ */
+:root {
+  /* ---- Palette — each colour has one job ---- */
+  --blue: #003DE5;        /* the logo. Brand moments: the arc, the CTA band, the mark */
+  --blue-2: #2456E6;      /* CRM primary. Buttons and links — what you can press */
+  --blue-3: #1638A0;      /* CRM active. Pressed states, text on mist */
+  --navy: #0F2557;        /* CRM secondary. Dark sections */
+  --ink: #0F1419;         /* CRM ink. Body text and headings on light */
+  --paper: #F7F8FB;       /* CRM surface. The default page */
+  --white: #FFFFFF;       /* cards that sit on paper */
+  --mist: #E9EEFC;        /* a tint of the logo blue. Alternate light sections */
+
+  /* Status colours are only ever used inside product UI (cards, chips),
+     where they mean exactly what they mean in the CRM. Never decoration. */
+  --ok: #0F8A4A;
+  --warn: #B95A00;
+  --bad: #C8242C;
+  --ai: #7C3AED;          /* reserved for the AI assistant, once it's confirmed */
+
+  /* ---- Type ---- */
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Times New Roman', serif;
+  --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --fs-label: 0.75rem;
+  --fs-small: 0.875rem;
+  --fs-body: 1rem;
+  --fs-lede: clamp(1.0625rem, 1rem + 0.35vw, 1.3125rem);
+  --fs-h4: clamp(1.25rem, 1.1rem + 0.5vw, 1.625rem);
+  --fs-h3: clamp(1.625rem, 1.3rem + 1.2vw, 2.5rem);
+  --fs-h2: clamp(2.25rem, 1.5rem + 3.2vw, 4.75rem);
+  --fs-h1: clamp(2.75rem, 1.6rem + 5vw, 7rem);
+  --fs-mega: clamp(4rem, 1.5rem + 11vw, 13rem);
+
+  /* ---- Space ---- */
+  --pad-x: clamp(1rem, 3vw, 2.5rem);
+  --section-y: clamp(4.5rem, 10vh, 8.5rem);
+  --container: 1320px;
+  --nav-h: 4.5rem;
+  --radius: 18px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation — soft, blue-tinted, never grey mud ---- */
+  --shadow-1: 0 1px 2px rgba(15, 37, 87, 0.06), 0 2px 8px rgba(15, 37, 87, 0.05);
+  --shadow-2: 0 2px 4px rgba(15, 37, 87, 0.05), 0 12px 32px -6px rgba(15, 37, 87, 0.16);
+
+  /* ---- Motion — one hand: calm, decisive, no bounce on content ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);   /* small UI only: chips, toggles */
+  --dur: 0.5s;
+
+  /* ---- Layers ---- */
+  --z-content: 10;
+  --z-nav: 100;
+  --z-menu: 90;
+}
+
+/* ---- Section themes ----
+   Every section declares data-theme; components only ever read these. */
+[data-theme='paper'] {
+  --surface: var(--paper);
+  --card: var(--white);
+  --fg: var(--ink);
+  --fg-2: rgba(15, 20, 25, 0.66);
+  --fg-3: rgba(15, 20, 25, 0.42);
+  --line: rgba(15, 37, 87, 0.1);
+  --hi: var(--blue);
+  --chip: rgba(15, 37, 87, 0.05);
+}
+[data-theme='white'] {
+  --surface: var(--white);
+  --card: var(--paper);
+  --fg: var(--ink);
+  --fg-2: rgba(15, 20, 25, 0.66);
+  --fg-3: rgba(15, 20, 25, 0.42);
+  --line: rgba(15, 37, 87, 0.1);
+  --hi: var(--blue);
+  --chip: rgba(15, 37, 87, 0.05);
+}
+[data-theme='mist'] {
+  --surface: var(--mist);
+  --card: var(--white);
+  --fg: var(--navy);
+  --fg-2: rgba(15, 37, 87, 0.72);
+  --fg-3: rgba(15, 37, 87, 0.48);
+  --line: rgba(15, 37, 87, 0.14);
+  --hi: var(--blue);
+  --chip: rgba(255, 255, 255, 0.7);
+}
+[data-theme='navy'] {
+  --surface: var(--navy);
+  --card: rgba(255, 255, 255, 0.06);
+  --fg: #F2F5FF;
+  --fg-2: rgba(242, 245, 255, 0.7);
+  --fg-3: rgba(242, 245, 255, 0.45);
+  --line: rgba(242, 245, 255, 0.14);
+  --hi: #8FB0FF;
+  --chip: rgba(255, 255, 255, 0.08);
+}
+[data-theme='blue'] {
+  --surface: var(--blue);
+  --card: rgba(255, 255, 255, 0.1);
+  --fg: #FFFFFF;
+  --fg-2: rgba(255, 255, 255, 0.78);
+  --fg-3: rgba(255, 255, 255, 0.55);
+  --line: rgba(255, 255, 255, 0.22);
+  --hi: #FFFFFF;
+  --chip: rgba(255, 255, 255, 0.14);
+}

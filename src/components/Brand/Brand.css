@@ -1,0 +1,23 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--fg);
+}
+.brand__mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  transition: transform var(--dur) var(--ease-spring);
+}
+.brand:hover .brand__mark { transform: rotate(-8deg); }
+.brand__word {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.brand__word-2 { color: var(--hi); }
+.brand--lg .brand__mark { width: 2.75rem; height: 2.75rem; border-radius: 11px; }
+.brand--lg .brand__word { font-size: 1.75rem; }
