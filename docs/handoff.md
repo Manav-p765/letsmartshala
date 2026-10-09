@@ -134,8 +134,13 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
 - [x] Removed "Log in" from the nav (`site.loginUrl` kept for later)
 - [x] Features page redesigned: a sticky module bar, plus one row per module
       with a live app window (tour screens + `components/Features/moreScreens.jsx`)
-- [ ] **Deploy**: the Vercel CLI here is logged out. Follow `docs/deploy.md`
-      (login, env vars, domain and DNS, Resend domain verification)
+- [x] **Deployed** to https://letsmartshala.vercel.app (Vercel project
+      "letsmartshala", auto-deploys from GitHub Manav-p765/letsmartshala, branch
+      main). Every route is a real file (`dist/<route>/index.html` + `404.html`),
+      with no rewrites. Prerendering is skipped on Vercel (no Chromium); run
+      `npm run build` locally for the full static HTML.
+- [ ] Set `RESEND_API_KEY` in Vercel: until then the live form shows the
+      call/WhatsApp fallback. Then add the domain and DNS (`docs/deploy.md`).
 - [ ] Legal review of the privacy, terms and refund drafts; fill in the
       [bracketed] parts
 - Waiting on the owner:
