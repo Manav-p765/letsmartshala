@@ -129,6 +129,11 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
       flagged as drafts and not indexed)
 - [x] Pre-render every route (`scripts/prerender.mjs`), sitemap, robots,
       share image (`npm run og`), `vercel.json`
+- [x] Fixed: sections inside a page wrapper (CtaBand on inner pages) stayed
+      invisible. `useReveal` roots now animate only their own elements.
+- [x] Removed "Log in" from the nav (`site.loginUrl` kept for later)
+- [x] Features page redesigned: a sticky module bar, plus one row per module
+      with a live app window (tour screens + `components/Features/moreScreens.jsx`)
 - [ ] **Deploy**: the Vercel CLI here is logged out. Follow `docs/deploy.md`
       (login, env vars, domain and DNS, Resend domain verification)
 - [ ] Legal review of the privacy, terms and refund drafts; fill in the

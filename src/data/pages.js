@@ -49,63 +49,85 @@ export const features = {
   eyebrow: 'Features',
   title: ['Everything the office,', 'staff room and principal use.'],
   lede: 'One system, shared students, classes and staff. Start with what you need; every module reads from the same records.',
+  // `screen` picks the app-window preview: a tour screen (Tour.jsx) or one of
+  // components/Features/moreScreens.jsx.
   groups: [
     {
       name: 'Students & admissions',
+      screen: 'students',
+      short: 'Students',
       icon: 'students',
       text: 'One record per student, from enquiry to leaving.',
       items: ['Student profiles with guardian, father and mother details', 'Aadhaar and APAAR IDs, previous school, documents', 'Bulk import of existing student lists', 'Behaviour notes, with restricted counsellor notes', 'Full edit history on every profile', 'Activate and deactivate students']
     },
     {
       name: 'Classes & timetable',
+      screen: 'timetable',
+      short: 'Timetable',
       icon: 'timetable',
       text: 'Classes, sections, subjects and who teaches what.',
       items: ['Classes with sections, stream and medium of instruction', 'Class teacher and maximum strength', 'Subjects and teacher period assignments', 'Weekly timetable with your period times', 'Academic years and year-end rollover']
     },
     {
       name: 'Attendance',
+      screen: 'attendance',
+      short: 'Attendance',
       icon: 'attendance',
       text: 'Roll call in a few taps, reports without counting.',
       items: ['Present, absent, late and half-day', 'Daily and monthly reports by class and student', 'Holidays on the school calendar', 'See which classes haven’t been marked, and nudge teachers', 'Staff punch-in, breaks and punch-out']
     },
     {
       name: 'Fees & receipts',
+      screen: 'fees',
+      short: 'Fees',
       icon: 'fees',
       text: 'Every rupee recorded, receipted and reconciled.',
       items: ['Fee structures with heads and instalments', 'Assign fees by class or by student', 'Payments by UPI, cheque or DD', 'Adjustments kept on the student’s ledger', 'Receipt PDFs for every payment', 'Defaulters list and fee reminders', 'Transport fee added for bus students']
     },
     {
       name: 'Exams & report cards',
+      screen: 'exams',
+      short: 'Exams',
       icon: 'exams',
       text: 'Marks in once, report cards out.',
       items: ['Exams with terms, subjects, maximum and passing marks', 'Teachers enter marks for the subjects they teach', 'Grading and results', 'Report-card PDFs', 'Exam, subject-wise and student performance reports']
     },
     {
       name: 'Homework',
+      screen: 'homework',
+      short: 'Homework',
       icon: 'homework',
       text: 'Set, track and check, by class and subject.',
       items: ['Homework by class and subject with due dates', 'Maximum marks where needed', 'Submission tracking and status', 'Shows on each student’s profile']
     },
     {
       name: 'Transport',
+      screen: 'transport',
+      short: 'Transport',
       icon: 'transport',
       text: 'Buses, routes and who rides them.',
       items: ['Vehicles and routes', 'Ordered stops on each route', 'Assign students to routes and stops', 'Transport fee on the student’s fees', 'Transport report']
     },
     {
       name: 'Staff, leave & payroll',
+      screen: 'payroll',
+      short: 'Payroll',
       icon: 'payroll',
       text: 'From punch-in to pay slip.',
       items: ['Shifts and pay profiles', 'Salary calculated from staff attendance', 'Pay slips staff can see themselves', 'Leave requests with attachments and approvals']
     },
     {
       name: 'Communication & calendar',
+      screen: 'comms',
+      short: 'Notices',
       icon: 'announcements',
       text: 'The school’s notices, in one place.',
       items: ['Announcements to everyone, staff, teachers or parents', 'Priority and read receipts', 'Message templates and communication logs', 'School calendar with events and holidays']
     },
     {
       name: 'Reports & dashboards',
+      screen: 'reports',
+      short: 'Reports',
       icon: 'reports',
       text: 'The day’s picture, without asking for it.',
       items: ['Role-based dashboards', 'Daily principal report', 'Attendance and fee risk insights', 'Class, exam, teacher and transport reports', 'Activity logs of who changed what']

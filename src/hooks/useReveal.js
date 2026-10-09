@@ -21,6 +21,11 @@ const ONCE = { toggleActions: 'play none none none', once: true };
  *   data-animate="lines"    each .line-mask > * rises out of its mask, in turn
  *   data-animate="stagger"  children rise in one after another
  *   data-animate="in"       gets class .is-in once (CSS does the rest)
+ *
+ * Roots can nest (a page wrapper around a shared section like CtaBand):
+ * each root only animates elements whose nearest root is itself, so no
+ * element is ever animated twice — a second gsap.from() would start from
+ * the first one's hidden state and leave it invisible.
  */
 export default function useReveal() {
   const ref = useRef(null);
@@ -28,7 +33,9 @@ export default function useReveal() {
   useLayoutEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const all = (sel) => gsap.utils.toArray(root.querySelectorAll(sel));
+    root.setAttribute('data-reveal-root', '');
+    const all = (sel) =>
+      gsap.utils.toArray(root.querySelectorAll(sel)).filter((el) => el.closest('[data-reveal-root]') === root);
 
     if (prefersReducedMotion()) {
       all('[data-animate="in"]').forEach((el) => el.classList.add('is-in'));

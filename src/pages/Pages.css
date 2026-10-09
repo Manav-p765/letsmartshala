@@ -61,30 +61,10 @@
   transition: box-shadow var(--dur) var(--ease-out), translate var(--dur) var(--ease-out);
 }
 .card:hover { box-shadow: inset 0 0 0 1px rgb(var(--blue-rgb) / 0.2), var(--shadow-2); translate: 0 -3px; }
-.card h3, .feat-card h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; letter-spacing: -0.025em; }
+.card h3 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; letter-spacing: -0.025em; }
 .card > p { margin-top: 0.35rem; color: var(--fg-2); font-size: 0.93rem; }
 .block-title { font-size: var(--fs-title); }
 .block-title--center { text-align: center; }
-
-/* ---- Features ---- */
-.feat-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.45rem; margin-top: 0.5rem; }
-.feat-jump a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-pill);
-  background: var(--white);
-  box-shadow: inset 0 0 0 1px var(--line);
-  font-size: 0.85rem;
-  transition: box-shadow var(--dur), color var(--dur);
-}
-.feat-jump a:hover { color: var(--blue-2); box-shadow: inset 0 0 0 1px rgb(var(--blue-rgb) / 0.35); }
-.feat-jump .micon { width: 0.95rem; height: 0.95rem; color: var(--blue); }
-.feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-.feat-card { display: grid; grid-template-columns: 2.75rem 1fr; gap: 0 1rem; scroll-margin-top: calc(var(--nav-h) + 2rem); }
-.feat-card .icon-tile { grid-row: span 2; }
-.feat-card .checks { grid-column: 2; margin-top: 1rem; }
 
 /* ---- Solutions ---- */
 .role-block {
@@ -214,7 +194,7 @@
 .legal a { color: var(--blue-2); text-decoration: underline; text-underline-offset: 2px; }
 
 @media (max-width: 960px) {
-  .feat-grid, .about-beliefs, .sec-grid, .ty__steps { grid-template-columns: 1fr; }
+  .about-beliefs, .sec-grid, .ty__steps { grid-template-columns: 1fr; }
   .role-block, .price-grid, .contact-grid { grid-template-columns: 1fr; }
   .role-block:nth-child(even) .role-block__note { order: 0; }
 }

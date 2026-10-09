@@ -187,7 +187,7 @@ function PayrollScreen({ s }) {
   );
 }
 
-const screens = { fees: FeesScreen, attendance: AttendanceScreen, exams: ExamsScreen, students: StudentScreen, transport: TransportScreen, payroll: PayrollScreen };
+export const screens = { fees: FeesScreen, attendance: AttendanceScreen, exams: ExamsScreen, students: StudentScreen, transport: TransportScreen, payroll: PayrollScreen };
 
 export default function Tour() {
   const revealRef = useReveal();

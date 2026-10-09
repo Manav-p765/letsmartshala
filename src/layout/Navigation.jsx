@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import Brand from '../components/Brand/Brand.jsx';
-import { nav, site } from '../data/site.js';
+import { nav } from '../data/site.js';
 import { stopScroll, startScroll } from '../lib/smooth.js';
 import './Navigation.css';
 
@@ -85,11 +85,6 @@ export default function Navigation({ minimal = false }) {
         )}
 
         <div className="nav__pill nav__pill--actions">
-          {!minimal && (
-            <a className="nav__login" href={site.loginUrl}>
-              Log in
-            </a>
-          )}
           <Link className="btn btn--small" to="/demo">
             Book a demo
           </Link>
@@ -116,9 +111,6 @@ export default function Navigation({ minimal = false }) {
                 <NavLink to={item.to}>{item.label}</NavLink>
               </li>
             ))}
-            <li style={{ '--i': nav.length }}>
-              <a href={site.loginUrl}>Log in</a>
-            </li>
           </ul>
         </div>
       )}
