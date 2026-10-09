@@ -13,7 +13,9 @@ export default function Dummy({ children, note = 'Dummy' }) {
   );
 }
 
-/** Renders a site.js field: shows the "Dummy" tag only when the value is a placeholder. */
+/** Renders a site.js field — as a link when it has an href — with the
+ *  "Dummy" tag only when the value is still a placeholder. */
 export function Fact({ field }) {
-  return field.dummy ? <Dummy>{field.value}</Dummy> : field.value;
+  const text = field.href ? <a href={field.href}>{field.value}</a> : field.value;
+  return field.dummy ? <Dummy>{text}</Dummy> : text;
 }

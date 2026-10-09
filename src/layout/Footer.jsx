@@ -33,7 +33,6 @@ export default function Footer() {
           <ul>
             <li><Fact field={site.contact.phone} /></li>
             <li><Fact field={site.contact.email} /></li>
-            <li><Fact field={site.contact.address} /></li>
           </ul>
         </div>
 
@@ -48,7 +47,7 @@ export default function Footer() {
       </div>
 
       <div className="container footer__base">
-        <p>© {new Date().getFullYear()} SmartShala</p>
+        <p>© {new Date().getFullYear()} {site.legalName}. SmartShala is a product of {site.legalName}.</p>
         <p lang="hi" className="footer__hi">शाला — school</p>
       </div>
     </footer>
