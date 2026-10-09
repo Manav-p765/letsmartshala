@@ -19,6 +19,9 @@
   font-size: var(--fs-small);
   color: var(--fg-3);
 }
+@media (max-width: 600px) {
+  .footer__base { flex-direction: column; }
+}
 .footer__hi { font-family: 'Mukta', var(--font-sans); }
 @media (max-width: 860px) {
   .footer__grid { grid-template-columns: 1fr 1fr; }

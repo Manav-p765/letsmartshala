@@ -8,14 +8,15 @@ export const site = {
   tagline: 'School management CRM for Indian schools',
   legalName: 'Hybrid Monks LLP',
 
+  siteUrl: 'https://letssmartshala.com',
+
   // The CRM's current deployment. Swap for the production app domain once it exists.
   appUrl: 'https://campus-loom.vercel.app',
   loginUrl: 'https://campus-loom.vercel.app/login',
 
   contact: {
     phone: { value: '+91 78630 41196', href: 'tel:+917863041196' },
-    // Same number as phone until HR confirms it is on WhatsApp.
-    whatsapp: { value: '+91 78630 41196', href: 'https://wa.me/917863041196', dummy: true },
+    whatsapp: { value: '+91 78630 41196', href: 'https://wa.me/917863041196' },
     email: { value: 'support@letssmartshala.com', href: 'mailto:support@letssmartshala.com' }
   },
 

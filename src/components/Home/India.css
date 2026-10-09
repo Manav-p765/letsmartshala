@@ -1,0 +1,40 @@
+.india { overflow: clip; }
+.india__head { display: grid; justify-items: center; gap: 1.25rem; text-align: center; max-width: 52rem; }
+.india__eyebrow { color: var(--hi); }
+.india__title { font-size: var(--fs-h2); text-wrap: balance; }
+
+.marquee {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: clamp(2.5rem, 7vh, 4.5rem);
+  -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee__row { display: flex; width: max-content; }
+.marquee__track { display: flex; gap: 0.9rem; padding-right: 0.9rem; }
+.marquee__track li {
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.9rem + 0.6vw, 1.5rem);
+  font-weight: 550;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.marquee__row--rev .marquee__track li { background: var(--mist); color: var(--navy); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee__row { animation: marquee 48s linear infinite; }
+  .marquee__row--rev { animation-direction: reverse; animation-duration: 56s; }
+  .marquee:hover .marquee__row { animation-play-state: paused; }
+}
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee { -webkit-mask: none; mask: none; padding-inline: var(--pad-x); }
+  .marquee__row { width: auto; justify-content: center; }
+  .marquee__track { flex-wrap: wrap; justify-content: center; }
+  .marquee__track[aria-hidden] { display: none; }
+}

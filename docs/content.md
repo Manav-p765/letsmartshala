@@ -35,7 +35,6 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 
 | Where | Field | Source file |
 |---|---|---|
-| Contact links | WhatsApp: same number as phone, not yet confirmed to be on WhatsApp | `src/data/site.js` |
 | Hero day cards | Names/numbers ("38 of 41", "₹1,84,500") | `src/data/dayArc.js` — labelled "Sample data" in the UI, which is honest as-is |
 
 ## Open questions
@@ -43,8 +42,8 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 1. ~~Phone, email~~ — confirmed: +91 78630 41196, support@letssmartshala.com. Address: none shown (HR: skip).
 2. ~~Legal entity~~ — Hybrid Monks LLP. Registered address still unknown (privacy/terms pages may need it for a grievance contact).
 3. ~~Leads inbox~~ — support@letssmartshala.com.
-3a. Is +91 78630 41196 on WhatsApp? (WhatsApp button stays tagged Dummy until confirmed.)
-3b. Is letssmartshala.com the site's domain? Who manages its DNS (needed to send lead emails from it)?
+3a. ~~WhatsApp~~ — yes, +91 78630 41196 takes calls and WhatsApp.
+3b. ~~Domain~~ — letssmartshala.com, shared with the CRM. Open: which part goes where (site at the root, CRM at app.? ), and who can add DNS records for lead email.
 4. Analytics IDs: GA4 measurement ID, Google Ads conversion ID/label, Meta Pixel ID.
 5. Pricing — "will give later".
 6. Production domain for the site and for the app login (currently `campus-loom.vercel.app/login`).
