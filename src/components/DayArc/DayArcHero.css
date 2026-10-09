@@ -326,3 +326,15 @@
 @media (max-width: 560px) {
   .hero__eyebrow-more { display: none; }
 }
+
+/* Touch screens can't hover to bring a card forward, so show them at full strength. */
+@media (hover: none) {
+  .day-card__body > * { opacity: 1; filter: none; }
+  .day-card__body { background: var(--white); }
+}
+
+/* Tablets in portrait: centre the stacked hero instead of leaving a tall
+   empty band under it. */
+@media (min-width: 600px) and (max-width: 900px) {
+  .hero__stage.is-narrow { justify-content: center; padding-top: calc(var(--nav-h) + 2rem); }
+}

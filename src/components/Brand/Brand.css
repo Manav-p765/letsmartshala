@@ -2,23 +2,30 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  color: var(--fg);
+  color: var(--ink);
+  white-space: nowrap;
 }
+/* flex: none — the mark must never be squeezed by a narrow nav. */
 .brand__mark {
-  width: 1.45rem;
-  height: 1.65rem;
-  color: var(--blue);
+  flex: none;
+  width: 2.15rem;
+  height: 2.15rem;
   transition: transform var(--dur) var(--ease-spring);
 }
-.brand:hover .brand__mark { transform: rotate(-8deg); }
+.brand:hover .brand__mark { transform: rotate(-6deg); }
 .brand__word {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   letter-spacing: -0.035em;
   line-height: 1;
 }
-/* "Shala" is the logo blue on every theme — it is the mark, not an accent. */
-.brand__word-2 { color: var(--blue); }
-.brand--lg .brand__mark { width: 2rem; height: 2.3rem; }
-.brand--lg .brand__word { font-size: 1.75rem; }
+/* The official wordmark is a single colour. */
+.brand__word-2 { color: inherit; }
+.brand--lg .brand__mark { width: 2.75rem; height: 2.75rem; }
+.brand--lg .brand__word { font-size: 1.7rem; }
+@media (max-width: 400px) {
+  .brand { gap: 0.45rem; }
+  .brand__mark { width: 1.9rem; height: 1.9rem; }
+  .brand__word { font-size: 1.15rem; }
+}

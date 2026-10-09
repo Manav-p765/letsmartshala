@@ -67,7 +67,8 @@
 .fx-win__main { height: 23rem; }
 
 /* ---- Extra screens (timetable, homework, announcements, reports) ---- */
-.xs-tt { display: grid; grid-template-columns: 2rem repeat(5, 1fr); gap: 0.3rem; font-size: 0.74rem; }
+.xs-tt { display: grid; grid-template-columns: 2rem repeat(5, minmax(0, 1fr)); gap: 0.3rem; font-size: 0.74rem; }
+.xs-tt__row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .xs-tt > b { text-align: center; font-weight: 600; color: var(--fg-3); padding-bottom: 0.2rem; }
 .xs-tt__row { display: contents; }
 .xs-tt__row i { font-style: normal; font-family: var(--font-mono); color: var(--fg-3); align-self: center; }
@@ -116,5 +117,8 @@
   .fx-row__checks { grid-template-columns: 1fr; }
   .fx-win .scr__kpis { grid-template-columns: 1fr 1fr; }
   .fx-win .scr__kpi:nth-child(3) { display: none; }
+  .xs-tt { grid-template-columns: 1.4rem repeat(5, minmax(0, 1fr)); gap: 0.2rem; font-size: 0.64rem; }
+  .xs-tt__row span { padding: 0.45rem 0.1rem; }
+  .xs-rp__bars { gap: 0.3rem; }
   .fx-win__main { height: 21rem; }
 }

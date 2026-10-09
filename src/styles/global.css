@@ -193,3 +193,9 @@ body {
 /* Module icons default to text size, so an icon can never render huge
    while a component stylesheet is still loading. */
 .micon { width: 1.25em; height: 1.25em; flex: none; }
+
+/* Layout grids: let columns shrink below their content's natural width, so
+   a sideways-scrolling chip row or a long email address can't push a
+   column (and the page) wider than the screen. */
+:where([class*='__grid'], [class*='-grid'], .container) > * { min-width: 0; }
+:where(a[href^='mailto:'], .contact-cards strong) { overflow-wrap: anywhere; }

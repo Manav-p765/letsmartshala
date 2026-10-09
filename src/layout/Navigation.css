@@ -31,7 +31,22 @@
   background: rgba(255, 255, 255, 0.88);
   box-shadow: inset 0 0 0 1px var(--line), var(--shadow-2);
 }
-.nav__pill--brand { padding-inline: 0.75rem 1.1rem; }
+/* The logo stands free (no pill) at the top of the page; once the page
+   scrolls under it, a soft frosted backing keeps it readable. */
+.nav__pill--brand {
+  padding-inline: 0.25rem 0.9rem;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.nav.is-scrolled .nav__pill--brand {
+  padding-inline: 0.6rem 1rem;
+  background: rgb(var(--white-rgb) / 0.82);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
 
 /* Over dark sections: dark glass, light text. */
 .nav.is-dark .nav__pill {
@@ -40,7 +55,6 @@
 }
 .nav.is-dark.is-scrolled .nav__pill { background: rgba(10, 20, 50, 0.7); }
 .nav.is-dark .brand { color: #fff; }
-.nav.is-dark .brand__word-2 { color: #8FB0FF; }
 .nav.is-dark .nav__link, .nav.is-dark .nav__login { color: rgba(242, 245, 255, 0.75); }
 .nav.is-dark .nav__link:hover, .nav.is-dark .nav__login:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
 .nav.is-dark .nav__link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
@@ -121,6 +135,14 @@
   .nav__burger { display: block; }
 }
 @media (max-width: 420px) {
-  .nav__pill--brand { padding-inline: 0.5rem 0.8rem; }
-  .nav__pill--actions .btn { padding-inline: 0.9rem; }
+  .nav__bar { gap: 0.4rem; }
+  .nav__pill { height: 3.1rem; }
+  .nav__pill--brand { padding-inline: 0 0.5rem; }
+  .nav.is-scrolled .nav__pill--brand { padding-inline: 0.5rem 0.7rem; }
+  .nav__pill--actions { padding-inline: 0.3rem; gap: 0.2rem; }
+  .nav__pill--actions .btn { height: 2.35rem; padding-inline: 0.85rem; font-size: 0.85rem; }
+  .nav__burger { width: 2.35rem; height: 2.35rem; }
+}
+@media (max-width: 350px) {
+  .nav__pill--actions .btn { display: none; }
 }

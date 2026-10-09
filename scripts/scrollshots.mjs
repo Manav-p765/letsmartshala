@@ -6,7 +6,8 @@ const [route = '/', w = 1536, h = 760, step = 760] = process.argv.slice(2).map((
 const base = process.env.BASE_URL || 'http://localhost:5180';
 const slug = route === '/' ? 'home' : route.slice(1).replace(/\W+/g, '-');
 const b = await chromium.launch();
-const p = await b.newPage({ viewport: { width: w, height: h } });
+const phone = w < 700;
+const p = await b.newPage({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone });
 const errs = [];
 p.on('pageerror', (e) => errs.push(e.message));
 await p.goto(base + route, { waitUntil: 'networkidle' });
@@ -16,7 +17,8 @@ const total = await p.evaluate(() => document.documentElement.scrollHeight);
 let n = 0;
 for (let y = 0; y < total; y += step) {
   await p.screenshot({ path: `shots/scroll-${slug}-${String(n++).padStart(2, '0')}.png` });
-  for (let k = 0; k < step; k += 190) { await p.mouse.wheel(0, 190); await p.waitForTimeout(60); }
+  if (phone) await p.evaluate((d) => window.scrollBy(0, d), step);
+  else for (let k = 0; k < step; k += 190) { await p.mouse.wheel(0, 190); await p.waitForTimeout(60); }
   await p.waitForTimeout(1500);
 }
 const hidden = await p.evaluate(() => [...document.querySelectorAll('[data-animate]')].filter((el) => getComputedStyle(el).opacity === '0' || getComputedStyle(el).visibility === 'hidden').length);

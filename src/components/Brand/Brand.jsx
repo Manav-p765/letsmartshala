@@ -25,11 +25,14 @@ export function Mark({ className = 'brand__mark', tile = false }) {
   );
 }
 
-/** Mark plus the wordmark set in the display face. */
+/**
+ * The official logo (docs/logo/logo.png): white SS on the rounded blue
+ * tile, with the wordmark in one ink colour beside it.
+ */
 export default function Brand({ to = '/', size = 'md' }) {
   return (
     <Link to={to} className={`brand brand--${size}`} aria-label="SmartShala home">
-      <Mark />
+      <Mark tile />
       <span className="brand__word">
         Smart<span className="brand__word-2">Shala</span>
       </span>

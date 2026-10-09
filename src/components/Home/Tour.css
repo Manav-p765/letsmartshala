@@ -242,3 +242,10 @@
 @media (prefers-reduced-motion: reduce) { .tour__timer { display: none; } }
 /* When the scroll drives the tour there is no countdown to show. */
 .is-scrubbed .tour__timer { display: none; }
+
+/* Phones: two number boxes, not three, so nothing runs off the window. */
+@media (max-width: 560px) {
+  .scr__kpis { grid-template-columns: 1fr 1fr; }
+  .scr__kpi:nth-child(3) { display: none; }
+  .scr__kpi strong { font-size: 1.05rem; }
+}
