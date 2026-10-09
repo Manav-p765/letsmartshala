@@ -139,6 +139,9 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
       main). Every route is a real file (`dist/<route>/index.html` + `404.html`),
       with no rewrites. Prerendering is skipped on Vercel (no Chromium); run
       `npm run build` locally for the full static HTML.
+- [x] Official logo (docs/logo): white SS on the blue tile, single-colour
+      wordmark, no pill around it in the nav. Responsive pass at 320–1920px;
+      `node scripts/overflow.mjs <width>` must report "ok" for every route.
 - [ ] Set `RESEND_API_KEY` in Vercel: until then the live form shows the
       call/WhatsApp fallback. Then add the domain and DNS (`docs/deploy.md`).
 - [ ] Legal review of the privacy, terms and refund drafts; fill in the
