@@ -7,11 +7,10 @@
  * The names and numbers are SAMPLE DATA — the hero labels them as such.
  *
  * `time` is 24h "HH:MM" and must sit inside DAY_START..DAY_END.
- * Layout rule: on desktop the cards ride the arc around the headline, so
- * times must avoid the arc's flanks beside it. Keep each time either
- * before 08:15 / after 15:45 (low on the arc, beside the buttons) or
- * between 09:45 and 14:15 (over the top, above the headline).
- * `tone` picks the CRM status colour for the card's chip.
+ * Layout: on desktop the cards ride the arc around the headline. A card
+ * whose spot would cover the headline is nudged outward (arcGeometry.js);
+ * one that still can't fit is left off the arc, so keep times spread out.
+ * `tone` picks the CRM status colour for the card's chip; `icon` is a ModuleIcon name.
  */
 export const DAY_START = '07:30';
 export const DAY_END = '16:30';
@@ -24,33 +23,39 @@ export const roles = [
     id: 'principal',
     label: 'Principal',
     events: [
-      { time: '07:50', title: 'Staff in today', value: '38 of 41', chip: 'Live', tone: 'ok' },
-      { time: '10:10', title: 'Attendance marked', value: '24 / 24 classes', chip: 'Done', tone: 'ok' },
-      { time: '12:05', title: 'Fees collected today', value: '₹1,84,500', chip: '+12 payments', tone: 'info' },
-      { time: '13:50', title: 'Leave requests', value: '3 waiting', chip: 'Approve', tone: 'warn' },
-      { time: '16:05', title: 'Daily report', value: 'Ready to read', chip: 'PDF', tone: 'info' }
+      { time: '07:50', icon: 'staff', title: 'Staff in today', value: '38 of 41', chip: 'Live', tone: 'ok' },
+      { time: '08:40', icon: 'students', title: 'New admission', value: 'Aarav S. · 7-B', chip: 'Added', tone: 'info' },
+      { time: '10:10', icon: 'attendance', title: 'Attendance marked', value: '24 / 24 classes', chip: 'Done', tone: 'ok' },
+      { time: '12:05', icon: 'fees', title: 'Fees collected today', value: '₹1,84,500', chip: '+12 payments', tone: 'info' },
+      { time: '13:50', icon: 'leave', title: 'Leave requests', value: '3 waiting', chip: 'Approve', tone: 'warn' },
+      { time: '15:10', icon: 'announcements', title: 'Announcement', value: 'PTM on Saturday', chip: 'Sent', tone: 'ok' },
+      { time: '16:05', icon: 'reports', title: 'Daily report', value: 'Ready to read', chip: 'PDF', tone: 'info' }
     ]
   },
   {
     id: 'teacher',
     label: 'Teacher',
     events: [
-      { time: '07:45', title: 'Punched in', value: 'Shift 07:45 – 14:30', chip: 'On time', tone: 'ok' },
-      { time: '09:50', title: 'Class 7-B attendance', value: '38 present · 2 absent', chip: 'Saved', tone: 'ok' },
-      { time: '12:00', title: 'Homework set', value: 'Science · due Friday', chip: '7-B', tone: 'info' },
-      { time: '14:00', title: 'Unit Test 2 marks', value: 'Mathematics · 40 students', chip: 'Entered', tone: 'ok' },
-      { time: '15:55', title: 'Leave request', value: 'Sat, 18 Oct', chip: 'Approved', tone: 'ok' }
+      { time: '07:45', icon: 'timetable', title: 'Punched in', value: 'Shift 07:45 – 14:30', chip: 'On time', tone: 'ok' },
+      { time: '08:35', icon: 'timetable', title: 'Today’s timetable', value: '5 periods · 2 free', chip: 'P1 7-B', tone: 'info' },
+      { time: '09:50', icon: 'attendance', title: 'Class 7-B attendance', value: '38 present · 2 absent', chip: 'Saved', tone: 'ok' },
+      { time: '12:00', icon: 'homework', title: 'Homework set', value: 'Science · due Friday', chip: '7-B', tone: 'info' },
+      { time: '14:00', icon: 'exams', title: 'Unit Test 2 marks', value: 'Mathematics · 40 students', chip: 'Entered', tone: 'ok' },
+      { time: '15:05', icon: 'payroll', title: 'Salary slip', value: 'October · ready', chip: 'View', tone: 'info' },
+      { time: '15:55', icon: 'leave', title: 'Leave request', value: 'Sat, 18 Oct', chip: 'Approved', tone: 'ok' }
     ]
   },
   {
     id: 'accountant',
     label: 'Accountant',
     events: [
-      { time: '08:05', title: 'Payment recorded', value: '₹12,500 · UPI', chip: 'Term 2', tone: 'ok' },
-      { time: '10:20', title: 'Receipt R-2041', value: 'PDF generated', chip: 'Ready', tone: 'info' },
-      { time: '12:10', title: 'Defaulters list', value: '23 students', chip: 'Review', tone: 'warn' },
-      { time: '14:10', title: 'Transport fee', value: 'Route 4 added', chip: 'Adjusted', tone: 'info' },
-      { time: '16:15', title: 'Collected today', value: '₹1,84,500', chip: 'Closed', tone: 'ok' }
+      { time: '08:05', icon: 'fees', title: 'Payment recorded', value: '₹12,500 · UPI', chip: 'Term 2', tone: 'ok' },
+      { time: '08:50', icon: 'fees', title: 'Cheque recorded', value: '₹8,000 · Class 4-A', chip: 'Cheque', tone: 'info' },
+      { time: '10:20', icon: 'receipt', title: 'Receipt R-2041', value: 'PDF generated', chip: 'Ready', tone: 'info' },
+      { time: '12:10', icon: 'students', title: 'Defaulters list', value: '23 students', chip: 'Review', tone: 'warn' },
+      { time: '14:10', icon: 'transport', title: 'Transport fee', value: 'Route 4 added', chip: 'Adjusted', tone: 'info' },
+      { time: '15:15', icon: 'payroll', title: 'Payroll run', value: '41 staff · October', chip: 'Done', tone: 'ok' },
+      { time: '16:15', icon: 'fees', title: 'Collected today', value: '₹1,84,500', chip: 'Closed', tone: 'ok' }
     ]
   }
 ];

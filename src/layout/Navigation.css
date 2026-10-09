@@ -33,6 +33,20 @@
 }
 .nav__pill--brand { padding-inline: 0.75rem 1.1rem; }
 
+/* Over dark sections: dark glass, light text. */
+.nav.is-dark .nav__pill {
+  background: rgba(10, 20, 50, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+.nav.is-dark.is-scrolled .nav__pill { background: rgba(10, 20, 50, 0.7); }
+.nav.is-dark .brand { color: #fff; }
+.nav.is-dark .brand__word-2 { color: #8FB0FF; }
+.nav.is-dark .nav__link, .nav.is-dark .nav__login { color: rgba(242, 245, 255, 0.75); }
+.nav.is-dark .nav__link:hover, .nav.is-dark .nav__login:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.nav.is-dark .nav__link.active { color: #fff; background: rgba(255, 255, 255, 0.12); }
+.nav.is-dark .nav__burger { background: rgba(255, 255, 255, 0.1); }
+.nav.is-dark .nav__burger span { background: #fff; }
+
 .nav__pill--links ul { display: flex; gap: 0.125rem; }
 .nav__link {
   display: block;

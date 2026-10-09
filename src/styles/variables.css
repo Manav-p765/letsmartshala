@@ -104,6 +104,17 @@
   --hi: #8FB0FF;
   --chip: rgba(255, 255, 255, 0.08);
 }
+/* The hero's night: deeper than navy, so the glowing arc can carry it. */
+[data-theme='night'] {
+  --surface: #071433;
+  --card: rgba(255, 255, 255, 0.06);
+  --fg: #F2F5FF;
+  --fg-2: rgba(242, 245, 255, 0.72);
+  --fg-3: rgba(242, 245, 255, 0.46);
+  --line: rgba(255, 255, 255, 0.12);
+  --hi: #8FB0FF;
+  --chip: rgba(255, 255, 255, 0.08);
+}
 [data-theme='blue'] {
   --surface: var(--blue);
   --card: rgba(255, 255, 255, 0.1);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import Brand from '../components/Brand/Brand.jsx';
 import { nav, site } from '../data/site.js';
@@ -13,14 +13,37 @@ import './Navigation.css';
 export default function Navigation({ minimal = false }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [onDark, setOnDark] = useState(false);
+  const headerRef = useRef(null);
   const { pathname } = useLocation();
 
+  // Read which section sits under the bar (its data-theme) so the pills
+  // switch to dark glass over dark sections. One check per frame at most.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    onScroll();
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      setScrolled(window.scrollY > 12);
+      const y = (headerRef.current?.getBoundingClientRect().bottom || 80) - 20;
+      const under = document
+        .elementsFromPoint(window.innerWidth / 2, y)
+        .find((el) => !headerRef.current?.contains(el))
+        ?.closest('[data-theme]');
+      setOnDark(['night', 'navy', 'blue'].includes(under?.dataset.theme));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(check); };
+    check();
+    // Sections mount and restyle after the first frame; look again shortly.
+    const late = setTimeout(check, 400);
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(late);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [pathname]);
 
   // Close the menu on navigation.
   useEffect(() => setOpen(false), [pathname]);
@@ -37,7 +60,11 @@ export default function Navigation({ minimal = false }) {
   }, [open]);
 
   return (
-    <header className={`nav${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}`} data-theme="paper">
+    <header
+      ref={headerRef}
+      className={`nav${scrolled ? ' is-scrolled' : ''}${open ? ' is-open' : ''}${onDark && !open ? ' is-dark' : ''}`}
+      data-theme="paper"
+    >
       <div className="nav__bar container">
         <div className="nav__pill nav__pill--brand">
           <Brand />

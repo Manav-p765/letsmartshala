@@ -3,11 +3,13 @@ import MiniArc from '../ui/MiniArc.jsx';
 import { desks } from '../../data/home.js';
 import { clockAt, dayFraction } from '../../data/dayArc.js';
 import './Desks.css';
+import useReveal from '../../hooks/useReveal.js';
 
 /** Four roles, each pinned to the moment of the day they're busiest. */
 export default function Desks() {
+  const revealRef = useReveal();
   return (
-    <section className="section desks" data-theme="white" aria-labelledby="desks-title">
+    <section ref={revealRef} className="section desks" data-theme="paper" aria-labelledby="desks-title">
       <div className="container">
         <SectionHead id="desks-title" eyebrow={desks.eyebrow} title={desks.title} lede={desks.lede} />
         <ol className="desks__grid" data-animate="stagger">

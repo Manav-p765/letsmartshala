@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { site } from '../../data/site.js';
 import './CtaBand.css';
+import useReveal from '../../hooks/useReveal.js';
 
 /** The closing ask, on the logo's blue, with the arc rising behind it. */
 export default function CtaBand() {
+  const revealRef = useReveal();
   return (
-    <section className="section cta" data-theme="blue" aria-labelledby="cta-title">
+    <section ref={revealRef} className="section cta" data-theme="blue" aria-labelledby="cta-title">
       <svg className="cta__arc" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
         <path d="M 40 500 A 460 440 0 0 1 960 500" />
       </svg>

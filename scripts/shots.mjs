@@ -11,6 +11,7 @@ const slug = route === '/' ? 'home' : route.replace(/\W+/g, '-').replace(/^-|-$/
 mkdirSync('shots', { recursive: true });
 
 const views = [
+  { name: 'wide', viewport: { width: 1920, height: 940 } },
   { name: 'desktop', viewport: { width: 1440, height: 900 } },
   { name: 'laptop', viewport: { width: 1280, height: 720 } },
   { name: 'phone', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }

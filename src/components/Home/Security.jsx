@@ -1,6 +1,7 @@
 import SectionHead from '../ui/SectionHead.jsx';
 import { security } from '../../data/home.js';
 import './Security.css';
+import useReveal from '../../hooks/useReveal.js';
 
 const icons = [
   // separate databases: three stacked cylinders, one highlighted
@@ -12,8 +13,9 @@ const icons = [
 ];
 
 export default function Security() {
+  const revealRef = useReveal();
   return (
-    <section className="section security" data-theme="paper" aria-labelledby="security-title">
+    <section ref={revealRef} className="section security" data-theme="navy" aria-labelledby="security-title">
       <div className="container security__grid">
         <SectionHead id="security-title" eyebrow={security.eyebrow} title={security.title} lede={security.lede} />
         <ul className="security__points" data-animate="stagger">

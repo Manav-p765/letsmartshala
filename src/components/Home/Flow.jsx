@@ -5,6 +5,7 @@ import SectionHead from '../ui/SectionHead.jsx';
 import { flow } from '../../data/home.js';
 import { prefersReducedMotion } from '../../lib/motion.js';
 import './Flow.css';
+import useReveal from '../../hooks/useReveal.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -15,6 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
  * step lights up as the line reaches it.
  */
 export default function Flow() {
+  const revealRef = useReveal();
   const listRef = useRef(null);
   const lineRef = useRef(null);
 
@@ -45,7 +47,7 @@ export default function Flow() {
   }, []);
 
   return (
-    <section className="section flow" data-theme="navy" aria-labelledby="flow-title">
+    <section ref={revealRef} className="section flow" data-theme="white" aria-labelledby="flow-title">
       <div className="container flow__grid">
         <div className="flow__head">
           <SectionHead id="flow-title" eyebrow={flow.eyebrow} title={flow.title} lede={flow.lede} />

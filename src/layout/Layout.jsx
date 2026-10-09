@@ -5,7 +5,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './Navigation.jsx';
 import Footer from './Footer.jsx';
-import useScrollAnimations from '../hooks/useScrollAnimations.js';
 import { setLenis, scrollToTop } from '../lib/smooth.js';
 import { prefersReducedMotion } from '../lib/motion.js';
 
@@ -34,7 +33,6 @@ export default function Layout({ minimal = false }) {
   }, []);
 
   useEffect(() => scrollToTop(), [pathname]);
-  useScrollAnimations(pathname);
 
   return (
     <>

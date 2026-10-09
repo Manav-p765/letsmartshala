@@ -157,11 +157,6 @@ body {
 }
 .skip-link:focus { transform: none; }
 
-/* Elements that animate in start hidden only when JS motion will run;
-   reduced motion (or no JS) shows everything at rest. */
-@media (prefers-reduced-motion: no-preference) {
-  .js [data-animate] { opacity: 0; }
-}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -169,3 +164,7 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Module icons default to text size, so an icon can never render huge
+   while a component stylesheet is still loading. */
+.micon { width: 1.25em; height: 1.25em; flex: none; }

@@ -1,24 +1,24 @@
 import DayArcHero from '../components/DayArc/DayArcHero.jsx';
 import Desks from '../components/Home/Desks.jsx';
+import Stream from '../components/Home/Stream.jsx';
 import Modules from '../components/Home/Modules.jsx';
 import Flow from '../components/Home/Flow.jsx';
 import India from '../components/Home/India.jsx';
 import Security from '../components/Home/Security.jsx';
-import Apps from '../components/Home/Apps.jsx';
 import Faq from '../components/Home/Faq.jsx';
 import CtaBand from '../components/Home/CtaBand.jsx';
 
-/** Rhythm: paper → white → mist → navy → white → paper → mist → white → blue → navy footer. */
+/** Rhythm: night → paper → night → mist → white → paper → navy → white → blue → navy footer. */
 export default function HomePage() {
   return (
     <>
       <DayArcHero />
       <Desks />
+      <Stream />
       <Modules />
       <Flow />
       <India />
       <Security />
-      <Apps />
       <Faq />
       <CtaBand />
     </>

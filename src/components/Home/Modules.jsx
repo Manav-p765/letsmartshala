@@ -1,6 +1,7 @@
 import SectionHead from '../ui/SectionHead.jsx';
 import { modules } from '../../data/home.js';
 import './Modules.css';
+import useReveal from '../../hooks/useReveal.js';
 
 /**
  * Bento of the six biggest modules. Each tile carries a small, honest
@@ -66,8 +67,9 @@ const visuals = {
 };
 
 export default function Modules() {
+  const revealRef = useReveal();
   return (
-    <section className="section modules" data-theme="mist" aria-labelledby="modules-title">
+    <section ref={revealRef} className="section modules" data-theme="mist" aria-labelledby="modules-title">
       <div className="container">
         <SectionHead id="modules-title" eyebrow={modules.eyebrow} title={modules.title} lede={modules.lede} />
         <div className="bento" data-animate="stagger">

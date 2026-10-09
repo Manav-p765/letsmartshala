@@ -35,7 +35,7 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 
 | Where | Field | Source file |
 |---|---|---|
-| Hero day cards | Names/numbers ("38 of 41", "₹1,84,500") | `src/data/dayArc.js` — labelled "Sample data" in the UI, which is honest as-is |
+| Hero day cards, stream phone, module previews | Names/numbers ("38 of 41", "₹1,84,500") | `src/data/dayArc.js`, `src/data/stream.js`, `Modules.jsx` — illustrative UI. Per owner's call (2026-10-09) the hero and stream carry no on-page "sample data" line; module previews still do. Never reuse these figures as claims. |
 
 ## Open questions
 
