@@ -3,8 +3,7 @@
 // and slow connections get real content and the right <title>/meta per page.
 // The app still boots normally on top (createRoot replaces the markup).
 //
-// Also writes dist/app.html (the plain SPA shell; vercel.json rewrites
-// unknown URLs to /app, since cleanUrls serves app.html there),
+// Also writes dist/app.html and dist/404.html (the plain SPA shell),
 // dist/sitemap.xml and dist/robots.txt.
 //
 // Pages are captured with reduced motion, so no element is saved mid-entrance
@@ -24,6 +23,17 @@ const ROUTES = [
 ];
 
 copyFileSync('dist/index.html', 'dist/app.html');
+
+// Every route gets a real file first — the plain SPA shell — so the host
+// serves /demo, /features… directly with no rewrite rules. 404.html is the
+// shell too: the app renders its own not-found page. If the browser step
+// below runs, it overwrites these with fully rendered HTML.
+for (const [route] of ROUTES) {
+  if (route === '/') continue;
+  mkdirSync(`dist${route}`, { recursive: true });
+  copyFileSync('dist/app.html', `dist${route}/index.html`);
+}
+copyFileSync('dist/app.html', 'dist/404.html');
 
 // Written first, so they ship even if the browser step below is skipped.
 const today = new Date().toISOString().slice(0, 10);
