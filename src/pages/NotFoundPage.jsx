@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import usePageMeta from '../hooks/usePageMeta.js';
 import './NotFoundPage.css';
 
 export default function NotFoundPage() {
+  usePageMeta({ title: 'Page not found', description: 'This page doesn’t exist.', path: '/404', noindex: true });
   return (
     <section className="section notfound" data-theme="paper">
       <div className="ruled" aria-hidden="true" />

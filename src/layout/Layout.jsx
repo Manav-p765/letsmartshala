@@ -7,6 +7,8 @@ import Navigation from './Navigation.jsx';
 import Footer from './Footer.jsx';
 import { setLenis, scrollToTop } from '../lib/smooth.js';
 import { prefersReducedMotion } from '../lib/motion.js';
+import { initTracking, trackPageView } from '../lib/track.js';
+import { lazyPages } from '../routes.js';
 
 /**
  * Page chrome. `minimal` is for the ad landing page and thank-you page:
@@ -33,6 +35,21 @@ export default function Layout({ minimal = false }) {
   }, []);
 
   useEffect(() => scrollToTop(), [pathname]);
+
+  // Analytics (only if IDs are configured) and one page view per route.
+  useEffect(() => { initTracking(); }, []);
+  useEffect(() => {
+    // After the route's title has been set by usePageMeta.
+    const t = setTimeout(() => trackPageView(pathname), 0);
+    return () => clearTimeout(t);
+  }, [pathname]);
+
+  // Once the page is idle, fetch the other routes' code so clicks are instant.
+  useEffect(() => {
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
+    const id = idle(() => Object.values(lazyPages).forEach((load) => load().catch(() => {})));
+    return () => (window.cancelIdleCallback || clearTimeout)(id);
+  }, []);
 
   return (
     <>

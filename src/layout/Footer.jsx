@@ -5,6 +5,7 @@ import { nav, site } from '../data/site.js';
 import './Footer.css';
 
 const legal = [
+  { label: 'Security & data', to: '/security' },
   { label: 'Privacy policy', to: '/privacy' },
   { label: 'Terms of use', to: '/terms' },
   { label: 'Refund policy', to: '/refunds' }
