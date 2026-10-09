@@ -49,3 +49,10 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 6. Production domain for the site and for the app login (currently `campus-loom.vercel.app/login`).
 7. Real customers / testimonials / school logos we're allowed to show (none yet → section held back).
 8. Every "Ask owner" row in the table above.
+
+## Added 2026-10-09 (inner pages)
+
+- Pricing page shows no prices or plan names; it explains what a quote depends on (students, staff, modules) and collects a quote request.
+- Legal pages (privacy, terms, refunds) are **drafts**: shown with a "pending legal review" banner, `noindex`, with [bracketed] gaps for the registered address, grievance officer, liability and refund terms.
+- Security page states only what the code shows (per-school database, server-checked roles, activity logs, token/cookie sign-in, Razorpay, export/deletion on request). Hosting region, backup schedule and certifications are not claimed; the page invites questions.
+- Demo form roles: Principal, Owner / Trustee, Administrator, Accountant, Teacher, Other. Email is optional; an Indian mobile number is required.

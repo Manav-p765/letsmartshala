@@ -115,31 +115,41 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
       `translate` so it no longer fights GSAP; added count-ups, import
       counter and done state, roll-call row highlight and tally, and a
       receipt PDF chip
-- [ ] Commit: branch `palette-ivory` holds this session's Flow/Tour work
-      mixed with another session's palette and contour/background changes
-      (in the same CSS files). Commit them together once that work settles.
-- [ ] Background pattern: the owner wants the topographic contours replaced
-      with subtle, minimal school references (being done in the palette
-      session)
-- [ ] `/demo` landing page: form in the hero (name, school name, role,
-      phone, email)
-- [ ] Form backend: email each lead to support@letssmartshala.com (Vercel
-      function; needs DNS access on letssmartshala.com for sending)
-- [ ] `/thank-you` page with GA4, Google Ads and Meta conversion events
-      (IDs pending)
-- [ ] Pages: features, solutions, pricing ("talk to us"), about, contact,
-      security, legal (privacy, terms, refunds; Hybrid Monks LLP)
-- [ ] Pre-render pages, OG/share images, deploy to Vercel at
-      letssmartshala.com
+- [x] Commit the palette-ivory work (Desks, Tour, Flow, palette): `45299ea`, `48bfefd`
+- [x] Background pattern: subtle school sketches (`public/school-lines.svg`, `.linework`)
+- [x] `/demo` landing page: the form in the hero, minimal nav (`src/pages/DemoPage.jsx`)
+- [x] Form backend: `api/lead.js` (Vercel function, Resend over plain
+      fetch). It validates, filters bots and keeps UTM/gclid tags. In dev it
+      is mounted by `vite.config.js` and logs leads to the terminal.
+- [x] `/thank-you`: GA4, Google Ads and Meta conversions, fired once per
+      real submission (`src/lib/track.js`); every tag is opt-in through
+      `VITE_*` env vars
+- [x] Pages: features, solutions, pricing (quote form, no prices), about,
+      contact, security; draft privacy, terms and refunds (`src/data/legal.js`,
+      flagged as drafts and not indexed)
+- [x] Pre-render every route (`scripts/prerender.mjs`), sitemap, robots,
+      share image (`npm run og`), `vercel.json`
+- [ ] **Deploy**: the Vercel CLI here is logged out. Follow `docs/deploy.md`
+      (login, env vars, domain and DNS, Resend domain verification)
+- [ ] Legal review of the privacy, terms and refund drafts; fill in the
+      [bracketed] parts
 - Waiting on the owner:
-  - the domain split
-  - DNS access
+  - the domain split (site at the root, CRM at app.?)
+  - DNS access (Vercel and Resend records)
+  - a Resend account/API key
   - analytics IDs
-  - answers on WhatsApp messaging, Hindi, app stores and boards
   - pricing
-  - git user name (commits use "Kartik")
+  - registered address and grievance officer (privacy policy)
+  - refund terms
+  - answers on WhatsApp messaging, Hindi, app stores and boards
+
+Commits use `manav <manavparihar2000@gmail.com>` (owner's instruction, in memory).
 
 ## Checking tools
+
+- `node scripts/formcheck.mjs`: demo form end to end (validation, submit, thank-you, conversion flag).
+- `node scripts/pages.mjs 1536 760`: screenshot and error check for every inner route.
+- `npm run build`: Vite plus pre-render; see `docs/deploy.md`.
 
 - `node scripts/sections.mjs 1536 700`: one screenshot per section, plus its
   height. The owner's screen is about 1536×700 CSS pixels (1920 at 125%).
