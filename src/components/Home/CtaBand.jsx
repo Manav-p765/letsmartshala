@@ -3,11 +3,12 @@ import { site } from '../../data/site.js';
 import './CtaBand.css';
 import useReveal from '../../hooks/useReveal.js';
 
-/** The closing ask: calm paper, a soft blue arc rising behind it, one clear button. */
+/** The closing ask: calm ivory, a soft blue arc and school sketches behind it, one clear button. */
 export default function CtaBand() {
   const revealRef = useReveal();
   return (
-    <section ref={revealRef} className="section section--screen cta" data-theme="paper" aria-labelledby="cta-title">
+    <section ref={revealRef} className="section section--screen cta" data-section="09 · Book a demo" data-theme="paper" aria-labelledby="cta-title">
+      <div className="linework" aria-hidden="true" />
       <svg className="cta__arc" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
         <path d="M 40 500 A 460 440 0 0 1 960 500" />
       </svg>

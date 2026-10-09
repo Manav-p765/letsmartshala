@@ -18,6 +18,7 @@
   letter-spacing: -0.035em;
   line-height: 1;
 }
-.brand__word-2 { color: var(--hi); }
+/* "Shala" is the logo blue on every theme — it is the mark, not an accent. */
+.brand__word-2 { color: var(--blue); }
 .brand--lg .brand__mark { width: 2rem; height: 2.3rem; }
 .brand--lg .brand__word { font-size: 1.75rem; }

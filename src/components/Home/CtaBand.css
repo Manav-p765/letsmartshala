@@ -1,11 +1,11 @@
 .cta { overflow: clip; text-align: center; padding-block: clamp(5rem, 14vh, 9rem); }
-/* A soft, blurred arc and a blue bloom — the hero's idea, said quietly. */
+/* A soft, blurred blue arc and bloom — the hero's idea, said quietly. */
 .cta::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(ellipse 45% 55% at 50% 100%, rgba(0, 61, 229, 0.12), transparent 70%);
+  background: radial-gradient(ellipse 45% 55% at 50% 100%, rgb(var(--blue-rgb) / 0.1), transparent 70%);
 }
 .cta__arc {
   position: absolute;
@@ -14,7 +14,7 @@
   height: 100%;
   z-index: -1;
   fill: none;
-  stroke: rgba(0, 61, 229, 0.1);
+  stroke: rgb(var(--blue-rgb) / 0.08);
   stroke-width: 70;
   vector-effect: non-scaling-stroke;
   filter: blur(16px);
@@ -23,4 +23,4 @@
 .cta__title { font-size: clamp(2.25rem, 1rem + 5vw, 6rem); }
 .cta__title .serif { font-size: 1.05em; }
 .cta__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 0.75rem; }
-.cta .btn--ghost { background: rgba(255, 255, 255, 0.7); }
+.cta .btn--ghost { background: rgb(var(--white-rgb) / 0.7); }

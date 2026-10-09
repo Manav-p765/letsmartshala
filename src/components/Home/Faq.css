@@ -12,7 +12,7 @@
   text-align: left;
   transition: background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), color var(--dur);
 }
-.faq__chip:hover { background: var(--mist); box-shadow: inset 0 0 0 1px rgba(0, 61, 229, 0.3); }
+.faq__chip:hover { background: var(--mist); box-shadow: inset 0 0 0 1px rgb(var(--blue-rgb) / 0.3); }
 .faq__chip.is-asked { color: var(--fg-3); }
 
 /* ---- The chat window ---- */
@@ -22,7 +22,7 @@
   height: clamp(26rem, calc(100svh - var(--nav-h) - 8rem), 34rem);
   border-radius: 22px;
   background: var(--paper);
-  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -32px rgba(15, 37, 87, 0.35);
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -32px rgb(var(--navy-rgb) / 0.35);
   overflow: hidden;
 }
 .chat__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.1rem; background: var(--white); border-bottom: 1px solid var(--line); }
@@ -39,7 +39,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background:
-    radial-gradient(circle at 1px 1px, rgba(15, 37, 87, 0.06) 1px, transparent 0) 0 0 / 18px 18px,
+    radial-gradient(circle at 1px 1px, rgb(var(--navy-rgb) / 0.06) 1px, transparent 0) 0 0 / 18px 18px,
     var(--paper);
 }
 .chat__day { align-self: center; padding: 0.2rem 0.7rem; border-radius: var(--radius-pill); background: var(--white); font-size: 0.7rem; color: var(--fg-3); }
@@ -50,7 +50,7 @@
   border-radius: 16px;
   font-size: 0.9rem;
   line-height: 1.45;
-  box-shadow: 0 1px 1px rgba(15, 37, 87, 0.06);
+  box-shadow: 0 1px 1px rgb(var(--navy-rgb) / 0.06);
 }
 .bubble--out { align-self: flex-end; background: var(--blue-2); color: #fff; border-bottom-right-radius: 5px; }
 .bubble--in { align-self: flex-start; background: var(--white); color: var(--ink); border-bottom-left-radius: 5px; }

@@ -72,7 +72,9 @@ export default function DayArcHero() {
     const sample = cardsRef.current.querySelector('.day-card__body');
     const card = { w: sample?.offsetWidth || 216, h: sample?.offsetHeight || 96 };
 
-    const next = makeArc({ w: s.width, h: s.height, narrow: isNarrow, navH: navH + 14, cardsTop, copyTop: copy.t });
+    // The ellipse curves on down to the hero's bottom edge, past the role switch row.
+    const legTo = stage.closest('section').getBoundingClientRect().bottom - s.top;
+    const next = makeArc({ w: s.width, h: s.height, narrow: isNarrow, navH: navH + 14, cardsTop, copyTop: copy.t, legTo });
     next.copy = copy;
     next.card = card;
     next.minTop = navH + 22;
@@ -157,7 +159,7 @@ export default function DayArcHero() {
       tl.fromTo(lines, { yPercent: 110 }, { yPercent: 0, duration: 1.1, stagger: 0.09, ease: 'power4.out' }, 0)
         .fromTo(rest, { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.35)
         .fromTo('.arc__band, .arc__track', { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0.2)
-        .fromTo(sunRef.current, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, 1.1)
+        .fromTo([sunRef.current, '.arc__leg'], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 }, 1.1)
         .fromTo(rolesRef.current, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out' }, 0.9);
     }
 
@@ -225,8 +227,8 @@ export default function DayArcHero() {
   };
 
   return (
-    <section className="hero section" data-theme="paper" aria-labelledby="hero-title">
-      <div className="hero__bg" aria-hidden="true"><div className="ruled" /></div>
+    <section className="hero section" data-section="01 · Hero (day arc)" data-theme="paper" aria-labelledby="hero-title">
+      <div className="hero__bg" aria-hidden="true"><div className="ruled" /><div className="linework" /></div>
 
       <div className={`hero__stage${narrow ? ' is-narrow' : ''}`} ref={stageRef}>
         {arc && (
@@ -240,14 +242,15 @@ export default function DayArcHero() {
           >
             <defs>
               <linearGradient id="arc-band" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="var(--blue)" stopOpacity="0.07" />
-                <stop offset="0.5" stopColor="var(--blue)" stopOpacity="0.22" />
-                <stop offset="1" stopColor="var(--blue)" stopOpacity="0.07" />
+                <stop offset="0" stopColor="var(--sky)" stopOpacity="0.14" />
+                <stop offset="0.5" stopColor="var(--sky)" stopOpacity="0.36" />
+                <stop offset="1" stopColor="var(--sky)" stopOpacity="0.14" />
               </linearGradient>
             </defs>
-            <path className="arc__glow" d={arc.d} />
-            <path className="arc__band" d={arc.d} pathLength="1" stroke="url(#arc-band)" />
-            <path className="arc__track" d={arc.d} pathLength="1" />
+            <path className="arc__glow" d={arc.dFull} />
+            <path className="arc__band" d={arc.dFull} pathLength="1" stroke="url(#arc-band)" />
+            <path className="arc__track" d={arc.dFull} pathLength="1" />
+            {arc.dStartLeg && <path className="arc__leg" d={arc.dStartLeg} />}
             <path className="arc__progress" d={arc.d} pathLength="1" ref={progressRef} />
             {/* Connectors for cards that had to step off the arc. */}
             {spots?.map((c, i) =>

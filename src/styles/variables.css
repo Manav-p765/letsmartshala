@@ -1,18 +1,29 @@
 /* ============================================
-   TOKENS — palette taken from the SmartShala CRM
-   (frontend/src/app/globals.css) plus the logo's own blue,
-   so the marketing site and the product feel like one thing.
+   TOKENS — "field notes" palette: ivory paper, deep atlas navy ink and
+   gold linework. The logo blue stays for the mark and for anything you
+   can press, so the site still hands over cleanly to the CRM.
    ============================================ */
 :root {
   /* ---- Palette — each colour has one job ---- */
-  --blue: #003DE5;        /* the logo. Brand moments: the arc, the CTA band, the mark */
+  --blue: #003DE5;        /* the logo. The mark, button hover */
   --blue-2: #2456E6;      /* CRM primary. Buttons and links — what you can press */
-  --blue-3: #1638A0;      /* CRM active. Pressed states, text on mist */
-  --navy: #0F2557;        /* CRM secondary. Dark sections */
-  --ink: #0F1419;         /* CRM ink. Body text and headings on light */
-  --paper: #F7F8FB;       /* CRM surface. The default page */
-  --white: #FFFFFF;       /* cards that sit on paper */
-  --mist: #E9EEFC;        /* a tint of the logo blue. Alternate light sections */
+  --blue-3: #1638A0;      /* CRM active. Pressed states */
+  --sky: #6FA8FF;         /* light blue. Only the soft glow around the hero arc */
+  --navy: #0E1D61;        /* deep atlas navy. Headings, ink, dark UI chrome */
+  --ink: #0E1D61;         /* body text and headings on light */
+  --gold: #B8964F;        /* linework only: arcs, rules, school sketches, ornaments */
+  --gold-ink: #84662A;    /* gold you have to read — 4.5:1 on paper */
+  --paper: #F5EFE6;       /* light ivory. The default page */
+  --ivory: #EBE0D2;       /* full ivory. Alternate sections */
+  --white: #FFFDF8;       /* warm white. Cards that sit on paper */
+  --mist: var(--ivory);   /* legacy name for the alternate surface */
+
+  /* Channels, so translucent tints stay on-palette: rgb(var(--navy-rgb) / 0.1) */
+  --navy-rgb: 14 29 97;
+  --blue-rgb: 0 61 229;
+  --sky-rgb: 111 168 255;
+  --gold-rgb: 184 150 79;
+  --white-rgb: 255 253 248;
 
   /* Status colours are only ever used inside product UI (cards, chips),
      where they mean exactly what they mean in the CRM. Never decoration. */
@@ -49,9 +60,9 @@
   --radius-sm: 10px;
   --radius-pill: 999px;
 
-  /* ---- Elevation — soft, blue-tinted, never grey mud ---- */
-  --shadow-1: 0 1px 2px rgba(15, 37, 87, 0.06), 0 2px 8px rgba(15, 37, 87, 0.05);
-  --shadow-2: 0 2px 4px rgba(15, 37, 87, 0.05), 0 12px 32px -6px rgba(15, 37, 87, 0.16);
+  /* ---- Elevation — soft, navy-tinted, never grey mud ---- */
+  --shadow-1: 0 1px 2px rgb(var(--navy-rgb) / 0.06), 0 2px 8px rgb(var(--navy-rgb) / 0.05);
+  --shadow-2: 0 2px 4px rgb(var(--navy-rgb) / 0.05), 0 12px 32px -6px rgb(var(--navy-rgb) / 0.16);
 
   /* ---- Motion — one hand: calm, decisive, no bounce on content ---- */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -71,31 +82,31 @@
   --surface: var(--paper);
   --card: var(--white);
   --fg: var(--ink);
-  --fg-2: rgba(15, 20, 25, 0.66);
-  --fg-3: rgba(15, 20, 25, 0.42);
-  --line: rgba(15, 37, 87, 0.1);
-  --hi: var(--blue);
-  --chip: rgba(15, 37, 87, 0.05);
+  --fg-2: rgb(var(--navy-rgb) / 0.72);
+  --fg-3: rgb(var(--navy-rgb) / 0.48);
+  --line: rgb(var(--navy-rgb) / 0.12);
+  --hi: var(--gold-ink);
+  --chip: rgb(var(--navy-rgb) / 0.05);
 }
 [data-theme='white'] {
   --surface: var(--white);
   --card: var(--paper);
   --fg: var(--ink);
-  --fg-2: rgba(15, 20, 25, 0.66);
-  --fg-3: rgba(15, 20, 25, 0.42);
-  --line: rgba(15, 37, 87, 0.1);
-  --hi: var(--blue);
-  --chip: rgba(15, 37, 87, 0.05);
+  --fg-2: rgb(var(--navy-rgb) / 0.72);
+  --fg-3: rgb(var(--navy-rgb) / 0.48);
+  --line: rgb(var(--navy-rgb) / 0.12);
+  --hi: var(--gold-ink);
+  --chip: rgb(var(--navy-rgb) / 0.05);
 }
 [data-theme='mist'] {
-  --surface: var(--mist);
+  --surface: var(--ivory);
   --card: var(--white);
   --fg: var(--navy);
-  --fg-2: rgba(15, 37, 87, 0.72);
-  --fg-3: rgba(15, 37, 87, 0.48);
-  --line: rgba(15, 37, 87, 0.14);
-  --hi: var(--blue);
-  --chip: rgba(255, 255, 255, 0.7);
+  --fg-2: rgb(var(--navy-rgb) / 0.74);
+  --fg-3: rgb(var(--navy-rgb) / 0.5);
+  --line: rgb(var(--navy-rgb) / 0.14);
+  --hi: var(--gold-ink);
+  --chip: rgb(var(--white-rgb) / 0.7);
 }
 [data-theme='navy'] {
   --surface: var(--navy);

@@ -77,6 +77,20 @@ body {
   mask: radial-gradient(ellipse 80% 70% at 50% 40%, #000 30%, transparent 100%);
 }
 
+/* School things sketched in gold line (public/school-lines.svg, drawn by
+   scripts/school-lines.mjs). Masked away from the middle so it frames the
+   copy rather than sitting under it. Tune per section with --linework-opacity. */
+:where(.linework) {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url('/school-lines.svg') center / cover no-repeat;
+  opacity: var(--linework-opacity, 0.45);
+  -webkit-mask: radial-gradient(ellipse 58% 52% at 50% 50%, transparent 30%, #000 100%);
+  mask: radial-gradient(ellipse 58% 52% at 50% 50%, transparent 30%, #000 100%);
+}
+
 /* ---- Type ---- */
 :where(.display) {
   font-family: var(--font-display);
@@ -134,7 +148,7 @@ body {
   white-space: nowrap;
   transition: background-color var(--dur) var(--ease-out), transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
 }
-:where(.btn:hover) { --btn-bg: var(--blue); box-shadow: 0 10px 24px -10px rgba(0, 61, 229, 0.6); }
+:where(.btn:hover) { --btn-bg: var(--blue); box-shadow: 0 10px 24px -10px rgb(var(--blue-rgb) / 0.6); }
 :where(.btn:active) { --btn-bg: var(--blue-3); transform: translateY(1px); }
 :where(.btn--ghost) {
   --btn-bg: transparent;

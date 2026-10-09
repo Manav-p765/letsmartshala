@@ -13,17 +13,24 @@ export const HANG = 44;
  * Wide screens: a tall arch that frames the headline.
  * Narrow screens: a shallow arch that sits on top of the card row.
  */
-export function makeArc({ w, h, narrow, navH, cardsTop, copyTop }) {
+export function makeArc({ w, h, narrow, navH, cardsTop, copyTop, legTo }) {
   let cx, cy, rx, ry;
+  // The day runs between the two points where the ellipse crosses y = base.
+  // On narrow screens that is the ellipse's own ends. On wide screens the
+  // ellipse is centred lower, on the section's bottom edge, so it keeps
+  // curving down past the day's ends until it meets that edge.
+  let base;
   if (narrow) {
     cx = w / 2;
     cy = cardsTop + 4;
+    base = cy;
     rx = w / 2 - 22;
     ry = Math.min(110, w * 0.26);
   } else {
     const sidePad = Math.min(150, w * 0.11);
     cx = w / 2;
-    cy = h - 18;
+    base = h - 18;
+    cy = Math.max(base, legTo ?? base);
     rx = w / 2 - sidePad;
     // The crown sits high enough for a card to hang above it, and always
     // clear of the copy: the band (and its soft glow) never crosses text.
@@ -31,11 +38,15 @@ export function makeArc({ w, h, narrow, navH, cardsTop, copyTop }) {
     ry = Math.max(160, cy - crown);
   }
 
-  // Sample the left→right half-ellipse once and keep cumulative lengths.
+  // Angle where the ellipse crosses y = base (0 when base is its centre line).
+  const t0 = Math.asin(Math.min(1, (cy - base) / ry));
+  const pointAt = (t) => [cx + rx * Math.cos(t), cy - ry * Math.sin(t)];
+
+  // Sample the left→right day-arc once and keep cumulative lengths.
   const pts = [];
   let len = 0;
   for (let i = 0; i <= SAMPLES; i++) {
-    const t = Math.PI * (1 - i / SAMPLES);
+    const t = Math.PI - t0 - (Math.PI - 2 * t0) * (i / SAMPLES);
     const x = cx + rx * Math.cos(t);
     const y = cy - ry * Math.sin(t);
     if (i) len += Math.hypot(x - pts[i - 1].x, y - pts[i - 1].y);
@@ -60,9 +71,17 @@ export function makeArc({ w, h, narrow, navH, cardsTop, copyTop }) {
     return { x, y, nx: nx / n, ny: ny / n };
   }
 
+  const [sx, sy] = pointAt(Math.PI - t0);
+  const [ex, ey] = pointAt(t0);
+  const r1 = (n) => n.toFixed(1);
   return {
     w, h, cx, cy, rx, ry, at,
-    d: `M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cy}`
+    // The day's path: the sun and the progress stroke travel this.
+    d: `M ${r1(sx)} ${r1(sy)} A ${rx} ${ry} 0 0 1 ${r1(ex)} ${r1(ey)}`,
+    // The whole half-ellipse, down to the section's edge: glow, band, track.
+    dFull: `M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cy}`,
+    // The stretch below the day's start is already "lived": drawn as progress.
+    dStartLeg: cy > base ? `M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 1 ${r1(sx)} ${r1(sy)}` : null
   };
 }
 
