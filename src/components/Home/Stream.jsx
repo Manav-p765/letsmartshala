@@ -128,7 +128,7 @@ export default function Stream() {
   }, []);
 
   return (
-    <section ref={revealRef} className="section stream" data-theme="mist" aria-labelledby="stream-title">
+    <section ref={revealRef} className="section stream" data-section="03 · Phone feed" data-theme="mist" aria-labelledby="stream-title">
       <div className="stream__bg" aria-hidden="true" />
       <div className="stream__stage" ref={stageRef}>
         <div className="container stream__copy">

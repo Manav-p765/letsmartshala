@@ -32,7 +32,8 @@ export const tour = [
         ['Ishaan Gupta', '11-A', 'UPI', '₹21,000', 'R-2037']
       ],
       action: 'Send Fee Reminder'
-    }
+    },
+    note: ['Receipt R-2041', 'PDF ready · Aarav Sharma · UPI']
   },
   {
     id: 'attendance',
@@ -49,7 +50,8 @@ export const tour = [
       summary: [['Present', 38], ['Absent', 2], ['Late', 1]],
       pending: ['8-A · Period 1', '10-B · Period 1'],
       action: 'Nudge Teachers'
-    }
+    },
+    note: ['2 classes still to mark', '8-A and 10-B · Period 1']
   },
   {
     id: 'exams',
@@ -67,7 +69,8 @@ export const tour = [
         ['Ishaan Gupta', [33, 38, 29, 30]]
       ],
       action: 'Generate report cards'
-    }
+    },
+    note: ['Report cards', 'PDFs for the whole of 7-B']
   },
   {
     id: 'students',
@@ -85,7 +88,8 @@ export const tour = [
       ],
       tabs: ['Overview', 'Attendance', 'Academics', 'Fees', 'Documents', 'Behaviour'],
       stats: [['Attendance', '94%'], ['Fee balance', '₹0'], ['Last exam', 'A1']]
-    }
+    },
+    note: ['APAAR ID linked', 'Adm. no. 2019/0412']
   },
   {
     id: 'transport',
@@ -103,7 +107,8 @@ export const tour = [
         ['School', '7:40 AM', 0]
       ],
       assigned: 34
-    }
+    },
+    note: ['34 students on Route 4', 'Transport fee on their ledgers']
   },
   {
     id: 'payroll',
@@ -120,7 +125,8 @@ export const tour = [
         ['Ravi Kumar', 'Driver', '25 / 25', 'Pending']
       ],
       action: 'Generate slips'
-    }
+    },
+    note: ['Pay slips', '3 of 4 generated for October']
   }
 ];
 

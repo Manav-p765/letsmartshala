@@ -12,7 +12,7 @@ const legal = [
 
 export default function Footer() {
   return (
-    <footer className="footer section" data-theme="white">
+    <footer className="footer section" data-section="10 · Footer" data-theme="white">
       <div className="container footer__grid">
         <div className="footer__about">
           <Brand size="lg" />

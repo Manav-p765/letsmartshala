@@ -43,7 +43,7 @@ export default function Faq() {
   const asked = new Set(thread.map((m) => m.q));
 
   return (
-    <section ref={revealRef} className="section section--screen faq" data-theme="white" aria-labelledby="faq-title">
+    <section ref={revealRef} className="section section--screen faq" data-section="08 · FAQ chat" data-theme="white" aria-labelledby="faq-title">
       <div className="container faq__grid">
         <div>
           <SectionHead id="faq-title" eyebrow="Questions" title={['Asked by', 'principals.']} lede="Tap a question. We answer the way we would on WhatsApp — short and straight." />

@@ -7,18 +7,23 @@
  * Transport, Payroll — and the window changes to that screen: rows slide in,
  * numbers count up, bars fill, the sidebar highlights the module.
  *
- * The window plays through the modules once when the section comes into
- * view (a few seconds each), then rests; clicking a module takes over.
- * The page itself scrolls normally — nothing is pinned.
+ * Desktop: the section pins and the scroll moves through the modules, then
+ * lets go (the owner asked for this). Phones: the window plays through the
+ * modules once when in view, then rests. Clicking a module takes over.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import useReveal from '../../hooks/useReveal.js';
 import ModuleIcon from '../ui/ModuleIcon.jsx';
 import { Mark } from '../Brand/Brand.jsx';
 import { tour, tourHead, tourMore } from '../../data/tour.js';
 import useAutoStep from '../../hooks/useAutoStep.js';
 import './Tour.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const PIN_MQ = '(min-width: 901px) and (prefers-reduced-motion: no-preference)';
 
 const inr = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
 
@@ -186,17 +191,43 @@ const screens = { fees: FeesScreen, attendance: AttendanceScreen, exams: ExamsSc
 
 export default function Tour() {
   const revealRef = useReveal();
-  // Plays through the modules once when the section is in view, then rests;
-  // clicking a module takes over. No scroll-jacking.
-  const [stepRef, active, choose] = useAutoStep(tour.length, 3800);
+  // Phones: plays through the modules once when the section is in view, then
+  // rests; clicking a module takes over.
+  const [stepRef, active, choose] = useAutoStep(tour.length, 4200, { threshold: 0.9 });
 
   const setRefs = (el) => { revealRef.current = el; stepRef.current = el; };
   const go = choose;
 
+  // Desktop: the section pins (the owner asked for this, as with Flow) and
+  // the scroll moves through the modules, half a screen each, then lets go.
+  useLayoutEffect(() => {
+    const mm = gsap.matchMedia();
+    mm.add(PIN_MQ, () => {
+      const el = revealRef.current;
+      el.classList.add('is-scrubbed');
+      choose(0);   // also switches the autoplay off for good
+      let last = 0;
+      const n = tour.length - 1;
+      ScrollTrigger.create({
+        trigger: el,
+        pin: true,
+        start: () => (el.offsetHeight > window.innerHeight ? 'bottom bottom' : 'top top'),
+        end: () => '+=' + n * window.innerHeight * 0.5,
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          const s = Math.min(n, Math.floor(progress * n + 0.35));
+          if (s !== last) choose((last = s));
+        }
+      });
+      return () => el.classList.remove('is-scrubbed');
+    });
+    return () => mm.revert();
+  }, [revealRef, choose]);
+
   const cur = tour[active];
 
   return (
-    <section ref={setRefs} className="section section--screen tour" data-theme="paper" aria-labelledby="tour-title">
+    <section ref={setRefs} className="section section--screen tour" data-section="04 · Module tour" data-theme="paper" aria-labelledby="tour-title">
       <div className="container tour__grid">
         <div className="tour__left">
           <p className="label tour__eyebrow" data-animate="fade-up">{tourHead.eyebrow}</p>
@@ -211,8 +242,8 @@ export default function Tour() {
                   <span className="tour__icon"><ModuleIcon name={m.icon} /></span>
                   <span className="tour__text">
                     <strong>{m.name}</strong>
-                    {i === active && <i className="tour__timer" key={active} aria-hidden="true" />}
                     <span>{m.line}</span>
+                    {i === active && <i className="tour__timer" key={active} aria-hidden="true" />}
                   </span>
                 </button>
               </li>
@@ -250,6 +281,11 @@ export default function Tour() {
                 })}
               </div>
             </div>
+          </div>
+          {/* A notification for the module on screen; re-keyed so it pops in each time. */}
+          <div className="tour__note" key={cur.id} aria-hidden="true">
+            <span className="tour__note-icon"><ModuleIcon name={cur.icon} /></span>
+            <span><strong>{cur.note[0]}</strong><em>{cur.note[1]}</em></span>
           </div>
         </div>
       </div>

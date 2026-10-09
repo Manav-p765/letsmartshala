@@ -12,7 +12,7 @@ export default function India() {
   const half = Math.ceil(india.terms.length / 2);
   const rows = [india.terms.slice(0, half), india.terms.slice(half)];
   return (
-    <section ref={revealRef} className="section india" data-theme="paper" aria-labelledby="india-title">
+    <section ref={revealRef} className="section india" data-section="06 · Indian terms" data-theme="paper" aria-labelledby="india-title">
       <div className="container india__head">
         <p className="label india__eyebrow" data-animate="fade-up">{india.eyebrow}</p>
         <h2 className="display india__title" id="india-title" data-animate="fade-up">{india.title}</h2>

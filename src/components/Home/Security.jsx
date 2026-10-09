@@ -23,7 +23,7 @@ const Db = () => (
 export default function Security() {
   const revealRef = useReveal();
   return (
-    <section ref={revealRef} className="section section--screen security" data-theme="mist" aria-labelledby="security-title">
+    <section ref={revealRef} className="section section--screen security" data-section="07 · Your data" data-theme="mist" aria-labelledby="security-title">
       <div className="container">
         <div className="security__grid">
           <SectionHead id="security-title" eyebrow={security.eyebrow} title={security.title} lede={security.lede} />

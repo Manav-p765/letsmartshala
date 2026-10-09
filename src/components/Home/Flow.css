@@ -1,28 +1,77 @@
-.flow { padding-block: var(--section-y); overflow: clip; }
-.flow.is-pinned { min-height: 100svh; display: flex; align-items: center; padding-block: calc(var(--nav-h) + 0.75rem) 1rem; }
-.is-pinned .journey { margin-top: 1rem; }
-.is-pinned .file__lines li { padding-block: 0.28rem; }
-.is-pinned .track { margin-top: 1rem; height: 6rem; }
-.flow.is-pinned .container { width: 100%; }
-
 .flow__head { text-align: center; }
 .flow__eyebrow { color: var(--hi); margin-bottom: 0.8rem; }
 .flow__heading { font-size: var(--fs-title); }
 
-/* ---- The student file ---- */
+/* The line takes --travel to reach a station; the station and its column
+   light up as it arrives, so nothing lights ahead of the line. */
+.journey {
+  --travel: 1.2s;
+  --arrive: 0.85s;
+  max-width: 68rem;
+  margin: clamp(1.5rem, 4.5vh, 3rem) auto 0;
+}
+/* Scroll-driven (desktop): quicker, so it keeps up with the wheel. */
+.is-scrubbed .journey { --travel: 0.6s; --arrive: 0.35s; }
+
+/* ---- Stations on one line ---- */
+.stations { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); }
+/* The rail runs from the first dot's centre to the last one's. */
+.stations::before,
+.stations::after {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: calc(1.25rem - 1px);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.stations::after {
+  background: var(--blue);
+  transform-origin: left;
+  transform: scaleX(calc(var(--s) / var(--last)));
+  transition: transform var(--travel) var(--ease-in-out);
+}
+.station { position: relative; z-index: 1; }
+.station__btn { display: grid; justify-items: center; width: 100%; padding-inline: 0.5rem; text-align: center; cursor: pointer; }
+.station__dot {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--fg-3);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: background-color 0.4s var(--ease-out) var(--arrive), color 0.4s var(--arrive), box-shadow 0.5s var(--arrive);
+}
+.station__dot .micon { width: 1.1rem; height: 1.1rem; }
+.station.is-lit .station__dot { background: var(--blue); color: #fff; box-shadow: none; }
+.station.is-active .station__dot { box-shadow: 0 0 0 6px rgb(var(--blue-rgb) / 0.14); }
+.station__who { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); transition: color 0.4s var(--arrive); }
+.station.is-lit .station__who { color: var(--hi); }
+.station__title { margin-top: 0.15rem; font-weight: 700; font-size: 0.9rem; line-height: 1.25; letter-spacing: -0.015em; color: var(--fg-3); transition: color 0.4s var(--arrive); }
+.station.is-lit .station__title,
+.station__btn:hover .station__title { color: var(--fg); }
+.station__btn:focus-visible { outline: 2px solid var(--blue-2); outline-offset: 4px; border-radius: 10px; }
+
+/* ---- The student file, one column per station ---- */
 .file {
-  width: min(24rem, 100%);
+  margin-top: 1.25rem;
   border-radius: var(--radius);
   background: var(--white);
-  box-shadow: inset 0 0 0 1px var(--line), 0 24px 50px -28px rgba(15, 37, 87, 0.4);
+  box-shadow: inset 0 0 0 1px var(--line), 0 24px 50px -28px rgb(var(--navy-rgb) / 0.4);
   overflow: hidden;
 }
-.file__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); }
-.file__avatar { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 0.8rem; flex: none; }
-.file__head strong { display: block; font-size: 0.95rem; }
-.file__head div span { display: block; font-size: 0.72rem; color: var(--fg-3); }
+.file__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--line); }
+.file__avatar { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 0.78rem; flex: none; }
+.file__name strong { display: block; font-size: 0.95rem; }
+.file__name span { display: block; font-size: 0.72rem; color: var(--fg-3); }
+.file__meter { flex: 0 1 10rem; height: 4px; margin-left: auto; border-radius: 4px; background: var(--mist); overflow: hidden; }
+.file__meter i { display: block; height: 100%; background: var(--ok); transform-origin: left; transform: scaleX(calc((var(--s) + 1) / (var(--last) + 1))); transition: transform 0.6s var(--ease-out) var(--arrive); }
+.file__count { font-size: 0.68rem; color: var(--fg-3); }
 .file__stamp {
-  margin-left: auto;
   padding: 0.2rem 0.6rem;
   border: 2px solid var(--ok);
   border-radius: 7px;
@@ -36,106 +85,57 @@
   transform: rotate(-8deg) scale(1.7);
   transition: opacity 0.3s, transform 0.5s var(--ease-spring);
 }
-.file__stamp.is-on { opacity: 1; transform: rotate(-8deg) scale(1); }
-.file__lines { display: grid; gap: 0.15rem; padding: 0.5rem; }
-.file__lines li {
-  display: grid;
-  grid-template-columns: 4.6rem 1fr;
-  gap: 0.6rem;
-  align-items: baseline;
-  padding: 0.4rem 0.55rem;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  opacity: 0.22;
-  transition: opacity 0.5s var(--ease-out), background-color 0.8s var(--ease-out);
-}
-.file__lines li.is-on { opacity: 1; }
-.file__lines li.is-new { background: var(--mist); }
-.file__label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hi); }
-.file__value { color: var(--fg); }
+.file__stamp.is-on { opacity: 1; transform: rotate(-8deg) scale(1); transition-delay: calc(var(--arrive) + 0.3s); }
 
-/* ---- Pinned: the file rides above a horizontal track ---- */
-.journey { position: relative; margin-top: clamp(1.25rem, 3.5vh, 2.5rem); }
-.is-pinned .file {
+.file__cols { display: grid; grid-template-columns: repeat(5, 1fr); }
+.file__col {
   position: relative;
-  left: clamp(12rem, calc(var(--x) * 1%), calc(100% - 12rem));
-  transform: translateX(-50%);
-  transition: left 0.8s var(--ease-in-out);
+  min-height: 7.25rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.76rem;
+  transition: background-color 0.8s var(--ease-out);
 }
-.track { position: relative; margin-top: 1.5rem; height: 7rem; }
-/* The rail, and the part already travelled. */
-.track::before,
-.track::after {
-  content: '';
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 1.25rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--line);
-}
-.track::after {
-  background: var(--blue);
-  transform-origin: left;
-  transform: scaleX(calc(var(--s) / var(--last)));
-  transition: transform 0.8s var(--ease-in-out);
-}
-.station {
-  position: absolute;
-  left: calc(var(--px) * 1%);
-  top: 0;
-  z-index: 1;
-  display: grid;
-  justify-items: center;
-  width: 11rem;
-  margin-left: -5.5rem;
-  text-align: center;
-}
-.station__dot {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: var(--white);
-  color: var(--fg-3);
-  box-shadow: inset 0 0 0 1.5px var(--line);
-  transition: background-color 0.5s var(--ease-out), color 0.5s, box-shadow 0.5s;
-}
-.station__dot .micon { width: 1.15rem; height: 1.15rem; }
-.station.is-lit .station__dot { background: var(--blue); color: #fff; box-shadow: none; }
-.station.is-active .station__dot { box-shadow: 0 0 0 7px rgba(0, 61, 229, 0.15); }
-.station__who { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hi); }
-.station__title { margin-top: 0.2rem; font-weight: 700; font-size: 0.92rem; line-height: 1.25; letter-spacing: -0.015em; color: var(--fg-3); transition: color 0.5s; }
-.station.is-lit .station__title { color: var(--fg); }
-.station__text { display: none; }
+.file__col + .file__col { border-left: 1px dashed var(--line); }
+.file__col.is-new { background: var(--mist); transition-delay: var(--arrive); }
+.file__label { display: block; margin-bottom: 0.45rem; font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); transition: color 0.4s var(--arrive); }
+.file__col.is-on .file__label { color: var(--hi); }
+.file__rows { display: grid; gap: 0.35rem; }
+.file__rows div { opacity: 0; transform: translateY(6px); transition: opacity 0.3s, transform 0.3s; }
+.file__col.is-on .file__rows div { opacity: 1; transform: none; transition: opacity 0.45s, transform 0.5s var(--ease-out); transition-delay: calc(var(--arrive) + 0.1s + var(--r) * 0.12s); }
+.file__rows dt { font-size: 0.66rem; color: var(--fg-3); }
+.file__rows dd { color: var(--fg); font-weight: 500; }
+/* Placeholder bars until the line gets there. */
+.file__ghost { position: absolute; left: 1rem; right: 1rem; top: 2.05rem; display: grid; gap: 0.55rem; transition: opacity 0.3s var(--arrive); }
+.file__ghost i { height: 0.45rem; border-radius: 4px; background: var(--chip); }
+.file__ghost i:last-child { width: 60%; }
+.file__col.is-on .file__ghost { opacity: 0; }
 
 .journey__now {
-  max-width: 40rem;
-  margin: 0.25rem auto 0;
+  max-width: 36rem;
+  min-height: 3em;
+  margin: 1.1rem auto 0;
   text-align: center;
   color: var(--fg-2);
-  font-size: 0.98rem;
+  font-size: 0.95rem;
+  animation: flow-now 0.5s var(--ease-out) var(--arrive) both;
 }
-.journey__now .label { display: block; margin-bottom: 0.3rem; }
+@keyframes flow-now { from { opacity: 0; transform: translateY(6px); } }
 
-/* ---- Not pinned: the finished file, then the stations as a list ---- */
-.flow:not(.is-pinned) .file { margin-inline: auto; }
-.flow:not(.is-pinned) .journey__now { display: none; }
-.flow:not(.is-pinned) .track { height: auto; display: grid; gap: 1.25rem; max-width: 40rem; margin: 2rem auto 0; }
-.flow:not(.is-pinned) .track::before,
-.flow:not(.is-pinned) .track::after { display: none; }
-.flow:not(.is-pinned) .station {
-  position: static;
-  width: auto;
-  margin: 0;
-  grid-template-columns: 2.5rem 1fr;
-  justify-items: start;
-  column-gap: 1rem;
-  text-align: left;
+@media (prefers-reduced-motion: reduce) {
+  .journey { --arrive: 0s; }
+  .journey__now { animation: none; }
 }
-.flow:not(.is-pinned) .station__dot { grid-row: span 3; }
-.flow:not(.is-pinned) .station__who,
-.flow:not(.is-pinned) .station__title { margin-top: 0; }
-.flow:not(.is-pinned) .station__text { display: block; margin-top: 0.3rem; color: var(--fg-2); font-size: 0.92rem; }
+
+/* ---- Narrow: no stations; the file's columns stack ---- */
+@media (max-width: 900px) {
+  .stations { display: none; }
+  .file { margin-top: 0; }
+  .file__meter { display: none; }
+  .file__count { margin-left: auto; }
+  .file__cols { grid-template-columns: 1fr; }
+  .file__col { min-height: 0; display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.75rem; padding-block: 0.65rem; }
+  .file__col + .file__col { border-left: 0; border-top: 1px dashed var(--line); }
+  .file__label { margin: 0; }
+  .file__rows { gap: 0.2rem; }
+  .file__ghost { left: 7.25rem; top: 0.8rem; }
+}

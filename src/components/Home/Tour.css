@@ -1,9 +1,9 @@
 /* One screen tall. Pinned on desktop, the grid fills the viewport under the nav. */
-.tour { padding-block: calc(var(--nav-h) + 2.5rem) clamp(4rem, 10vh, 6rem); }
+.tour { padding-block: calc(var(--nav-h) + 1.75rem) 2.5rem; }
 
 .tour__grid {
   display: grid;
-  grid-template-columns: minmax(18rem, 0.8fr) 1.6fr;
+  grid-template-columns: minmax(18rem, 0.85fr) 1.4fr;
   gap: clamp(2rem, 4vw, 4.5rem);
   align-items: center;
 }
@@ -78,11 +78,11 @@
 .tour__more .label { margin-right: 0.5rem; }
 
 /* ---- The app window ---- */
-.tour__window { min-width: 0; }
+.tour__window { position: relative; min-width: 0; }
 .win {
   border-radius: 18px;
   background: var(--white);
-  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -30px rgba(15, 37, 87, 0.35), 0 0 0 10px rgba(0, 61, 229, 0.04);
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -30px rgb(var(--navy-rgb) / 0.35), 0 0 0 10px rgb(var(--navy-rgb) / 0.04);
   overflow: hidden;
 }
 .win__bar {
@@ -93,9 +93,9 @@
   border-bottom: 1px solid var(--line);
   background: var(--paper);
 }
-.win__bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(15, 37, 87, 0.15); }
+.win__bar i { width: 9px; height: 9px; border-radius: 50%; background: rgb(var(--navy-rgb) / 0.15); }
 .win__bar span { margin-left: 0.75rem; font-family: var(--font-mono); font-size: 0.7rem; color: var(--fg-3); }
-.win__body { display: grid; grid-template-columns: 3.5rem 1fr; height: clamp(22rem, calc(100svh - var(--nav-h) - 7rem), 36rem); }
+.win__body { display: grid; grid-template-columns: 3.5rem 1fr; height: clamp(21rem, calc(100svh - var(--nav-h) - 11rem), 30rem); }
 .win__side { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding-block: 1rem; border-right: 1px solid var(--line); background: var(--paper); }
 .win__logo { width: 1.3rem; height: 1.5rem; margin-bottom: 0.75rem; color: var(--blue); }
 .win__logo .brand__mark { width: 100%; height: 100%; }
@@ -163,7 +163,7 @@
 .scr__label { font-size: 0.7rem; color: var(--fg-3); }
 
 .scr__table--marks td:not(:first-child) { text-align: left; }
-.scr__score { display: inline-grid; place-items: center; min-width: 2.2rem; padding: 0.2rem 0.4rem; border-radius: 7px; font-variant-numeric: tabular-nums; background: linear-gradient(90deg, rgba(36, 86, 230, 0.16) calc(var(--p) * 100%), transparent 0); }
+.scr__score { display: inline-grid; place-items: center; min-width: 2.2rem; padding: 0.2rem 0.4rem; border-radius: 7px; font-variant-numeric: tabular-nums; background: linear-gradient(90deg, rgb(var(--blue-rgb) / 0.16) calc(var(--p) * 100%), transparent 0); }
 .scr__foot { display: flex; align-items: center; gap: 0.9rem; margin-top: 1rem; font-size: 0.78rem; color: var(--fg-3); }
 
 .scr__profile { display: grid; gap: 0.9rem; }
@@ -188,6 +188,28 @@
 
 .scr__days { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 7px; font-variant-numeric: tabular-nums; background: linear-gradient(90deg, rgba(15, 138, 74, 0.14) calc(var(--p) * 100%), transparent 0); }
 
+/* ---- The notification that pops out over the window's corner ---- */
+.tour__note {
+  position: absolute;
+  left: -1.5rem;
+  bottom: 1.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem 0.7rem 0.75rem;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), 0 18px 40px -18px rgb(var(--navy-rgb) / 0.4);
+  animation: tour-note 0.6s var(--ease-out) 0.9s both;
+}
+.tour__note-icon { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 9px; background: var(--mist); color: var(--blue); flex: none; }
+.tour__note-icon .micon { width: 1rem; height: 1rem; }
+.tour__note strong { display: block; font-size: 0.85rem; line-height: 1.3; }
+.tour__note em { display: block; font-style: normal; font-size: 0.72rem; color: var(--fg-3); }
+@keyframes tour-note { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
+@media (prefers-reduced-motion: reduce) { .tour__note { animation: none; } }
+
 /* ---- Narrow: chips on top, window full width, no sidebar ---- */
 @media (max-width: 900px) {
   .tour__grid { grid-template-columns: 1fr; }
@@ -198,6 +220,7 @@
   .tour__text strong { line-height: 1.4; font-size: 0.85rem; }
   .win__body { grid-template-columns: 1fr; height: 30rem; }
   .win__side { display: none; }
+  .tour__note { left: 0.75rem; bottom: 0.75rem; }
   .scr { padding: 1rem; font-size: 0.78rem; }
   .scr__split { grid-template-columns: 1fr; }
   .scr__table th:nth-child(n + 4), .scr__table td:nth-child(n + 4) { display: none; }
@@ -209,7 +232,7 @@
 .tour__timer {
   display: block;
   height: 2px;
-  margin-top: 0.45rem;
+  margin-block: 0.5rem 0.35rem;
   border-radius: 2px;
   background: var(--blue);
   transform-origin: left;
@@ -217,3 +240,5 @@
 }
 @keyframes tour-timer { from { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { .tour__timer { display: none; } }
+/* When the scroll drives the tour there is no countdown to show. */
+.is-scrubbed .tour__timer { display: none; }
