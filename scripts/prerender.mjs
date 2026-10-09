@@ -3,7 +3,8 @@
 // and slow connections get real content and the right <title>/meta per page.
 // The app still boots normally on top (createRoot replaces the markup).
 //
-// Also writes dist/app.html (the plain SPA shell, used for unknown URLs),
+// Also writes dist/app.html (the plain SPA shell; vercel.json rewrites
+// unknown URLs to /app, since cleanUrls serves app.html there),
 // dist/sitemap.xml and dist/robots.txt.
 //
 // Pages are captured with reduced motion, so no element is saved mid-entrance
@@ -23,6 +24,20 @@ const ROUTES = [
 ];
 
 copyFileSync('dist/index.html', 'dist/app.html');
+
+// Written first, so they ship even if the browser step below is skipped.
+const today = new Date().toISOString().slice(0, 10);
+writeFileSync('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${ROUTES.filter(([, i]) => i).map(([r]) => `  <url><loc>${SITE}${r}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+</urlset>
+`);
+writeFileSync('dist/robots.txt', `User-agent: *
+Allow: /
+Disallow: /thank-you
+
+Sitemap: ${SITE}/sitemap.xml
+`);
 
 // No browser available (e.g. a CI image without Chromium's libraries)?
 // Ship the plain SPA rather than fail the deploy — it works, just without
@@ -56,21 +71,8 @@ for (const [route] of ROUTES) {
 await browser.close();
 await new Promise((r) => server.httpServer.close(r));
 
-const today = new Date().toISOString().slice(0, 10);
-writeFileSync('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${ROUTES.filter(([, i]) => i).map(([r]) => `  <url><loc>${SITE}${r}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
-</urlset>
-`);
-writeFileSync('dist/robots.txt', `User-agent: *
-Allow: /
-Disallow: /thank-you
-
-Sitemap: ${SITE}/sitemap.xml
-`);
-
 if (errors.length) {
   console.error('Page errors while prerendering:\n' + errors.join('\n'));
   process.exit(1);
 }
-console.log('sitemap.xml, robots.txt, app.html written');
+console.log('prerender done');

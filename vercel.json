@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/((?!api/|assets/|brand/|share/|.*..*).*)",
-      "destination": "/app.html"
+      "destination": "/app"
     }
   ],
   "headers": [
