@@ -8,49 +8,44 @@ export const desks = {
   eyebrow: 'One school, four desks',
   title: ['Everyone opens', 'the same school.'],
   lede: 'Each person signs in to their own view. Nobody re-types what someone else already entered.',
+  // `preview` picks the little animated screen at the top of each card (Desks.jsx). Sample data.
   items: [
     {
       role: 'Principal',
       time: '07:50',
+      preview: 'principal',
       line: 'Sees the whole school before the first bell.',
-      points: ['Who is in today, who is on leave', 'Attendance and fee risk at a glance', 'Leave approvals and announcements', 'Daily report and school-wide analytics']
+      points: ['Who is in, who is on leave', 'Attendance and fee risk', 'Daily report and analytics']
     },
     {
       role: 'Office admin',
       time: '08:30',
+      preview: 'admin',
       line: 'Keeps records, classes and timetables in order.',
-      points: ['Student records and bulk import', 'Classes, sections and subjects', 'Period times and timetables', 'Academic year rollover']
+      points: ['Student records and bulk import', 'Classes, sections, subjects', 'Year-end rollover']
     },
     {
       role: 'Teacher',
       time: '09:50',
+      preview: 'teacher',
       line: 'Gets through the paperwork between periods.',
-      points: ['Attendance for their classes', 'Homework and marks for their subjects', 'Own timetable and salary slips', 'Punch in, breaks and leave requests']
+      points: ['Attendance for their classes', 'Homework and marks', 'Timetable, leave, pay slips']
     },
     {
       role: 'Accountant',
       time: '10:20',
+      preview: 'accountant',
       line: 'Closes the day with every rupee accounted for.',
-      points: ['Fee structures and instalments', 'Payments by UPI, cheque or DD', 'Receipt PDFs and student ledgers', 'Defaulters list, ready to follow up']
+      points: ['Fee structures and instalments', 'UPI, cheque or DD payments', 'Receipts, ledgers, defaulters']
     }
   ]
 };
 
-export const modules = {
-  eyebrow: 'Modules',
-  title: ['Every office in', 'the school, connected.'],
-  lede: 'Start with the parts you need. They all share the same students, classes and staff.',
-  tiles: [
-    { id: 'fees', name: 'Fees & receipts', text: 'Fee heads, instalments, transport fees, adjustments, ledgers and receipt PDFs.' },
-    { id: 'attendance', name: 'Attendance', text: 'Class-wise roll call with present, absent, late and half-day, plus monthly reports.' },
-    { id: 'exams', name: 'Exams & report cards', text: 'Terms, subjects, marks entry, grading and report-card PDFs.' },
-    { id: 'students', name: 'Student records', text: 'Guardians, Aadhaar, APAAR, documents, behaviour notes and full edit history.' },
-    { id: 'transport', name: 'Transport', text: 'Vehicles, routes with ordered stops, and who rides which bus.' },
-    { id: 'payroll', name: 'Staff & payroll', text: 'Punch-in, shifts, attendance-based salary calculation and pay slips.' }
-  ],
-  more: ['Homework', 'Timetable', 'Calendar & holidays', 'Leave', 'Announcements', 'Communication logs', 'Reports & dashboards', 'Activity logs']
-};
 
+/**
+ * `file` is what each step adds to the student's file on the left of the
+ * section, so the record visibly builds up as you scroll. SAMPLE DATA.
+ */
 export const flow = {
   eyebrow: 'How it fits together',
   title: ['From admission', 'to fee receipt.'],
@@ -61,6 +56,13 @@ export const flow = {
     { who: 'Principal', title: 'Assign the fee structure', text: 'Fee heads and instalments for the class, plus a transport fee if the student takes the bus.' },
     { who: 'Accountant', title: 'Record the payment', text: 'UPI, cheque or DD, against the right instalment. Adjustments are kept on the ledger.' },
     { who: 'Accountant', title: 'Receipt and ledger, done', text: 'A receipt PDF is generated and the student’s ledger and the defaulters list update themselves.' }
+  ],
+  file: [
+    { label: 'Admitted', rows: [['Guardian', 'Rakesh Sharma'], ['Aadhaar', 'XXXX XXXX 4821'], ['APAAR ID', 'Linked']] },
+    { label: 'Class', rows: [['Class', '7-B · Roll 12'], ['Class teacher', 'Neha Verma']] },
+    { label: 'Fees', rows: [['Term 2', '₹24,000 · 2 instalments'], ['Transport', 'Route 4 · ₹3,600']] },
+    { label: 'Payment', rows: [['Paid', '₹12,500 · UPI']] },
+    { label: 'Receipt', rows: [['Receipt', 'R-2041 · PDF'], ['Balance', '₹15,100']] }
   ]
 };
 

@@ -22,9 +22,9 @@
   --ai: #7C3AED;          /* reserved for the AI assistant, once it's confirmed */
 
   /* ---- Type ---- */
-  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-serif: 'Instrument Serif', 'Times New Roman', serif;
-  --font-sans: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --fs-label: 0.75rem;
@@ -36,6 +36,9 @@
   --fs-h2: clamp(2.25rem, 1.5rem + 3.2vw, 4.75rem);
   --fs-h1: clamp(2.75rem, 1.6rem + 5vw, 7rem);
   --fs-mega: clamp(4rem, 1.5rem + 11vw, 13rem);
+  /* Section titles: sized by width, capped by height so short laptop
+     screens (or 125% zoom) still fit a section's content. */
+  --fs-title: min(clamp(1.9rem, 1.1rem + 2vw, 3.2rem), calc(5.4vh + 0.7rem));
 
   /* ---- Space ---- */
   --pad-x: clamp(1rem, 3vw, 2.5rem);

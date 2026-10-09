@@ -72,7 +72,7 @@ export default function DayArcHero() {
     const sample = cardsRef.current.querySelector('.day-card__body');
     const card = { w: sample?.offsetWidth || 216, h: sample?.offsetHeight || 96 };
 
-    const next = makeArc({ w: s.width, h: s.height, narrow: isNarrow, navH: navH + 14, cardsTop });
+    const next = makeArc({ w: s.width, h: s.height, narrow: isNarrow, navH: navH + 14, cardsTop, copyTop: copy.t });
     next.copy = copy;
     next.card = card;
     next.minTop = navH + 22;
@@ -240,9 +240,9 @@ export default function DayArcHero() {
           >
             <defs>
               <linearGradient id="arc-band" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stopColor="var(--blue)" stopOpacity="0.04" />
-                <stop offset="0.5" stopColor="var(--blue)" stopOpacity="0.14" />
-                <stop offset="1" stopColor="var(--blue)" stopOpacity="0.04" />
+                <stop offset="0" stopColor="var(--blue)" stopOpacity="0.07" />
+                <stop offset="0.5" stopColor="var(--blue)" stopOpacity="0.22" />
+                <stop offset="1" stopColor="var(--blue)" stopOpacity="0.07" />
               </linearGradient>
             </defs>
             <path className="arc__glow" d={arc.d} />

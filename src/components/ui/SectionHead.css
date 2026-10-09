@@ -1,5 +1,5 @@
 .shead { display: grid; gap: 1.25rem; max-width: 46rem; }
 .shead--center { margin-inline: auto; text-align: center; justify-items: center; }
 .shead__eyebrow { color: var(--hi); }
-.shead__title { font-size: var(--fs-h2); }
+.shead__title { font-size: var(--fs-title); }
 .shead__lede { max-width: 36rem; text-wrap: pretty; }

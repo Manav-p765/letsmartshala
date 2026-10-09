@@ -5,19 +5,19 @@
   color: var(--fg);
 }
 .brand__mark {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 8px;
+  width: 1.45rem;
+  height: 1.65rem;
+  color: var(--blue);
   transition: transform var(--dur) var(--ease-spring);
 }
 .brand:hover .brand__mark { transform: rotate(-8deg); }
 .brand__word {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.035em;
   line-height: 1;
 }
 .brand__word-2 { color: var(--hi); }
-.brand--lg .brand__mark { width: 2.75rem; height: 2.75rem; border-radius: 11px; }
+.brand--lg .brand__mark { width: 2rem; height: 2.3rem; }
 .brand--lg .brand__word { font-size: 1.75rem; }

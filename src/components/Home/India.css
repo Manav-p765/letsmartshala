@@ -1,7 +1,7 @@
 .india { overflow: clip; }
 .india__head { display: grid; justify-items: center; gap: 1.25rem; text-align: center; max-width: 52rem; }
 .india__eyebrow { color: var(--hi); }
-.india__title { font-size: var(--fs-h2); text-wrap: balance; }
+.india__title { font-size: var(--fs-title); text-wrap: balance; }
 
 .marquee {
   display: grid;

@@ -1,60 +1,141 @@
-.flow__grid {
-  display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(2.5rem, 6vw, 6rem);
-  align-items: start;
-}
-.flow__head { position: sticky; top: calc(var(--nav-h) + 3rem); }
+.flow { padding-block: var(--section-y); overflow: clip; }
+.flow.is-pinned { min-height: 100svh; display: flex; align-items: center; padding-block: calc(var(--nav-h) + 0.75rem) 1rem; }
+.is-pinned .journey { margin-top: 1rem; }
+.is-pinned .file__lines li { padding-block: 0.28rem; }
+.is-pinned .track { margin-top: 1rem; height: 6rem; }
+.flow.is-pinned .container { width: 100%; }
 
-.flow__list { position: relative; }
-.flow__steps { display: grid; gap: clamp(2.5rem, 7vh, 4.5rem); padding-block: 0.5rem; }
-.flow__rail {
+.flow__head { text-align: center; }
+.flow__eyebrow { color: var(--hi); margin-bottom: 0.8rem; }
+.flow__heading { font-size: var(--fs-title); }
+
+/* ---- The student file ---- */
+.file {
+  width: min(24rem, 100%);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line), 0 24px 50px -28px rgba(15, 37, 87, 0.4);
+  overflow: hidden;
+}
+.file__head { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; border-bottom: 1px solid var(--line); }
+.file__avatar { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 0.8rem; flex: none; }
+.file__head strong { display: block; font-size: 0.95rem; }
+.file__head div span { display: block; font-size: 0.72rem; color: var(--fg-3); }
+.file__stamp {
+  margin-left: auto;
+  padding: 0.2rem 0.6rem;
+  border: 2px solid var(--ok);
+  border-radius: 7px;
+  color: var(--ok);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: rotate(-8deg) scale(1.7);
+  transition: opacity 0.3s, transform 0.5s var(--ease-spring);
+}
+.file__stamp.is-on { opacity: 1; transform: rotate(-8deg) scale(1); }
+.file__lines { display: grid; gap: 0.15rem; padding: 0.5rem; }
+.file__lines li {
+  display: grid;
+  grid-template-columns: 4.6rem 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.4rem 0.55rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  opacity: 0.22;
+  transition: opacity 0.5s var(--ease-out), background-color 0.8s var(--ease-out);
+}
+.file__lines li.is-on { opacity: 1; }
+.file__lines li.is-new { background: var(--mist); }
+.file__label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hi); }
+.file__value { color: var(--fg); }
+
+/* ---- Pinned: the file rides above a horizontal track ---- */
+.journey { position: relative; margin-top: clamp(1.25rem, 3.5vh, 2.5rem); }
+.is-pinned .file {
+  position: relative;
+  left: clamp(12rem, calc(var(--x) * 1%), calc(100% - 12rem));
+  transform: translateX(-50%);
+  transition: left 0.8s var(--ease-in-out);
+}
+.track { position: relative; margin-top: 1.5rem; height: 7rem; }
+/* The rail, and the part already travelled. */
+.track::before,
+.track::after {
+  content: '';
   position: absolute;
-  left: 1.5rem;
-  top: 1.5rem;
-  bottom: 1.5rem;
-  width: 2px;
-  margin-left: -1px;
+  left: 10%;
+  right: 10%;
+  top: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
   background: var(--line);
 }
-.flow__rail span {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(var(--hi), #fff);
-  transform-origin: top;
-  transform: scaleY(0);
+.track::after {
+  background: var(--blue);
+  transform-origin: left;
+  transform: scaleX(calc(var(--s) / var(--last)));
+  transition: transform 0.8s var(--ease-in-out);
 }
-.flow__step { position: relative; display: grid; grid-template-columns: 3rem 1fr; gap: 1.5rem; }
-.flow__num {
-  position: relative;
+.station {
+  position: absolute;
+  left: calc(var(--px) * 1%);
+  top: 0;
   z-index: 1;
   display: grid;
+  justify-items: center;
+  width: 11rem;
+  margin-left: -5.5rem;
+  text-align: center;
+}
+.station__dot {
+  display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
-  background: var(--navy);
-  box-shadow: inset 0 0 0 1.5px var(--line);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
+  background: var(--white);
   color: var(--fg-3);
-  transition: background-color 0.6s var(--ease-out), color 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  transition: background-color 0.5s var(--ease-out), color 0.5s, box-shadow 0.5s;
 }
-.flow__step > div { opacity: 0.4; transition: opacity 0.8s var(--ease-out); }
-.flow__step.is-lit > div { opacity: 1; }
-.flow__step.is-lit .flow__num { background: var(--blue); color: #fff; box-shadow: 0 0 0 6px rgba(0, 61, 229, 0.25); }
-.flow__who { color: var(--hi); }
-.flow__title {
-  margin-top: 0.4rem;
-  font-family: var(--font-display);
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-.flow__text { margin-top: 0.75rem; max-width: 34rem; color: var(--fg-2); }
+.station__dot .micon { width: 1.15rem; height: 1.15rem; }
+.station.is-lit .station__dot { background: var(--blue); color: #fff; box-shadow: none; }
+.station.is-active .station__dot { box-shadow: 0 0 0 7px rgba(0, 61, 229, 0.15); }
+.station__who { margin-top: 0.6rem; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hi); }
+.station__title { margin-top: 0.2rem; font-weight: 700; font-size: 0.92rem; line-height: 1.25; letter-spacing: -0.015em; color: var(--fg-3); transition: color 0.5s; }
+.station.is-lit .station__title { color: var(--fg); }
+.station__text { display: none; }
 
-@media (max-width: 900px) {
-  .flow__grid { grid-template-columns: 1fr; }
-  .flow__head { position: static; }
+.journey__now {
+  max-width: 40rem;
+  margin: 0.25rem auto 0;
+  text-align: center;
+  color: var(--fg-2);
+  font-size: 0.98rem;
 }
+.journey__now .label { display: block; margin-bottom: 0.3rem; }
+
+/* ---- Not pinned: the finished file, then the stations as a list ---- */
+.flow:not(.is-pinned) .file { margin-inline: auto; }
+.flow:not(.is-pinned) .journey__now { display: none; }
+.flow:not(.is-pinned) .track { height: auto; display: grid; gap: 1.25rem; max-width: 40rem; margin: 2rem auto 0; }
+.flow:not(.is-pinned) .track::before,
+.flow:not(.is-pinned) .track::after { display: none; }
+.flow:not(.is-pinned) .station {
+  position: static;
+  width: auto;
+  margin: 0;
+  grid-template-columns: 2.5rem 1fr;
+  justify-items: start;
+  column-gap: 1rem;
+  text-align: left;
+}
+.flow:not(.is-pinned) .station__dot { grid-row: span 3; }
+.flow:not(.is-pinned) .station__who,
+.flow:not(.is-pinned) .station__title { margin-top: 0; }
+.flow:not(.is-pinned) .station__text { display: block; margin-top: 0.3rem; color: var(--fg-2); font-size: 0.92rem; }

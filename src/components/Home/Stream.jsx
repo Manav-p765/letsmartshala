@@ -3,7 +3,7 @@
  *
  * What the viewer sees: a ribbon of the school's modules — attendance, fees,
  * exams, transport, payroll… — drifting along a long S-curve out of the left
- * edge and diving into the screen of a phone. Each time one lands, the phone's
+ * edge and slipping in behind a gently floating phone, as if into it. Each time one lands, the phone's
  * "Today" feed gets that update on top and the numbers at the top tick up,
  * so over one pass the principal's day fills in. After the day is complete
  * the feed stops changing; the ribbon keeps drifting quietly.
@@ -36,8 +36,9 @@ const inr = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
  * phone's screen. Narrow: a short swoop from the left into the phone.
  */
 function buildPath(w, h, phone, copy, narrow) {
-  const ex = phone.x + phone.w / 2;
-  const ey = phone.y + (narrow ? 70 : 96);
+  // The ribbon ends behind the phone, so tiles slip in under its bezel.
+  const ex = phone.x + phone.w * 0.5;
+  const ey = phone.y + phone.h * (narrow ? 0.22 : 0.3);
   if (narrow) {
     // A wide loop over the phone: in from the left, across to the right
     // edge, then back down into the screen — long enough to keep tiles apart.
@@ -61,6 +62,7 @@ export default function Stream() {
   const stageRef = useRef(null);
   const phoneRef = useRef(null);
   const statRefs = { staff: useRef(null), attendance: useRef(null), fees: useRef(null) };
+  const feesBarRef = useRef(null);
   const [path, setPath] = useState('');
   const [feed, setFeed] = useState([]);
   const landed = useRef(0);
@@ -101,6 +103,7 @@ export default function Stream() {
     const el = statRefs[key].current;
     if (!el) return;
     const fmt = key === 'fees' ? inr : key === 'attendance' ? (v) => `${Math.round(v)}%` : (v) => `${Math.round(v)}/41`;
+    if (key === 'fees') feesBarRef.current?.style.setProperty('--p', Math.min(1, value / 240000));
     if (!animate) { el.textContent = fmt(value); return; }
     const from = { v: Number(el.dataset.v || 0) };
     gsap.to(from, { v: value, duration: 1.1, ease: 'power2.out', onUpdate: () => (el.textContent = fmt(from.v)) });
@@ -125,7 +128,7 @@ export default function Stream() {
   }, []);
 
   return (
-    <section ref={revealRef} className="section stream" data-theme="night" aria-labelledby="stream-title">
+    <section ref={revealRef} className="section stream" data-theme="mist" aria-labelledby="stream-title">
       <div className="stream__bg" aria-hidden="true" />
       <div className="stream__stage" ref={stageRef}>
         <div className="container stream__copy">
@@ -162,12 +165,15 @@ export default function Stream() {
 
         <div className="stream__phone" ref={phoneRef}>
           <div className="stream__screen">
-            <div className="stream__status"><span>Today</span><span>Principal</span></div>
+            <div className="stream__status"><span><i className="stream__live" />Live</span><span>Principal</span></div>
             <p className="stream__hello">Good morning</p>
             <div className="stream__stats">
               <div><span>Staff in</span><strong ref={statRefs.staff}>—</strong></div>
               <div><span>Attendance</span><strong ref={statRefs.attendance}>—</strong></div>
-              <div className="wide"><span>Fees today</span><strong ref={statRefs.fees}>—</strong></div>
+              <div className="wide">
+                <span>Fees today</span><strong ref={statRefs.fees}>—</strong>
+                <i className="stream__bar" ref={feesBarRef} />
+              </div>
             </div>
             <p className="stream__sub">Live feed</p>
             <ol className="stream__feed" aria-live="off">

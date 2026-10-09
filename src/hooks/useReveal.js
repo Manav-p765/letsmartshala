@@ -54,17 +54,25 @@ export default function useReveal() {
           scrollTrigger: { trigger: group, start: 'top 88%', ...ONCE }
         });
       });
-      all('[data-animate="in"]').forEach((el) => {
-        ScrollTrigger.create({
-          trigger: el, start: 'top 80%', once: true,
-          onEnter: () => el.classList.add('is-in')
-        });
-      });
     }, root);
+
+    // "in" uses an IntersectionObserver rather than ScrollTrigger, so pins
+    // and late layout shifts elsewhere on the page can't stop it firing.
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -15% 0px' });
+    all('[data-animate="in"]').forEach((el) => io.observe(el));
 
     // Webfonts shift layout when they land, which moves every start point.
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      io.disconnect();
+    };
   }, []);
 
   return ref;

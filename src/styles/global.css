@@ -23,7 +23,7 @@ body {
   color: var(--ink);
   background: var(--paper);
   overflow-x: clip;
-  font-feature-settings: 'cv11', 'ss01';
+  font-feature-settings: normal;
 }
 
 ::selection { background: var(--blue); color: #fff; }
@@ -50,6 +50,18 @@ body {
   color: var(--fg);
 }
 
+/* One section = one screen on desktop: content is sized to fit and
+   centred, so no section scrolls longer than the viewport. */
+@media (min-width: 901px) and (min-height: 640px) {
+  :where(.section--screen) {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: calc(var(--nav-h) + 1.5rem) 2.5rem;
+  }
+}
+
 /* Exercise-book ruling: faint horizontal lines with a margin rule, faded
    out at the edges by a mask so the compositor does the work. It is the
    one bit of "school" texture the site allows itself. */
@@ -68,10 +80,9 @@ body {
 /* ---- Type ---- */
 :where(.display) {
   font-family: var(--font-display);
-  font-weight: 650;
-  font-variation-settings: 'wdth' 90;
-  line-height: 0.96;
-  letter-spacing: -0.035em;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
 }
 :where(.serif) {
   font-family: var(--font-serif);

@@ -6,12 +6,14 @@
  * all agree on where "11:00" is, even though an ellipse isn't a circle.
  */
 const SAMPLES = 240;
+/** How far every card hangs off the arc, on its dotted string. */
+export const HANG = 44;
 
 /**
  * Wide screens: a tall arch that frames the headline.
  * Narrow screens: a shallow arch that sits on top of the card row.
  */
-export function makeArc({ w, h, narrow, navH, cardsTop }) {
+export function makeArc({ w, h, narrow, navH, cardsTop, copyTop }) {
   let cx, cy, rx, ry;
   if (narrow) {
     cx = w / 2;
@@ -23,7 +25,10 @@ export function makeArc({ w, h, narrow, navH, cardsTop }) {
     cx = w / 2;
     cy = h - 18;
     rx = w / 2 - sidePad;
-    ry = Math.max(160, cy - (navH + 70));
+    // The crown sits high enough for a card to hang above it, and always
+    // clear of the copy: the band (and its soft glow) never crosses text.
+    const crown = Math.min(navH + 70 + HANG, (copyTop ?? h) - 70);
+    ry = Math.max(160, cy - crown);
   }
 
   // Sample the left→right half-ellipse once and keep cumulative lengths.
@@ -64,11 +69,11 @@ export function makeArc({ w, h, narrow, navH, cardsTop }) {
 const overlaps = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
 
 /**
- * Places each card centred on its moment of the arc. Where that would cover
- * the headline block, the card slides outward along the arc's normal until
- * it is clear (the hero then draws a short connector back to the arc).
- * A card that can't be placed without leaving the stage is dropped from the
- * arc rather than allowed to cover the copy.
+ * Places each card just outside its moment of the arc, hanging off it on a
+ * dotted string (HANG px out along the arc's normal). Where that would cover
+ * the headline or another card, it slides further out until clear; if it
+ * runs out of room above, it tries hanging closer in. A card that still
+ * can't be placed is dropped from the arc rather than cover the copy.
  */
 export function placeCards(arc, fractions, card, avoid, minTop) {
   const pad = 14;
@@ -77,13 +82,16 @@ export function placeCards(arc, fractions, card, avoid, minTop) {
 
   return fractions.map((f) => {
     const p = arc.at(f);
-    for (let push = 0; push <= 220; push += 6) {
+    const tries = [];
+    for (let push = HANG; push <= 240; push += 6) tries.push(push);
+    for (let push = HANG - 6; push >= 0; push -= 6) tries.push(push);
+    for (const push of tries) {
       let x = p.x + p.nx * push;
       const y = p.y + p.ny * push;
       // Never hang off the sides of the stage.
       x = Math.min(arc.w - card.w / 2 - 12, Math.max(card.w / 2 + 12, x));
       const r = { l: x - card.w / 2, r: x + card.w / 2, t: y - card.h / 2, b: y + card.h / 2 };
-      if (r.t < minTop) break;
+      if (r.t < minTop) continue;
       if (overlaps(r, keepOut) || placed.some((o) => overlaps(r, o))) continue;
       placed.push(r);
       return { x, y, ax: p.x, ay: p.y, pushed: push > 0, visible: true };

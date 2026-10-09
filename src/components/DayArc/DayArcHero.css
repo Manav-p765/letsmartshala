@@ -49,9 +49,12 @@
   opacity: 0.08;
   filter: blur(40px);
 }
+/* The band is blurred so it has no hard edges — it reads as a soft glow
+   the thin line rides on. */
 .arc__band {
-  stroke-width: clamp(44px, 5vw, 76px);
+  stroke-width: clamp(40px, 4.4vw, 68px);
   stroke-dasharray: 1 1;
+  filter: blur(14px);
 }
 .arc__track {
   stroke: var(--blue);
@@ -65,8 +68,9 @@
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
 }
-.arc__pin line { stroke: var(--blue); stroke-opacity: 0.3; stroke-width: 1; stroke-dasharray: 3 3; }
-.arc__pin circle { fill: var(--blue); }
+/* Each card hangs off its moment of the arc on a dotted string. */
+.arc__pin line { stroke: var(--blue); stroke-opacity: 0.45; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 0 6; }
+.arc__pin circle { fill: var(--paper); stroke: var(--blue); stroke-width: 2; }
 
 /* ---- The sun ---- */
 .arc__sun {
@@ -295,7 +299,7 @@
   justify-content: flex-start;
   padding-top: calc(var(--nav-h) + 4.5rem);
 }
-.is-narrow .arc__band { stroke-width: 34px; }
+.is-narrow .arc__band { stroke-width: 30px; filter: blur(9px); }
 .is-narrow .arc__glow { stroke-width: 70px; }
 /* Room under the buttons for the shallow arch that sits on the card row. */
 .is-narrow .hero__copy { padding-bottom: calc(min(110px, 26vw) + 2.5rem); }

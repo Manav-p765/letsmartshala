@@ -3,18 +3,18 @@ import { site } from '../../data/site.js';
 import './CtaBand.css';
 import useReveal from '../../hooks/useReveal.js';
 
-/** The closing ask, on the logo's blue, with the arc rising behind it. */
+/** The closing ask: calm paper, a soft blue arc rising behind it, one clear button. */
 export default function CtaBand() {
   const revealRef = useReveal();
   return (
-    <section ref={revealRef} className="section cta" data-theme="blue" aria-labelledby="cta-title">
+    <section ref={revealRef} className="section section--screen cta" data-theme="paper" aria-labelledby="cta-title">
       <svg className="cta__arc" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
         <path d="M 40 500 A 460 440 0 0 1 960 500" />
       </svg>
       <div className="container cta__inner">
         <h2 className="display cta__title" id="cta-title" data-animate="lines">
           <span className="line-mask"><span>See your school’s day</span></span>
-          <span className="line-mask"><span>in <em className="serif">SmartShala.</em></span></span>
+          <span className="line-mask"><span>in <em className="serif hi">SmartShala.</em></span></span>
         </h2>
         <p className="lede" data-animate="fade-up">
           A short call, on your schedule. We’ll walk through the modules your school needs.
