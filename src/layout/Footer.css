@@ -24,7 +24,8 @@
 @media (max-width: 600px) {
   .footer__base { flex-direction: column; }
 }
-.footer__hi { font-family: 'Mukta', var(--font-sans); }
+/* One Hindi word: the device's own Devanagari font, not a 100 kB download. */
+.footer__hi { font-family: 'Nirmala UI', 'Noto Sans Devanagari', 'Kohinoor Devanagari', var(--font-sans); }
 @media (max-width: 860px) {
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .footer__about { grid-column: 1 / -1; }

@@ -66,11 +66,27 @@ Sitemap: ${SITE}/sitemap.xml
 // No browser available (e.g. a CI image without Chromium's libraries)?
 // Ship the plain SPA rather than fail the deploy — it works, just without
 // per-page static HTML.
+// dist/prerender.txt says what happened, so a deploy can be checked from
+// outside (curl) without opening the build log.
+const report = (text) => writeFileSync('dist/prerender.txt', text + '\n');
+
+// Vercel's build image has no system libraries for Playwright's own Chromium,
+// so there we start the self-contained build made for that image instead.
+async function launch() {
+  if (process.env.VERCEL && process.platform === 'linux') {
+    const { default: packed } = await import('@sparticuz/chromium');
+    return chromium.launch({ executablePath: await packed.executablePath(), args: packed.args, headless: true });
+  }
+  return chromium.launch();
+}
+
 let browser;
 try {
-  browser = await chromium.launch();
+  browser = await launch();
 } catch (e) {
-  console.warn('[prerender] skipped — could not start Chromium:', e.message.split('\n')[0]);
+  const why = e.message.split('\n')[0];
+  console.warn('[prerender] skipped — could not start Chromium:', why);
+  report('skipped: ' + why);
   process.exit(0);
 }
 const server = await preview({ preview: { port: 4179, strictPort: true }, logLevel: 'silent' });
@@ -86,6 +102,12 @@ for (const [route] of ROUTES) {
   let html = await page.content();
   // Runtime-only bits that shouldn't be baked into the static file.
   html = html.replace(/ class="js"/, '').replace(/<html([^>]*) class="lenis[^"]*"/, '<html$1');
+  // Links the app added for this page's own code and styles carry the
+  // preview server's address; make them relative so they work when deployed.
+  html = html.replaceAll(base, '');
+  // Marks the file as saved HTML until the app takes over (see global.css, main.jsx).
+  html = html.replace('<html ', '<html data-static ');
+  if (!html.includes('<html data-static ')) throw new Error('could not mark ' + route + ' as static');
   const dir = route === '/' ? 'dist' : `dist${route}`;
   mkdirSync(dir, { recursive: true });
   writeFileSync(`${dir}/index.html`, html);
@@ -97,6 +119,8 @@ await new Promise((r) => server.httpServer.close(r));
 
 if (errors.length) {
   console.error('Page errors while prerendering:\n' + errors.join('\n'));
+  report('failed: page errors');
   process.exit(1);
 }
+report(`ok: ${ROUTES.length} pages`);
 console.log('prerender done');

@@ -19,7 +19,7 @@ import gsap from 'gsap';
 import { makeArc, placeCards } from './arcGeometry.js';
 import { roles, dayFraction, clockAt } from '../../data/dayArc.js';
 import ModuleIcon from '../ui/ModuleIcon.jsx';
-import { prefersReducedMotion, hasFinePointer } from '../../lib/motion.js';
+import { prefersReducedMotion, hasFinePointer, isStaticBoot } from '../../lib/motion.js';
 import './DayArcHero.css';
 
 const NARROW = '(max-width: 900px)';
@@ -152,7 +152,10 @@ export default function DayArcHero() {
     gsap.set(svgRef.current.querySelectorAll('.arc__pin'), { autoAlpha: 0 });
     placeSun(0);
 
-    if (!introDoneRef.current) {
+    // On a static boot the headline and buttons are already being read:
+    // skip their entrance and just start the day.
+    if (!introDoneRef.current && isStaticBoot()) introDoneRef.current = true;
+    else if (!introDoneRef.current) {
       introDoneRef.current = true;
       const lines = copyRef.current.querySelectorAll('.line-mask > *');
       const rest = copyRef.current.querySelectorAll('[data-intro]');

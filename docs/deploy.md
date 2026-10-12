@@ -13,9 +13,12 @@ The site is a static React build plus one serverless function
      deploys.
 3. Vercel reads `vercel.json`:
    - The build runs `npm run build`: Vite, then the pre-render step.
-   - If Chromium can't start on Vercel's build machine, the pre-render step
-     is skipped and the site ships as a normal single-page app. It still
-     works, but without per-page static HTML.
+   - On Vercel the pre-render step uses `@sparticuz/chromium` (a Chromium
+     build made for Vercel's build machine). After a deploy, open
+     `/prerender.txt`: "ok: N pages" means every page shipped as finished
+     HTML; "skipped: …" means the browser could not start and the site
+     shipped as a plain single-page app (it works, but shows nothing until
+     its JavaScript has run, so it feels slow).
    - For the full pre-rendered site, run `npm run build` locally, then
      `npx vercel deploy --prebuilt --prod` after `npx vercel build`.
 

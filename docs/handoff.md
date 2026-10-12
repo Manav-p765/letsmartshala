@@ -64,6 +64,23 @@ content questions live in `docs/content.md`.
 - **Pricing rule (owner, 2026-10-12):** never show prices or plan names anywhere
   on the site. To learn pricing, a visitor fills in the form and books a
   meeting. The Pricing page explains what pricing depends on and has the form.
+- **Speed pass (2026-10-12):** the live site was sending an empty page (the
+  prerender step could not start Chromium on Vercel), so nothing showed until
+  all the JavaScript had run. Now: the build prerenders on Vercel with
+  `@sparticuz/chromium` and writes `dist/prerender.txt` ("ok: N pages" or
+  why it was skipped — check it at `/prerender.txt` after a deploy); the app
+  takes over saved HTML without a blink ("static boot" in `lib/motion.js`,
+  `main.jsx` preloads the page's code first); home sections below the first
+  screen use `content-visibility: auto`; two fonts are preloaded and the
+  Mukta font was dropped (the footer's Hindi word uses the device font);
+  other pages' code is prefetched only after load, never on slow connections.
+  Measure with `node scripts/perf.mjs <url> home demo about pricing`.
+- **Demo page (owner, 2026-10-12):** `/demo` is the home page with a
+  different hero: its own hero with the form, then every home section in the
+  same order. The "What happens next" block was removed to follow that (its
+  text is still in `data/pages.js` → `demo.next`, `demo.covers`).
+- **Social (2026-10-12):** Instagram, Facebook (`letssmartshala`), LinkedIn
+  (`company/smart-shala`) and WhatsApp, from `site.social`.
 - **Owner's preferences:**
   - Professional, not playful.
   - Floating elements are welcome, but they must not pull attention from the

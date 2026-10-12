@@ -1,22 +1,15 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './layout/Layout.jsx';
 import HomePage from './pages/HomePage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
-import { lazyPages } from './routes.js';
+import { pages } from './routes.js';
 
-const DemoPage = lazy(lazyPages.demo);
-const ThankYouPage = lazy(lazyPages.thanks);
-const FeaturesPage = lazy(lazyPages.features);
-const SolutionsPage = lazy(lazyPages.solutions);
-const PricingPage = lazy(lazyPages.pricing);
-const AboutPage = lazy(lazyPages.about);
-const ContactPage = lazy(lazyPages.contact);
-const SecurityPage = lazy(lazyPages.security);
-const LegalPage = lazy(lazyPages.legal);
-const BlogPage = lazy(lazyPages.blog);
-const BlogPostPage = lazy(lazyPages.blogPost);
-const AdminPage = lazy(lazyPages.admin);
+const {
+  demo: DemoPage, thanks: ThankYouPage, features: FeaturesPage, solutions: SolutionsPage,
+  pricing: PricingPage, about: AboutPage, contact: ContactPage, security: SecurityPage,
+  legal: LegalPage, blog: BlogPage, blogPost: BlogPostPage, admin: AdminPage
+} = pages;
 
 // A blank screen the height of a page, so the footer doesn't jump up while a route loads.
 const Fallback = () => <div style={{ minHeight: '100svh' }} aria-busy="true" />;

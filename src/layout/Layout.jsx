@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Lenis from 'lenis';
 import gsap from 'gsap';
@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './Navigation.jsx';
 import Footer from './Footer.jsx';
 import { setLenis, scrollToTop } from '../lib/smooth.js';
-import { prefersReducedMotion } from '../lib/motion.js';
+import { prefersReducedMotion, isStaticBoot, setStaticBoot } from '../lib/motion.js';
 import { initTracking, trackPageView } from '../lib/track.js';
 import { lazyPages } from '../routes.js';
 
@@ -34,7 +34,31 @@ export default function Layout({ minimal = false }) {
     };
   }, []);
 
-  useEffect(() => scrollToTop(), [pathname]);
+  // Top of the page on every navigation — but not when taking over a
+  // prerendered page, where the visitor may already have scrolled.
+  const landedOn = useRef(pathname);
+  useEffect(() => {
+    if (pathname === landedOn.current && isStaticBoot()) return;
+    landedOn.current = null;
+    setStaticBoot(false);
+    scrollToTop();
+  }, [pathname]);
+
+  // Sections that render late (content-visibility, lazy pages, webfonts)
+  // change the page's height; scroll entrances are measured against it.
+  useEffect(() => {
+    let t;
+    const ro = new ResizeObserver(() => {
+      clearTimeout(t);
+      // `true`: wait for scrolling to stop, so re-measuring never interrupts it.
+      t = setTimeout(() => ScrollTrigger.refresh(true), 150);
+    });
+    ro.observe(document.getElementById('main'));
+    return () => {
+      clearTimeout(t);
+      ro.disconnect();
+    };
+  }, []);
 
   // Analytics (only if IDs are configured) and one page view per route.
   useEffect(() => { initTracking(); }, []);
@@ -44,11 +68,26 @@ export default function Layout({ minimal = false }) {
     return () => clearTimeout(t);
   }, [pathname]);
 
-  // Once the page is idle, fetch the other routes' code so clicks are instant.
+  // Once this page has fully loaded and the browser is idle, fetch the other
+  // routes' code so clicks are instant. Not on slow or data-saving
+  // connections, where it would compete with the page itself.
   useEffect(() => {
+    // Nor while the build is saving this page as HTML (an automated browser):
+    // the saved file should link only the code this page needs.
+    if (navigator.webdriver) return;
+    const c = navigator.connection;
+    if (c && (c.saveData || /2g|3g/.test(c.effectiveType || ''))) return;
+    let id;
     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
-    const id = idle(() => Object.entries(lazyPages).forEach(([k, load]) => k !== 'admin' && load().catch(() => {})));
-    return () => (window.cancelIdleCallback || clearTimeout)(id);
+    const go = () => {
+      id = idle(() => Object.entries(lazyPages).forEach(([k, load]) => k !== 'admin' && load().catch(() => {})));
+    };
+    if (document.readyState === 'complete') go();
+    else window.addEventListener('load', go, { once: true });
+    return () => {
+      window.removeEventListener('load', go);
+      if (id) (window.cancelIdleCallback || clearTimeout)(id);
+    };
   }, []);
 
   return (

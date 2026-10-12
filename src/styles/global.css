@@ -214,3 +214,23 @@ body {
 }
 .motion-toggle:hover { color: var(--fg); }
 .motion-toggle__icon { font-size: 0.6rem; letter-spacing: -0.1em; }
+
+/*
+ * Prerendered HTML (html[data-static], removed when the app starts): the
+ * hero's arc and day cards are measured and placed by script for the
+ * visitor's own screen, so the saved copies (made at one desktop size) stay
+ * hidden until it runs; they then draw in as the day plays. The headline and
+ * buttons show straight away. (!important: the saved cards carry inline styles.)
+ */
+[data-static] .hero__stage .arc,
+[data-static] .hero__stage .day-cards { visibility: hidden !important; }
+[data-static] .hero__stage .day-card__body { visibility: hidden !important; }
+
+/*
+ * Home page: the sections below the first screen are laid out and painted
+ * only as they come near the window, so the first screen appears sooner on
+ * slow phones. The 600px stand-in height is deliberately shorter than any
+ * section (scroll entrances may then fire a touch early, never late), and
+ * Layout re-measures the entrances whenever a section takes its real height.
+ */
+#main > section ~ section { content-visibility: auto; contain-intrinsic-size: auto 600px; }

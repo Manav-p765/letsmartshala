@@ -40,7 +40,26 @@ function devApi() {
   };
 }
 
+/**
+ * Preloads the two fonts every first screen is set in (headline/body and the
+ * serif italic accent), so text settles into its real font sooner.
+ */
+function preloadFonts() {
+  const wanted = [/plus-jakarta-sans-latin-wght-normal-.*\.woff2$/, /instrument-serif-latin-400-italic-.*\.woff2$/];
+  return {
+    name: 'preload-fonts',
+    apply: 'build',
+    transformIndexHtml(html, ctx) {
+      const files = Object.keys(ctx.bundle || {});
+      return wanted
+        .map((re) => files.find((f) => re.test(f)))
+        .filter(Boolean)
+        .map((f) => ({ tag: 'link', attrs: { rel: 'preload', as: 'font', type: 'font/woff2', crossorigin: '', href: '/' + f }, injectTo: 'head' }));
+    }
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), devApi()],
+  plugins: [react(), devApi(), preloadFonts()],
   server: { port: 5180 }
 });

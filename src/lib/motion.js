@@ -22,3 +22,19 @@ export function setMotionPaused(paused) {
   try { localStorage.setItem(KEY, paused ? 'paused' : 'on'); } catch { /* storage blocked: still works for this page */ }
   window.dispatchEvent(new CustomEvent('motionpause', { detail: paused }));
 }
+
+/*
+ * "Static boot": the first page of a visit, when its prerendered HTML was
+ * already on screen before the app started. Entrance animations skip
+ * anything the visitor can already see (hiding it again just to animate it
+ * in would read as a blink). Cleared on the first navigation.
+ */
+let staticBoot = false;
+export const setStaticBoot = (value) => { staticBoot = value; };
+export const isStaticBoot = () => staticBoot;
+
+/** True if any part of the element is inside the window right now. */
+export const isOnScreen = (el) => {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < window.innerHeight;
+};

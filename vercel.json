@@ -1,5 +1,5 @@
 {
-  "buildCommand": "(npx playwright install chromium || true) && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,

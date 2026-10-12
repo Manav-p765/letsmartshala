@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { prefersReducedMotion } from '../lib/motion.js';
+import { prefersReducedMotion, isStaticBoot, isOnScreen } from '../lib/motion.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,6 +26,9 @@ const ONCE = { toggleActions: 'play none none none', once: true };
  * each root only animates elements whose nearest root is itself, so no
  * element is ever animated twice — a second gsap.from() would start from
  * the first one's hidden state and leave it invisible.
+ *
+ * On a static boot (lib/motion.js) whatever is already on screen is left as
+ * it is; only what the visitor scrolls to animates in.
  */
 export default function useReveal() {
   const ref = useRef(null);
@@ -34,8 +37,11 @@ export default function useReveal() {
     const root = ref.current;
     if (!root) return;
     root.setAttribute('data-reveal-root', '');
-    const all = (sel) =>
+    const mine = (sel) =>
       gsap.utils.toArray(root.querySelectorAll(sel)).filter((el) => el.closest('[data-reveal-root]') === root);
+    const seen = isStaticBoot() ? mine('[data-animate]').filter(isOnScreen) : [];
+    seen.forEach((el) => el.matches('[data-animate="in"]') && el.classList.add('is-in'));
+    const all = (sel) => mine(sel).filter((el) => !seen.includes(el));
 
     if (prefersReducedMotion()) {
       all('[data-animate="in"]').forEach((el) => el.classList.add('is-in'));
