@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmartShala — the story</title>
+<style>
+  html,body{margin:0;height:100%;background:#F5EFE6;overflow:hidden}
+  body{display:grid;place-items:center}
+  canvas{width:100%;height:100%;object-fit:contain;display:block}
+  .ui{position:fixed;left:50%;top:4.5%;translate:-50% 0;display:flex;gap:.5em;font:600 15px "Segoe UI",system-ui,sans-serif}
+  .ui{font-size:clamp(11px,2.4vw,15px)!important;white-space:nowrap}
+  .ui button[hidden],.ui[hidden],.bar[hidden]{display:none}
+  .ui button{display:inline-flex;align-items:center;gap:.5em;padding:.6em 1.05em;white-space:nowrap;border:0;border-radius:999px;background:#0E1D61;color:#FFFDF8;font:inherit;cursor:pointer;box-shadow:0 10px 24px -10px rgba(14,29,97,.6);transition:transform .2s cubic-bezier(.16,1,.3,1),opacity .3s}
+  .ui button:hover{transform:translateY(-2px)}
+  .ui button.ghost{background:rgba(255,253,248,.92);color:#0E1D61;box-shadow:inset 0 0 0 1px rgba(14,29,97,.15)}
+  .ui.is-quiet{opacity:0;transition:opacity .5s}
+  body:hover .ui.is-quiet{opacity:1}
+  .bar{position:fixed;left:0;bottom:0;height:3px;background:#003DE5;transform-origin:left;width:100%}
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080" role="img" aria-label="Animated film: a school office writes one new student into five paper registers, the copies drift apart and the principal waits for numbers; then everything flows into one SmartShala record that the principal, teachers, accountant and office all share."></canvas>
+<div class="ui" id="ui" hidden>
+  <button type="button" id="play">▶ Play with sound</button>
+  <button type="button" id="pause" class="ghost" hidden>❚❚ Pause</button>
+</div>
+<div class="bar" id="bar" hidden></div>
+<script>
+// SmartShala story film. Every pixel is computed (zero assets); draw(frame) is a
+// pure function of the frame number, so the live preview and the MP4 render match.
+// Storyboard: film/storyboard.md. Skills: javascript-animation + soundtrack.
+const W = 1920, H = 1080, FPS = 30, DUR = 47.5, FRAMES = Math.round(FPS * DUR);
+const cv = document.getElementById('c');
+let ctx = cv.getContext('2d');
+
+// ---------- look: paper era → SmartShala, told by the line itself ----------
+const PAPER = '#F5EFE6', SHEET = '#FFFDF6', INK = '#0E1D61', BLUE = '#003DE5', BLUE2 = '#2456E6',
+      GOLD = '#B8964F', GOLDINK = '#84662A', RED = '#C8242C', OK = '#0F8A4A', SHADOW = 'rgba(14,29,97,0.14)';
+const LOOK = { wobble: 1.1, boil: 4 };
+const SANS = '"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif';
+const HAND = 'Georgia, "Times New Roman", serif';
+const MONO = 'Consolas, ui-monospace, "Courier New", monospace';
+const f = (w, s, fam) => `${w} ${s}px ${fam}`;
+
+// ---------- math ----------
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const easeOut = t => 1 - Math.pow(1 - clamp(t), 3);
+const expoOut = t => { t = clamp(t); return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); };
+const settle = t => { t = clamp(t); const c = 1.15; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }; // ≤3% overshoot
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+function hash2(a, b) {
+  let n = Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263);
+  n = Math.imul(n ^ (n >>> 13), 1274126177);
+  return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+}
+function vnoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  return lerp(lerp(hash2(xi, yi), hash2(xi + 1, yi), u), lerp(hash2(xi, yi + 1), hash2(xi + 1, yi + 1), u), v);
+}
+function rng(seed) { let a = seed | 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- hand-drawn primitives (from the skill's starter) ----------
+let BOIL = 0, SHADOWING = false;
+function jit(x, y, seed, amp) {
+  const s = seed * 13.37;
+  return [x + (vnoise(x * .012 + s, y * .012) - .5) * 2 * amp + (vnoise(x * .09 + s, y * .09 + 7) - .5) * amp * .6,
+          y + (vnoise(x * .012, y * .012 + s + 50) - .5) * 2 * amp + (vnoise(x * .09 + 3, y * .09 + s) - .5) * amp * .6];
+}
+function resample(pts, step = 9, closed = false) {
+  const out = [], P = closed ? [...pts, pts[0]] : pts;
+  for (let i = 0; i < P.length - 1; i++) {
+    const [x0, y0] = P[i], [x1, y1] = P[i + 1], n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / step));
+    for (let k = 0; k < n; k++) out.push([lerp(x0, x1, k / n), lerp(y0, y1, k / n)]);
+  }
+  if (!closed) out.push(P[P.length - 1]);
+  return out;
+}
+function tracePath(pts, closed) {
+  ctx.beginPath();
+  if (pts.length < 3) { ctx.moveTo(...pts[0]); pts.slice(1).forEach(p => ctx.lineTo(...p)); if (closed) ctx.closePath(); return; }
+  const P = closed ? [...pts, pts[0], pts[1]] : pts;
+  ctx.moveTo(...(closed ? [(P[0][0] + P[1][0]) / 2, (P[0][1] + P[1][1]) / 2] : P[0]));
+  for (let i = 1; i < P.length - 1; i++) ctx.quadraticCurveTo(P[i][0], P[i][1], (P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2);
+  if (!closed) ctx.lineTo(...P[P.length - 1]); else ctx.closePath();
+}
+const J = (pts, seed, amp) => LOOK.wobble ? pts.map(([x, y]) => jit(x, y, BOIL + seed, amp * LOOK.wobble)) : pts;
+function ink(pts, o = {}) {
+  const { w = 3, col = INK, closed = false, amp = 1.6, seed = 0, alpha = 1 } = o;
+  const passes = LOOK.wobble > .15 ? 2 : 1;
+  ctx.save(); ctx.lineCap = ctx.lineJoin = 'round';
+  for (let p = 0; p < passes; p++) {
+    ctx.globalAlpha = alpha * (p ? .4 * LOOK.wobble : 1);
+    ctx.strokeStyle = SHADOWING ? SHADOW : col; ctx.lineWidth = w * (p ? .55 : 1);
+    tracePath(J(pts, seed + p * .41, amp * (p ? 1.4 : 1)), closed); ctx.stroke();
+  }
+  ctx.restore();
+}
+function fill(pts, col, o = {}) {
+  const { amp = 1.4, seed = 0, alpha = 1 } = o;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = SHADOWING ? SHADOW : col;
+  tracePath(J(pts, seed + .2, amp), true); ctx.fill(); ctx.restore();
+}
+function withShadow(fn, dx = 8, dy = 10) { ctx.save(); ctx.translate(dx, dy); SHADOWING = true; fn(); SHADOWING = false; ctx.restore(); fn(); }
+const rect = (x, y, w, h) => resample([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], 14, true);
+const line = (x0, y0, x1, y1) => resample([[x0, y0], [x1, y1]], 12);
+const arc = (cx, cy, r, a0, a1, ry = r) => { const n = Math.max(8, Math.round(Math.abs(a1 - a0) * r / 9)), o = [];
+  for (let i = 0; i <= n; i++) { const a = lerp(a0, a1, i / n); o.push([cx + Math.cos(a) * r, cy + Math.sin(a) * ry]); } return o; };
+const ellipse = (cx, cy, rx, ry, rot = 0) => { const n = 48, o = []; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = Math.cos(a) * rx, y = Math.sin(a) * ry;
+  o.push([cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]); } return o; };
+function drawOn(pts, p, o = {}) { const n = Math.max(2, Math.round(pts.length * clamp(p))); if (p > 0) ink(pts.slice(0, n), o); }
+// crisp UI primitives (the SmartShala era)
+function rr(x, y, w, h, r, fillCol, stroke) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); if (fillCol) { ctx.fillStyle = fillCol; ctx.fill(); } if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2 * PX; ctx.stroke(); } }
+function text(s, x, y, font, col, align = 'left', alpha = 1) { ctx.save(); ctx.globalAlpha *= alpha; ctx.font = font; ctx.fillStyle = col; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.fillText(s, x, y); ctx.restore(); }
+function glow(x, y, r, rgb, a) { ctx.save(); const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r); ctx.restore(); }
+
+// ---------- one world, many cameras ----------
+let PX = 1;
+function withCamera(cam, fn) { ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(cam.k, cam.k); ctx.translate(-cam.cx, -cam.cy); const px = PX; PX = 1 / cam.k; fn(); PX = px; ctx.restore(); }
+let LAYOUT = [];
+function claim(id, kind, x, y, w, h) {
+  const m = ctx.getTransform(), P = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([a, c]) => [m.a * a + m.c * c + m.e, m.b * a + m.d * c + m.f]);
+  const xs = P.map(p => p[0]), ys = P.map(p => p[1]); LAYOUT.push({ id, kind, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) });
+}
+
+// ---------- paper ground ----------
+const paper = document.createElement('canvas'); paper.width = W; paper.height = H;
+(() => {
+  const p = paper.getContext('2d'), r = rng(11);
+  p.fillStyle = PAPER; p.fillRect(0, 0, W, H);
+  for (let i = 0; i < 70000; i++) { p.fillStyle = r() < .5 ? 'rgba(90,70,50,0.04)' : 'rgba(255,255,255,0.07)'; p.fillRect(r() * W, r() * H, 1 + r() * 1.4, 1 + r() * 1.4); }
+  p.strokeStyle = 'rgba(120,95,70,0.05)'; p.lineWidth = 1;
+  for (let i = 0; i < 220; i++) { const x = r() * W, y = r() * H, a = r() * 6.28, l = 6 + r() * 20; p.beginPath(); p.moveTo(x, y); p.quadraticCurveTo(x + Math.cos(a) * l / 2 + 3, y + Math.sin(a) * l / 2, x + Math.cos(a) * l, y + Math.sin(a) * l); p.stroke(); }
+  const g = p.createRadialGradient(W / 2, H / 2, W * .35, W / 2, H / 2, W * .78); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(60,40,20,0.12)'); p.fillStyle = g; p.fillRect(0, 0, W, H);
+})();
+const layer = document.createElement('canvas'); layer.width = W; layer.height = H;
+function drawLayer(fn, filter) { const main = ctx, l = layer.getContext('2d'); l.setTransform(1, 0, 0, 1, 0, 0); l.clearRect(0, 0, W, H); ctx = l; fn(); ctx = main; ctx.save(); ctx.filter = filter || 'none'; ctx.drawImage(layer, 0, 0); ctx.restore(); }
+
+// ---------- storyboard: the single source of truth ----------
+const BPM = 96, BEAT = 60 / BPM, BAR = BEAT * 4, b = n => n * BEAT;
+const SH = { title: 0, admit: 5, copies: 10, mismatch: 17.5, wait: 20, defaulters: 22.5, merge: 25, record: 30, everyone: 35, end: 42.5 };
+const REG = [  // the five registers, left to right on one desk
+  { x: -1720, title: 'ADMISSION REGISTER', owner: 'Office', cover: '#22336E', write: 6.25, roll: '12' },
+  { x: -860, title: 'ATTENDANCE · 7-B', owner: 'Class teacher', cover: '#7E2B35', write: 10.6, roll: '12' },
+  { x: 0, title: 'FEE CARD', owner: 'Accountant', cover: '#2C6249', write: 12.5, roll: '12' },
+  { x: 860, title: 'BUS LIST · ROUTE 4', owner: 'Transport', cover: '#8C6E33', write: 14.4, roll: '12' },
+  { x: 1720, title: 'MARK SHEET · UT-2', owner: 'Subject teachers', cover: '#44527F', write: 16.2, roll: '21' }
+];
+const WRITE_DUR = 1.25;
+const MON = { x: 0, y: -60, w: 1280, h: 780 };              // the SmartShala screen in the world
+const ROLES = [
+  { name: 'Principal', line: 'Fees today', x: -1110, y: -470, col: BLUE, at: 35.6 },
+  { name: 'Teacher', line: '7-B attendance', x: 1110, y: -470, col: OK, at: 36.2 },
+  { name: 'Accountant', line: 'Receipt R-2041', x: -1110, y: 350, col: GOLD, at: 36.8 },
+  { name: 'Office', line: 'New admission', x: 1110, y: 350, col: '#7E2B35', at: 37.4 }
+];
+const TABS = [['Admission', 30.6], ['Attendance', 31.2], ['Fees', 31.8], ['Transport', 32.5], ['Marks', 33.1]];
+const SHOTS = [
+  { from: 0, to: 5, cam: t => ({ cx: 0, cy: 10, k: lerp(.4, .43, ease(prog(t, 0, 5))) }) },
+  { from: 5, to: 10, cam: t => ({ cx: lerp(-1720, -1600, ease(prog(t, 5, 10))), cy: 0, k: 1.18 }) },
+  { from: 10, to: 17.5, cam: t => ({ cx: lerp(-860, 1720, ease(prog(t, 10, 17.2))), cy: 0, k: .95 }) },
+  { from: 17.5, to: 20, overlay: 'mismatch', cam: () => ({ cx: 1720, cy: 0, k: .95 }) },
+  { from: 20, to: 22.5, overlay: 'wait', cam: () => ({ cx: 0, cy: 0, k: .5 }) },
+  { from: 22.5, to: 25, cam: t => ({ cx: 0, cy: 10, k: lerp(1.22, 1.3, ease(prog(t, 22.5, 25))) }) },
+  { from: 25, to: 30, cam: () => ({ cx: 0, cy: -20, k: .42 }) },
+  { from: 30, to: 35, cam: t => ({ cx: 0, cy: 40, k: lerp(.84, .9, ease(prog(t, 30, 35))) }) },
+  { from: 35, to: 42.5, cam: t => { const p = expoOut(prog(t, 35, 37)); return { cx: 0, cy: lerp(40, -40, p), k: lerp(.9, .62, p) }; } },
+  { from: 42.5, to: DUR, overlay: 'end', cam: () => ({ cx: 0, cy: -40, k: .62 }) }
+];
+const CAPTIONS = [
+  [0.9, 5, 'Why is the school office always catching up?'],
+  [5.6, 10, 'Aarav joins Class 7-B. The office writes him in.'],
+  [10.4, 17.5, 'Then four more people write him in. Again.'],
+  [17.8, 20, 'Copies drift: Roll 12 here, Roll 21 there.'],
+  [20.3, 22.5, 'The principal waits till evening for today’s fees.'],
+  [22.8, 25, 'Defaulters turn up at the end of term.'],
+  [27.8, 30, 'So we put the whole school in one place.'],
+  [30.3, 35, 'Aarav is written once. Every office reads it.'],
+  [37.6, 42.3, 'Principal, teachers, accountant, office — the same live numbers.']
+];
+const EVENTS = [
+  ...REG.map(r => [r.write, 'scratch']),
+  [18.75, 'stamp'], [19.15, 'stamp'], [20.6, 'alert'], [21.25, 'tick'], [23.75, 'stamp'],
+  [25, 'whoosh'], [27.5, 'chime'],
+  ...TABS.map(([, at]) => [at, 'pop']),
+  ...ROLES.map(r => [r.at, 'pop']), [38.5, 'ping'], [40, 'ping'],
+  [42.5, 'resolve'], [45.6, 'pop']
+];
+
+// ---------- the clock (persistent gauge) ----------
+function clockMinutes(t) {             // school time shown, in minutes after midnight
+  const k = [[0, 450], [10, 490], [17.5, 540], [20.6, 545], [22.4, 1090], [25, 1095], [27.2, 1095], [28.4, 545], [35, 552], [42.5, 560]];
+  for (let i = 0; i < k.length - 1; i++) if (t <= k[i + 1][0]) return lerp(k[i][1], k[i + 1][1], ease(prog(t, k[i][0], k[i + 1][0])));
+  return k[k.length - 1][1];
+}
+const hhmm = m => { m = Math.round(m); const h = Math.floor(m / 60) % 24, mm = m % 60; return `${((h + 11) % 12) + 1}:${String(mm).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
+function gauges(t) {
+  const a = t < SH.end ? 1 : 1 - prog(t, SH.end, SH.end + .5);
+  if (a <= 0) return;
+  ctx.save(); ctx.globalAlpha = a;
+  // clock, top right
+  const cx = 1780, cy = 112, r = 46, m = clockMinutes(t);
+  rr(cx - 150, cy - 58, 210, 116, 58, 'rgba(255,253,246,.9)'); claim('clock', 'text', cx - 150, cy - 58, 210, 116);
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 7); ctx.fillStyle = SHEET; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = INK; ctx.stroke();
+  for (let i = 0; i < 12; i++) { const an = i / 12 * Math.PI * 2; ctx.beginPath(); ctx.moveTo(cx + Math.cos(an) * r * .78, cy + Math.sin(an) * r * .78); ctx.lineTo(cx + Math.cos(an) * r * .9, cy + Math.sin(an) * r * .9); ctx.lineWidth = 2; ctx.stroke(); }
+  const ha = (m / 720) * Math.PI * 2 - Math.PI / 2, ma = (m % 60) / 60 * Math.PI * 2 - Math.PI / 2;
+  ctx.lineCap = 'round'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ha) * r * .5, cy + Math.sin(ha) * r * .5); ctx.stroke();
+  ctx.strokeStyle = t > 20 && t < 25 ? RED : BLUE; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ma) * r * .75, cy + Math.sin(ma) * r * .75); ctx.stroke();
+  text(hhmm(m), cx - 64, cy, f(700, 22, SANS), t > 20 && t < 25 ? RED : INK, 'right');
+  // counter, top left: how many times Aarav has been written
+  if (t > 6) {
+    const n = t < 27.5 ? REG.filter(rg => t > rg.write).length : 1;
+    const one = t >= 27.5;
+    rr(64, 54, 296, 116, 22, 'rgba(255,253,246,.9)'); claim('counter', 'text', 64, 54, 296, 116);
+    text('AARAV WRITTEN', 92, 88, f(600, 17, MONO), 'rgba(14,29,97,.55)');
+    text(`×${n}`, 92, 134, f(800, 50, SANS), one ? BLUE : n >= 4 ? RED : INK);
+    text(one ? 'written once' : n >= 2 ? 'by different people' : 'so far', 168, 136, f(500, 19, SANS), one ? BLUE : 'rgba(14,29,97,.6)');
+  }
+  ctx.restore();
+}
+
+// ---------- captions (kinetic: rise out of a mask, settle, fade) ----------
+function captions(t) {
+  for (const [a, z, s] of CAPTIONS) {
+    if (t < a || t > z) continue;
+    const pIn = expoOut(prog(t, a, a + .7)), pOut = prog(t, z - .35, z);
+    ctx.save(); ctx.font = f(650, 46, SANS);
+    const w = ctx.measureText(s).width + 64, x = 96, y = 930;
+    ctx.globalAlpha = 1 - pOut;
+    rr(x, y - 50, w, 100, 50, 'rgba(255,253,246,.92)');
+    ctx.fillStyle = GOLD; ctx.fillRect(x + 32, y - 30, 4, 60);
+    ctx.beginPath(); ctx.rect(x, y - 44, w, 88); ctx.clip();
+    text(s, x + 52, y + lerp(70, 0, pIn), f(650, 46, SANS), INK);
+    ctx.restore();
+    claim('caption', 'text', x, y - 50, w, 100);
+  }
+}
+
+// ---------- registers (paper era) ----------
+const BOOK = { w: 760, h: 500 };
+function register(rg, i, t, fade) {
+  const x0 = rg.x - BOOK.w / 2, y0 = -BOOK.h / 2;
+  const open = rg.write - .9;
+  const o = ease(prog(t, open, open + .6));
+  ctx.save(); ctx.globalAlpha *= fade;
+  // owner tag above
+  text(rg.owner.toUpperCase(), rg.x, y0 - 54, f(600, 22, MONO), GOLDINK, 'center');
+  ink(line(rg.x - 70, y0 - 30, rg.x + 70, y0 - 30), { w: 2, col: GOLD, seed: i + 30 });
+  // pages
+  withShadow(() => {
+    if (o > 0) {
+      const lw = BOOK.w / 2 * o;
+      fill(rect(rg.x - lw, y0, lw, BOOK.h), SHEET, { seed: i + 1 });
+    }
+    fill(rect(rg.x, y0, BOOK.w / 2, BOOK.h), SHEET, { seed: i + 2 });
+  });
+  if (o > 0) {
+    const lw = BOOK.w / 2 * o;
+    ctx.save(); ctx.beginPath(); ctx.rect(rg.x - lw, y0, lw, BOOK.h); ctx.clip();
+    for (let k = 1; k < 13; k++) ink(line(x0 + 14, y0 + 30 + k * 36, rg.x - 14, y0 + 30 + k * 36), { w: 1.2, col: 'rgba(14,29,97,.18)', seed: i * 9 + k });
+    ink(line(x0 + 64, y0 + 10, x0 + 64, y0 + BOOK.h - 10), { w: 1.4, col: 'rgba(200,36,44,.35)', seed: i + 40 });
+    text(rg.title, x0 + 82, y0 + 34, f(700, 20, MONO), INK);
+    for (let k = 2; k < 11; k++) {                                   // earlier entries, in other hands
+      const r = rng(i * 100 + k), len = 140 + r() * 170;
+      ink(resample([[x0 + 82, y0 + 26 + k * 36], [x0 + 82 + len * .5, y0 + 22 + k * 36 + (r() - .5) * 4], [x0 + 82 + len, y0 + 26 + k * 36]], 8), { w: 2, col: 'rgba(14,29,97,.55)', seed: i * 3 + k });
+    }
+    ctx.restore();
+  }
+  // right page: rules + the new entry
+  for (let k = 1; k < 13; k++) ink(line(rg.x + 14, y0 + 30 + k * 36, rg.x + BOOK.w / 2 - 14, y0 + 30 + k * 36), { w: 1.2, col: 'rgba(14,29,97,.18)', seed: i * 7 + k });
+  const wp = prog(t, rg.write, rg.write + WRITE_DUR);
+  if (wp > 0) {
+    const ex = rg.x + 34, ey = y0 + 30 + 4 * 36 - 6;
+    ctx.save(); ctx.font = f('italic 400', 40, HAND);
+    const full = 'Aarav Sharma', w1 = ctx.measureText(full).width;
+    ctx.beginPath(); ctx.rect(ex - 4, ey - 40, (w1 + 10) * clamp(wp / .7), 60); ctx.clip();
+    text(full, ex, ey, f('italic 400', 40, HAND), INK);
+    ctx.restore();
+    const wp2 = prog(t, rg.write + WRITE_DUR * .7, rg.write + WRITE_DUR);
+    ctx.save(); ctx.beginPath(); ctx.rect(ex, ey + 6, 340 * wp2, 60); ctx.clip();
+    text(`7-B · Roll ${rg.roll}`, ex, ey + 38, f('italic 400', 32, HAND), rg.roll === '12' ? INK : '#2B2F6B');
+    ctx.restore();
+    if (wp < 1) pen(ex + Math.min(w1, (w1 + 10) * clamp(wp / .7)) + (wp > .7 ? (wp - .7) / .3 * -60 : 0), ey + (wp > .7 ? 38 : 0) + 8, t);
+  }
+  // the cover: closed on the right page, swinging open over the spine
+  const cw = BOOK.w / 2 * (1 - o);
+  if (cw > 1) {
+    withShadow(() => fill(rect(rg.x, y0 - 6, cw, BOOK.h + 12), rg.cover, { seed: i + 7 }), 6, 8);
+    if (cw > 120) {
+      ink(rect(rg.x + cw * .12, y0 + 60, cw * .76, 120), { w: 2.4, col: GOLD, seed: i + 50 });
+      ctx.save(); ctx.beginPath(); ctx.rect(rg.x, y0, cw, BOOK.h); ctx.clip();
+      const words = rg.title.split(' · ');
+      words.forEach((wd, k) => text(wd, rg.x + cw / 2, y0 + 108 + k * 34 - (words.length - 1) * 14, f(700, 24, MONO), '#F2E2B8', 'center'));
+      text('2026–27', rg.x + cw / 2, y0 + BOOK.h - 70, f('italic 400', 34, HAND), '#F2E2B8', 'center');
+      ctx.restore();
+    }
+  }
+  ctx.restore();
+  claim('reg' + i, 'keep', x0, y0, BOOK.w, BOOK.h);
+}
+function pen(x, y, t) {                       // a fountain pen, nib at (x, y)
+  const wob = Math.sin(t * 22) * 2;
+  ctx.save(); ctx.translate(x, y + wob); ctx.rotate(-0.75);
+  withShadow(() => { fill(rect(4, -12, 230, 24), INK, { seed: 3 }); }, 10, 14);
+  fill(rect(-34, -9, 40, 18), GOLD, { seed: 4 });
+  fill([[-58, 0], [-34, -9], [-34, 9]], GOLD, { seed: 5 });
+  fill(rect(190, -14, 46, 28), '#1A2347', { seed: 6 });
+  ctx.restore();
+}
+
+// ---------- the mismatch, the wait, the defaulters (screen-space close-ups) ----------
+function strip(x, y, rot, label, roll, p, circleAt, t) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.globalAlpha = easeOut(p);
+  const tear = resample([[-370, -96], [370, -96]], 22).map(([px, py], k) => [px, py + (hash2(k, 3) - .5) * 10]);
+  const tear2 = resample([[370, 96], [-370, 96]], 22).map(([px, py], k) => [px, py + (hash2(k, 7) - .5) * 10]);
+  withShadow(() => fill([...tear, ...tear2], SHEET, { seed: 9 }), 10, 14);
+  text(label, -330, -48, f(700, 24, MONO), 'rgba(14,29,97,.6)');
+  text('Aarav Sharma', -330, 18, f('italic 400', 52, HAND), INK);
+  text(`Roll ${roll}`, 120, 18, f('italic 400', 52, HAND), INK);
+  drawOn(ellipse(190, 20, 100, 50, -.08), prog(t, circleAt, circleAt + .45), { w: 5, col: RED, seed: 12 });
+  ctx.restore();
+}
+function overlayMismatch(t) {
+  ctx.fillStyle = 'rgba(245,239,230,.55)'; ctx.fillRect(0, 0, W, H);
+  strip(700, 400, -.035, 'ADMISSION REGISTER', '12', prog(t, 17.5, 17.9), 18.75, t);
+  strip(1220, 660, .03, 'MARK SHEET · UT-2', '21', prog(t, 17.65, 18.05), 18.75, t);
+  const p = prog(t, 19.15, 19.45);
+  if (p > 0) { ctx.save(); ctx.globalAlpha = p; ctx.translate(1340, 410); ctx.scale(lerp(1.3, 1, easeOut(p)), lerp(1.3, 1, easeOut(p)));
+    text('≠', 0, 0, f(800, 150, SANS), RED, 'center'); ctx.restore(); }
+  claim('strips', 'keep', 320, 290, 1290, 490);
+}
+function overlayWait(t) {
+  ctx.fillStyle = 'rgba(245,239,230,.6)'; ctx.fillRect(0, 0, W, H);
+  const p = easeOut(prog(t, 20, 20.45));
+  ctx.save(); ctx.translate(960, lerp(620, 500, p)); ctx.rotate(-.025); ctx.globalAlpha = p;
+  withShadow(() => fill(rect(-430, -210, 860, 420), '#FFF8E2', { seed: 21 }), 12, 16);
+  ink(line(-430, -150, 430, -150), { w: 1.5, col: 'rgba(14,29,97,.2)', seed: 22 });
+  text('FROM: PRINCIPAL’S OFFICE', -390, -180, f(700, 22, MONO), GOLDINK);
+  const q = prog(t, 20.6, 21.2);
+  ctx.save(); ctx.beginPath(); ctx.rect(-400, -120, 800 * q, 110); ctx.clip();
+  text('Fees collected today?', -390, -62, f('italic 400', 66, HAND), INK); ctx.restore();
+  const a = prog(t, 21.25, 21.9);
+  ctx.save(); ctx.beginPath(); ctx.rect(-400, 10, 800 * a, 110); ctx.clip();
+  text('— will tell you by evening.', -390, 66, f('italic 400', 56, HAND), RED); ctx.restore();
+  ctx.restore();
+  claim('chit', 'keep', 520, 280, 880, 440);
+}
+function defaulters(t) {                      // on the fee card, in the world
+  const rg = REG[2], x0 = rg.x + 34, y0 = -BOOK.h / 2 + 30 + 6 * 36;
+  const n = Math.floor(lerp(0, 6, prog(t, 22.5, 23.6)));
+  for (let k = 0; k < n; k++) {
+    const r = rng(500 + k), len = 120 + r() * 90, y = y0 + k * 36 - 8;
+    ink(resample([[x0, y], [x0 + len, y + (r() - .5) * 4]], 8), { w: 2, col: 'rgba(14,29,97,.6)', seed: 60 + k });
+    text('pending', rg.x + 300, y, f('italic 400', 26, HAND), RED, 'right');
+  }
+  const p = prog(t, 23.75, 24.05);
+  if (p > 0) {
+    ctx.save(); ctx.translate(rg.x - 190, 40); ctx.rotate(-.12); const s = lerp(1.35, 1, easeOut(p)); ctx.scale(s, s); ctx.globalAlpha = p;
+    ink(rect(-180, -52, 360, 104), { w: 5, col: RED, seed: 70 });
+    text('23 DEFAULTERS', 0, -14, f(800, 34, MONO), RED, 'center');
+    text('found at term end', 0, 26, f(600, 22, MONO), RED, 'center');
+    ctx.restore();
+    claim('stamp', 'keep', rg.x - 380, -20, 380, 130);
+  }
+}
+
+// ---------- the merge: every written line flows into one screen ----------
+function merge(t) {
+  for (let i = 0; i < REG.length; i++) {
+    const rg = REG[i];
+    for (let k = 0; k < 9; k++) {
+      const st = 25.2 + i * .12 + k * .07, p = ease(prog(t, st, st + 1.7));
+      if (p <= 0 || p >= 1) continue;
+      const sx = rg.x - 300 + (k % 2) * 330, sy = -BOOK.h / 2 + 60 + k * 44;
+      const ex = MON.x + (hash2(i, k) - .5) * 600, ey = MON.y + (hash2(k, i) - .5) * 300;
+      const cx = (sx + ex) / 2, cy = Math.min(sy, ey) - 520;
+      const x = (1 - p) * (1 - p) * sx + 2 * (1 - p) * p * cx + p * p * ex, y = (1 - p) * (1 - p) * sy + 2 * (1 - p) * p * cy + p * p * ey;
+      const len = lerp(200, 40, p);
+      ctx.save(); ctx.globalAlpha = 1 - prog(p, .8, 1); ctx.strokeStyle = p < .5 ? INK : BLUE; ctx.lineWidth = lerp(7, 12, p) * 1.6; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x - len / 2, y); ctx.lineTo(x + len / 2, y); ctx.stroke(); ctx.restore();
+    }
+  }
+}
+
+// ---------- the SmartShala screen ----------
+function monitor(t) {
+  const a = easeOut(prog(t, 27.4, 28.1));
+  if (a <= 0) return;
+  const s = lerp(.94, 1, settle(prog(t, 27.4, 28.2)));
+  const { x, y, w, h } = MON;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(s, s);
+  glow(0, 0, 1100, '0,61,229', .16 * a);
+  // stand on the desk
+  rr(-70, h / 2 - 10, 140, 150, 10, '#1A2347'); rr(-260, h / 2 + 130, 520, 26, 13, '#1A2347');
+  rr(-w / 2 - 22, -h / 2 - 22, w + 44, h + 44, 30, '#0E1D61');
+  rr(-w / 2, -h / 2, w, h, 12, '#F7F8FB');
+  ctx.save(); ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 12); ctx.clip();
+  ctx.fillStyle = BLUE; ctx.fillRect(-w / 2, -h / 2, w, 92);
+  markAt(-w / 2 + 52, -h / 2 + 46, 34, '#FFFFFF');
+  text('SmartShala', -w / 2 + 84, -h / 2 + 46, f(800, 34, SANS), '#FFFFFF');
+  text(t < 35 ? 'Student record' : 'Principal · Today', w / 2 - 36, -h / 2 + 46, f(500, 24, SANS), 'rgba(255,255,255,.85)', 'right');
+  // the one record
+  const cy = -h / 2 + 150;
+  ctx.beginPath(); ctx.arc(-w / 2 + 104, cy + 30, 50, 0, 7); ctx.fillStyle = BLUE; ctx.fill();
+  text('AS', -w / 2 + 104, cy + 30, f(800, 34, SANS), '#fff', 'center');
+  text('Aarav Sharma', -w / 2 + 176, cy + 8, f(800, 46, SANS), INK);
+  text('Class 7-B · Roll 12 · Adm. no. 2019/0412', -w / 2 + 178, cy + 58, f(500, 26, SANS), 'rgba(14,29,97,.6)');
+  TABS.forEach(([name, at], k) => {
+    const p = prog(t, at, at + .35), tx = -w / 2 + 60 + k * 236, ty = cy + 130;
+    rr(tx, ty, 216, 120, 16, p > 0 ? '#FFFFFF' : 'rgba(14,29,97,.04)', 'rgba(14,29,97,.12)');
+    text(name, tx + 22, ty + 36, f(600, 26, SANS), INK);
+    if (p > 0) {
+      ctx.save(); ctx.translate(tx + 182, ty + 36); const sc = lerp(.4, 1, settle(p)); ctx.scale(sc, sc);
+      ctx.beginPath(); ctx.arc(0, 0, 18, 0, 7); ctx.fillStyle = OK; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-8, 1); ctx.lineTo(-2, 7); ctx.lineTo(9, -6); ctx.stroke(); ctx.restore();
+    }
+    const val = ['Added once', '94% · present', '₹0 due', 'Route 4', 'A1 · UT-2'][k];
+    text(val, tx + 22, ty + 82, f(500, 22, SANS), 'rgba(14,29,97,.6)', 'left', p);
+  });
+  // live numbers row (fills in once the record is complete)
+  const live = prog(t, 33.6, 34.2);
+  const kpis = [['Staff in', '38 / 41'], ['Attendance', '94%'], ['Fees today', '₹' + Math.round(lerp(126500, 184500, ease(prog(t, 36, 40.5)))).toLocaleString('en-IN')]];
+  kpis.forEach(([k, v], i) => {
+    const kx = -w / 2 + 60 + i * 394, ky = cy + 290;
+    ctx.save(); ctx.globalAlpha *= live;
+    rr(kx, ky, 370, 150, 18, i === 2 ? BLUE2 : '#FFFFFF', i === 2 ? null : 'rgba(14,29,97,.12)');
+    text(k, kx + 26, ky + 44, f(500, 26, SANS), i === 2 ? 'rgba(255,255,255,.85)' : 'rgba(14,29,97,.6)');
+    text(v, kx + 26, ky + 100, f(800, 50, SANS), i === 2 ? '#fff' : INK);
+    ctx.restore();
+  });
+  ctx.restore();
+  ctx.restore();
+  claim('monitor', 'keep', x - (w / 2 + 22) * s, y - (h / 2 + 22) * s, (w + 44) * s, (h + 44) * s);
+}
+// SmartShala's real SS mark: the logo traced to a vector path (src/components/Brand/markPath.js),
+// inlined here so the film stays zero-asset. Letters span roughly 360..872 × 330..915.
+const SS = new Path2D('M 496.768 342.112 C 461.709 345.494, 429.976 359.639, 408.626 381.401 C 385.381 405.095, 373.008 435.526, 373.008 469 C 373.008 507.290, 388.203 538.254, 417.949 560.584 C 427.804 567.982, 448.371 578.782, 465 585.293 C 471.325 587.769, 492.925 595.247, 513 601.911 C 555.327 615.962, 565.185 620.380, 575.115 629.748 C 582.181 636.413, 585.231 641.431, 587.580 650.256 C 590.975 663.009, 587.826 677.469, 579.180 688.825 C 576.012 692.985, 565.928 700.245, 559.472 703.012 C 537.043 712.626, 506.759 712.849, 483.783 703.568 C 474.036 699.631, 466.923 694.870, 459.026 686.998 C 450.162 678.162, 445.109 669.614, 440.408 655.500 C 438.576 650, 436.722 645.578, 436.288 645.673 C 433.916 646.192, 371.350 671.320, 370.573 672.066 C 369.066 673.510, 374.765 692.482, 380.139 703.914 C 386.540 717.533, 394.091 728.696, 403.318 738.184 C 431.875 767.547, 476.218 782.772, 527 780.650 C 579.372 778.462, 620.830 757.693, 643.744 722.165 C 646.818 717.399, 649.420 713.376, 649.525 713.225 C 649.631 713.074, 651.771 713.830, 654.281 714.906 C 659.155 716.995, 693.404 728.583, 727 739.510 C 762.080 750.920, 773.886 757.961, 780.808 771.602 C 787.943 785.662, 784.718 803.246, 772.826 815.124 C 750.433 837.491, 697.534 839.781, 668 819.661 C 656.479 811.812, 645.951 798.835, 641.001 786.381 C 639.716 783.147, 638.570 780.368, 638.456 780.207 C 638.341 780.046, 631.329 783.259, 622.874 787.348 C 605.562 795.719, 594.319 800.509, 579 806.042 C 566.384 810.599, 566.514 810.115, 573.864 825.232 C 593.342 865.290, 625.820 889.491, 674 899.849 C 689.512 903.184, 704.567 904.325, 724.904 903.707 C 746.095 903.064, 756.511 901.534, 774.018 896.495 C 823.517 882.247, 856.256 846.482, 861.891 800.500 C 863.361 788.508, 863.279 782.437, 861.486 770.500 C 856.119 734.757, 835.474 708.490, 798.227 690.012 C 784.432 683.169, 773.189 679.007, 723.500 662.350 C 680.162 647.822, 670.382 643.455, 661.476 634.657 C 653.176 626.457, 650.623 619.941, 651.231 608.500 C 652.390 586.662, 669.851 572.174, 700.075 567.972 C 716.066 565.749, 737.501 569.407, 751.235 576.704 C 759.682 581.192, 770.409 590.900, 775.681 598.829 C 777.755 601.948, 780.852 608.214, 782.562 612.753 C 784.272 617.291, 785.906 621.239, 786.193 621.526 C 786.479 621.812, 800.840 616.904, 818.107 610.619 C 861.467 594.835, 861 595.022, 861 593.478 C 861 591.251, 853.668 574.993, 849.261 567.447 C 839.966 551.532, 827.971 537.946, 813.627 527.085 C 794.780 512.816, 772.548 503.394, 745.694 498.297 C 731.137 495.534, 694.446 495.827, 678.500 498.833 C 643.073 505.513, 615.513 521.355, 597.740 545.256 C 594.947 549.012, 592.176 551.871, 591.581 551.609 C 590.987 551.348, 585.889 549.105, 580.252 546.624 C 574.616 544.143, 559.091 538.245, 545.752 533.517 C 491.068 514.133, 478.093 508.640, 467.748 500.496 C 456.751 491.838, 450.989 480.385, 451.012 467.229 C 451.052 444.224, 466.351 426.387, 492.545 418.803 C 499.491 416.792, 502.657 416.504, 517.500 416.535 C 530.744 416.563, 535.936 416.970, 540.998 418.377 C 568.165 425.929, 585.621 442.029, 594.038 467.299 C 595.328 471.172, 596.776 473.905, 597.401 473.651 C 598.006 473.405, 605.025 470.413, 613 467.004 C 620.975 463.594, 636.950 456.972, 648.500 452.290 C 660.050 447.607, 669.685 443.604, 669.910 443.394 C 670.667 442.690, 667.865 434.581, 663.519 424.900 C 637.886 367.796, 571.615 334.893, 496.768 342.112');
+function markAt(cx, cy, r, col) {
+  ctx.save(); ctx.translate(cx, cy); const k = (r * 1.7) / 585; ctx.scale(k, k); ctx.translate(-616, -622);
+  ctx.fillStyle = col; ctx.fill(SS, 'evenodd'); ctx.restore();
+}
+
+// ---------- the four desks around the screen ----------
+function roles(t) {
+  for (const rl of ROLES) {
+    const p = prog(t, rl.at, rl.at + .5);
+    if (p <= 0) continue;
+    const cw = 600, ch = 230, s = lerp(.9, 1, settle(p));
+    // the link and its pulses
+    const sx = rl.x < 0 ? MON.x - MON.w / 2 - 22 : MON.x + MON.w / 2 + 22, sy = rl.y + ch / 2 - (rl.y < 0 ? 0 : 0);
+    const ex = rl.x + (rl.x < 0 ? cw / 2 : -cw / 2), ey = rl.y;
+    const dl = prog(t, rl.at + .1, rl.at + .6);
+    ctx.save(); ctx.strokeStyle = 'rgba(36,86,230,.55)'; ctx.lineWidth = 4 * PX * .6; ctx.setLineDash([14, 12]);
+    ctx.beginPath(); ctx.moveTo(sx, Math.max(MON.y - MON.h / 2 + 40, Math.min(MON.y + MON.h / 2 - 40, ey))); ctx.lineTo(lerp(sx, ex, dl), ey); ctx.stroke(); ctx.restore();
+    if (dl >= 1) for (let k = 0; k < 2; k++) {
+      const q = ((t - rl.at) * .55 + k * .5) % 1, px = lerp(ex, sx, k ? q : 1 - q);
+      ctx.beginPath(); ctx.arc(px, ey, 11, 0, 7); ctx.fillStyle = BLUE2; ctx.fill();
+    }
+    ctx.save(); ctx.translate(rl.x, rl.y); ctx.scale(s, s); ctx.globalAlpha = easeOut(p);
+    ctx.shadowColor = 'rgba(14,29,97,.25)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18;
+    rr(-cw / 2, -ch / 2, cw, ch, 26, '#FFFDF8'); ctx.shadowColor = 'transparent';
+    ctx.beginPath(); ctx.arc(-cw / 2 + 80, 0, 46, 0, 7); ctx.fillStyle = rl.col; ctx.fill();
+    text(rl.name[0], -cw / 2 + 80, 2, f(800, 44, SANS), '#fff', 'center');
+    text(rl.name, -cw / 2 + 150, -40, f(800, 44, SANS), INK);
+    text(rl.line, -cw / 2 + 152, 8, f(500, 28, SANS), 'rgba(14,29,97,.6)');
+    const v = rl.name === 'Principal' ? '₹' + Math.round(lerp(126500, 184500, ease(prog(t, 36, 40.5)))).toLocaleString('en-IN')
+      : rl.name === 'Teacher' ? '38 / 40 present' : rl.name === 'Accountant' ? 'PDF ready' : 'Aarav · 7-B';
+    text(v, -cw / 2 + 152, 58, f(800, 36, SANS), rl.name === 'Principal' ? BLUE : INK);
+    ctx.restore();
+    claim('role-' + rl.name, 'keep', rl.x - cw / 2, rl.y - ch / 2, cw, ch);
+  }
+}
+
+// ---------- end card ----------
+function endCard(t) {
+  const a = ease(prog(t, SH.end, SH.end + .7));
+  ctx.save(); ctx.globalAlpha = a; ctx.drawImage(paper, 0, 0);
+  glow(960, 1180, 900, '0,61,229', .12);
+  ctx.strokeStyle = 'rgba(0,61,229,.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(960, 1080, 760, 640, 0, Math.PI, 0); ctx.stroke();
+  const m = expoOut(prog(t, 42.8, 43.6));
+  ctx.save(); ctx.globalAlpha = a * m; ctx.translate(960, lerp(380, 360, m));
+  rr(-64, -64, 128, 128, 30, BLUE); markAt(0, 0, 56, '#fff'); ctx.restore();
+  const t1 = expoOut(prog(t, 43.3, 44.1));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 440, W, 120); ctx.clip();
+  text('SmartShala', 960, lerp(600, 500, t1), f(800, 96, SANS), INK, 'center'); ctx.restore();
+  const t2 = expoOut(prog(t, 44.1, 44.9));
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 560, W, 80); ctx.clip();
+  text('The whole school day, in one system.', 960, lerp(660, 600, t2), f('italic 400', 52, HAND), GOLDINK, 'center'); ctx.restore();
+  const t3 = easeOut(prog(t, 45.6, 46.2));
+  ctx.save(); ctx.globalAlpha = a * t3;
+  rr(960 - 290, 690, 580, 84, 42, BLUE2);
+  text('Book a demo · letssmartshala.com', 960, 732, f(700, 32, SANS), '#fff', 'center');
+  ctx.restore();
+  ctx.restore();
+  claim('end-mark', 'text', 896, 296, 128, 128); claim('end-title', 'text', 600, 450, 720, 100); claim('end-line', 'text', 480, 570, 960, 64); claim('end-cta', 'text', 670, 690, 580, 84);
+}
+
+// ---------- the world ----------
+function world(t) {
+  const fade = 1 - ease(prog(t, 25.2, 27.2));
+  if (fade > 0) REG.forEach((rg, i) => register(rg, i, t, fade));
+  if (t >= 22.5 && t < 25.6) { ctx.save(); ctx.globalAlpha = fade; defaulters(t); ctx.restore(); }
+  if (t >= 25 && t < 27.6) merge(t);
+  monitor(t);
+  if (t >= 35) roles(t);
+}
+
+function draw(frame) {
+  const t = frame / FPS;
+  LOOK.wobble = t < 25 ? 1.1 : lerp(1.1, 0, ease(prog(t, 25, 27.5)));
+  BOIL = Math.floor(frame / LOOK.boil); LAYOUT = [];
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.filter = 'none'; ctx.globalAlpha = 1;
+  ctx.drawImage(paper, 0, 0);
+  const shot = SHOTS.find(s => t >= s.from && t < s.to) || SHOTS[SHOTS.length - 1];
+  if (shot.overlay === 'mismatch' || shot.overlay === 'wait') {
+    drawLayer(() => withCamera(shot.cam(t), () => world(t)), 'blur(7px)');
+    LAYOUT = [];
+    shot.overlay === 'mismatch' ? overlayMismatch(t) : overlayWait(t);
+  } else {
+    withCamera(shot.cam(t), () => world(t));
+  }
+  if (t >= SH.end) { LAYOUT = []; endCard(t); }
+  gauges(t);
+  captions(t);
+  window.LAYOUT = LAYOUT.filter(o => o.x < W && o.y < H && o.x + o.w > 0 && o.y + o.h > 0);
+}
+window.draw = draw; window.FRAMES = FRAMES; window.FPS = FPS;
+window.CUES = [5, 10, 17.5, 20, 22.5, 25, 27.5, 30, 35, 42.5];
+
+// ---------- the score (soundtrack skill: written for this film) ----------
+// D major, 96 BPM, one chord per bar; a tanpura-like drone; clock-tick woodblocks in the
+// paper era; minor colour where things break; a silent break bar; a bell where the screen lights.
+const CHORDS = [ // one per bar (MIDI)
+  [62, 66, 69], [62, 67, 71], [62, 66, 69], [61, 64, 69],      // 0-3  title, admission
+  [59, 62, 66], [55, 59, 62], [57, 61, 64],                    // 4-6  copies
+  [59, 62, 66], [52, 55, 59], [54, 58, 61],                    // 7-9  breaks (Bm, Em, F#)
+  null,                                                        // 10   the break
+  [62, 66, 69, 73], [55, 59, 62, 66], [62, 66, 69, 73],        // 11-13 one place, one record
+  [59, 62, 66], [55, 59, 62, 66], [57, 61, 64, 67],            // 14-16 everyone
+  [62, 66, 69, 74], [62, 66, 69, 74]                           // 17-18 end
+];
+window.SCORE = ac => {
+  const T0 = ac.currentTime + (ac instanceof OfflineAudioContext ? 0 : .05);
+  const hz = m => 440 * Math.pow(2, (m - 69) / 12);
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 3; comp.connect(ac.destination);
+  const master = ac.createGain(); master.gain.value = .8; master.connect(comp);
+  const rev = ac.createConvolver(), wet = ac.createGain(); wet.gain.value = .25; rev.connect(wet); wet.connect(master);
+  { const n = Math.round(ac.sampleRate * 2.2), ir = ac.createBuffer(2, n, ac.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); let s = 41 + c; for (let i = 0; i < n; i++) { s = (s * 1103515245 + 12345) & 0x7fffffff; d[i] = (s / 0x7fffffff * 2 - 1) * Math.pow(1 - i / n, 2.6); } } rev.buffer = ir; }
+  const bus = ac.createGain(); bus.connect(master); bus.connect(rev);
+  const noise = (() => { const n = ac.sampleRate, buf = ac.createBuffer(1, n, n), d = buf.getChannelData(0); let s = 5; for (let i = 0; i < n; i++) { s = (s * 1103515245 + 12345) & 0x7fffffff; d[i] = s / 0x7fffffff * 2 - 1; } return buf; })();
+  function tone(t, type, fr, peak, a, decay, dest = bus, len) {
+    const o = ac.createOscillator(), g = ac.createGain(); o.type = type; o.frequency.value = fr;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.setTargetAtTime(0, t + (len ?? a), decay);
+    o.connect(g); g.connect(dest); o.start(t); o.stop(t + (len ?? a) + decay * 8);
+  }
+  function hiss(t, type, fr, q, peak, a, decay, f2, glide = .2) {
+    const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(); s.buffer = noise;
+    fl.type = type; fl.frequency.setValueAtTime(fr, t); if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + glide); fl.Q.value = q;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.setTargetAtTime(0, t + a, decay);
+    s.connect(fl); fl.connect(g); g.connect(bus); s.start(t, (t * 3.7) % .5); s.stop(t + a + decay * 8);
+  }
+  // drone: D and A, filtered saws, swelling in; silent through the break bar
+  const droneOut = ac.createGain(); droneOut.connect(bus);
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = .4; lp.connect(droneOut);
+  [[38, 0], [45, 4], [50, -3]].forEach(([m, det]) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det; const g = ac.createGain(); g.gain.value = .05; o.connect(g); g.connect(lp); o.start(T0); o.stop(T0 + DUR + 1); });
+  droneOut.gain.setValueAtTime(0, T0); droneOut.gain.linearRampToValueAtTime(.9, T0 + 2.5);
+  droneOut.gain.setValueAtTime(.9, T0 + 25); droneOut.gain.linearRampToValueAtTime(0, T0 + 25.4);
+  droneOut.gain.setValueAtTime(0, T0 + 27.5); droneOut.gain.linearRampToValueAtTime(.9, T0 + 28.5);
+  droneOut.gain.setValueAtTime(.9, T0 + DUR - 2.5); droneOut.gain.linearRampToValueAtTime(0, T0 + DUR);
+  // pad + plucked melody, bar by bar
+  CHORDS.forEach((ch, bar) => {
+    if (!ch) return;
+    const t = T0 + bar * BAR, end = bar >= 17;
+    ch.forEach((m, k) => { tone(t, 'triangle', hz(m), .045, .5, .9, bus, BAR - .3); tone(t, 'sine', hz(m - 12), .03, .6, 1, bus, BAR - .3); });
+    if (bar >= 2 && bar !== 10) {                       // a soft plucked line: chord tones on beats 1 and 3 (+ an 8th in the busy bars)
+      const notes = [ch[ch.length - 1] + 12, ch[1] + 12, ch[0] + 12, ch[1] + 12];
+      notes.forEach((m, k) => { if (end && k > 0) return; tone(t + k * BEAT, 'sine', hz(m), .08, .004, .35); tone(t + k * BEAT, 'triangle', hz(m * 1 + 12), .015, .002, .12); });
+    }
+  });
+  // clock ticks (paper era) — woodblock on every beat, a quicker run while the principal waits
+  for (let bt = 8; bt < 40; bt++) { const t = T0 + bt * BEAT; tone(t, 'sine', bt % 4 === 0 ? 1180 : 1420, bt >= 28 ? .11 : .07, .001, .03); }
+  for (let k = 0; k < 16; k++) tone(T0 + 20.6 + k * .11, 'sine', 1500, .05, .001, .02);
+  // soft low tom, from the copies on (not in the break)
+  for (let bt = 16; bt < 76; bt++) { if (bt >= 40 && bt < 44) continue; if (bt % 4 === 0 || (bt >= 56 && bt % 4 === 2)) { const t = T0 + bt * BEAT, o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(70, t + .16); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.32, t + .004); g.gain.setTargetAtTime(0, t + .004, .1); o.connect(g); g.connect(bus); o.start(t); o.stop(t + .8); } }
+  // sound for every visible action
+  const FX = {
+    scratch: t => { for (let k = 0; k < 6; k++) hiss(t + k * .17, 'bandpass', 2600 + (k % 3) * 500, 3, .09, .01, .05); },
+    stamp: t => { tone(t, 'sine', 90, .35, .003, .09); hiss(t, 'lowpass', 900, .7, .18, .002, .05); },
+    alert: t => { tone(t, 'triangle', hz(74), .09, .005, .12); tone(t + .14, 'triangle', hz(77), .09, .005, .14); },
+    tick: t => tone(t, 'sine', 1600, .07, .001, .03),
+    whoosh: t => hiss(t, 'bandpass', 300, 1.2, .2, 1.4, .3, 3200, 2.2),
+    chime: t => { [1, 2.756, 5.404].forEach((r, k) => tone(t, 'sine', hz(74) * r, [.16, .06, .03][k], .002, [1.6, 1, .6][k])); },
+    pop: t => { tone(t, 'sine', 880, .07, .002, .06); tone(t + .04, 'sine', 1320, .04, .002, .05); },
+    ping: t => tone(t, 'sine', hz(81), .05, .002, .3),
+    resolve: t => { [62, 69, 74, 78].forEach((m, k) => tone(t + k * .05, 'sine', hz(m), .06, .01, 1.8)); }
+  };
+  EVENTS.forEach(([s, name]) => FX[name] && FX[name](T0 + s));
+};
+
+// ---------- live playback (skipped by the renderer, which loads ?render) ----------
+const params = new URLSearchParams(location.search);
+if (!params.has('render')) {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ui = document.getElementById('ui'), playBtn = document.getElementById('play'), pauseBtn = document.getElementById('pause'), bar = document.getElementById('bar');
+  ui.hidden = false; bar.hidden = false;
+  let start = performance.now(), paused = reduce, pausedAt = reduce ? Math.round(FRAMES * .93) : 0, ac = null, raf = 0;
+  const frameNow = () => paused ? pausedAt : Math.floor((performance.now() - start) / 1000 * FPS);
+  const loop = () => {
+    let fr = frameNow();
+    if (fr >= FRAMES) { if (ac) { ac.close(); ac = null; pauseBtn.hidden = true; playBtn.textContent = '↺ Watch again'; paused = true; pausedAt = FRAMES - 1; fr = pausedAt; } else { start = performance.now(); fr = 0; } }
+    draw(fr); bar.style.transform = `scaleX(${fr / (FRAMES - 1)})`;
+    raf = requestAnimationFrame(loop);
+  };
+  // Silent preview loops until someone asks for sound; reduced motion shows a still until played.
+  playBtn.addEventListener('click', () => {
+    if (ac) ac.close();
+    ac = new AudioContext(); window.SCORE(ac);
+    start = performance.now() + 50; paused = false;
+    playBtn.textContent = '↺ Restart'; pauseBtn.hidden = false; pauseBtn.textContent = '❚❚ Pause'; ui.classList.add('is-quiet');
+    canRun = true; resume();
+  });
+  pauseBtn.addEventListener('click', () => {
+    if (!paused) { paused = true; pausedAt = frameNow(); ac?.suspend(); pauseBtn.textContent = '▶ Resume'; }
+    else { paused = false; start = performance.now() - pausedAt / FPS * 1000; ac?.resume(); pauseBtn.textContent = '❚❚ Pause'; canRun = true; resume(); }
+  });
+  // Stop drawing while the film is off screen or the site's "Pause animations" is on.
+  // The About page sends { smartshalaFilm, run }; a silent preview simply freezes,
+  // a playing film (with sound) keeps going until its own Pause is pressed.
+  let canRun = true;
+  const resume = () => { cancelAnimationFrame(raf); if (canRun && !document.hidden && !scrub) loop(); };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else resume(); });
+  // Scroll-scrubbed mode: the About page sends { smartshalaFilm, frame } as the visitor
+  // scrolls, and the film simply draws that frame (draw() is pure, so any frame works).
+  let scrub = false;
+  addEventListener('message', (e) => {
+    if (e.origin !== location.origin || !e.data || !e.data.smartshalaFilm) return;
+    if (typeof e.data.frame === 'number') {
+      if (!scrub) { scrub = true; cancelAnimationFrame(raf); ui.hidden = true; if (ac) { ac.close(); ac = null; } }
+      const fr = Math.max(0, Math.min(FRAMES - 1, Math.round(e.data.frame)));
+      draw(fr); bar.style.transform = `scaleX(${fr / (FRAMES - 1)})`;
+      return;
+    }
+    if (scrub || ac) return;
+    const wasRunning = canRun; canRun = Boolean(e.data.run);
+    if (!canRun && wasRunning) { pausedAt = frameNow(); paused = true; draw(pausedAt); cancelAnimationFrame(raf); }
+    else if (canRun && !wasRunning) { if (!reduce) { paused = false; start = performance.now() - pausedAt / FPS * 1000; } resume(); }
+  });
+  loop();
+}
+</script>
+</body>
+</html>

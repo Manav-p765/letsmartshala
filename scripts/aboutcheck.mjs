@@ -1,27 +1,32 @@
-// Screenshots each 3D chapter of /about (scrolls each chapter to the middle
-// of the screen and waits for the scene to settle). Usage:
+// About page check: the film frame loads and draws, Play starts the film,
+// the before→after rows animate in, and nothing errors. Usage:
 //   node scripts/aboutcheck.mjs [width] [height]
 import { chromium } from 'playwright';
 const [w = 1536, h = 760] = process.argv.slice(2).map(Number);
 const base = process.env.BASE_URL || 'http://localhost:5180';
 const phone = w < 700;
-const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
-const p = await b.newPage({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone, deviceScaleFactor: Number(process.env.DSF || 1) });
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: w, height: h }, isMobile: phone, hasTouch: phone });
 const errs = [];
 p.on('pageerror', (e) => errs.push(e.message));
-p.on('console', (m) => (m.type() === 'error' || m.text().includes('[about]')) && errs.push(m.text()));
+p.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
 await p.goto(base + '/about', { waitUntil: 'networkidle' });
-await p.waitForTimeout(2500);
-const n = await p.locator('.st-ch').count();
-for (let i = 0; i < n; i++) {
-  await p.evaluate((i) => {
-    const el = document.querySelector(`.st-ch[data-i="${i}"]`);
-    const y = el.getBoundingClientRect().top + scrollY + el.offsetHeight / 2 - innerHeight / 2;
-    window.scrollTo(0, y);
-  }, i);
-  await p.waitForTimeout(3200);
-  await p.screenshot({ path: `shots/about3d-${w}-${i}.png` });
-}
-const gl = await p.evaluate(() => Boolean(document.querySelector('.st-stage__gl canvas')));
-console.log(`${n} chapters; canvas: ${gl}; ${errs.length ? 'ERRORS ' + errs.join(' | ') : 'no errors'}`);
+await p.waitForTimeout(2200);
+await p.screenshot({ path: `shots/about-${w}-hero.png` });
+const film = p.frameLocator('.ab-film iframe');
+await p.evaluate(() => document.querySelector('.ab-film').scrollIntoView({ block: 'center' }));
+await p.waitForTimeout(1500);
+const f1 = await p.frames().find((f) => f.url().includes('smartshala-story')).evaluate(() => document.querySelector('canvas').toDataURL().length);
+await p.waitForTimeout(1200);
+const f2 = await p.frames().find((f) => f.url().includes('smartshala-story')).evaluate(() => document.querySelector('canvas').toDataURL().length);
+console.log('film preview animating:', f1 !== f2);
+await film.locator('#play').click();
+await p.waitForTimeout(800);
+console.log('after Play, button says:', await film.locator('#play').innerText(), '| pause visible:', await film.locator('#pause').isVisible());
+await p.screenshot({ path: `shots/about-${w}-film.png` });
+await p.evaluate(() => document.querySelector('.ab-diff').scrollIntoView({ block: 'start' }));
+await p.waitForTimeout(2200);
+await p.screenshot({ path: `shots/about-${w}-diff.png` });
+const inCount = await p.evaluate(() => document.querySelectorAll('.ab-diff__row.is-in').length);
+console.log('difference rows animated:', inCount, '| errors:', errs.length ? errs.join(' | ') : 'none');
 await b.close();
