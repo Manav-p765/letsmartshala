@@ -2,9 +2,14 @@ import { Link } from 'react-router-dom';
 import { site } from '../../data/site.js';
 import './CtaBand.css';
 import useReveal from '../../hooks/useReveal.js';
+import { scrollToTop } from '../../lib/smooth.js';
 
-/** The closing ask: calm ivory, a soft blue arc and school sketches behind it, one clear button. */
-export default function CtaBand() {
+/**
+ * The closing ask: calm ivory, a soft blue arc and school sketches behind it, one clear button.
+ * `toForm`: for the demo page, where the form is at the top of this same page —
+ * the button scrolls back up to it instead of linking to /demo.
+ */
+export default function CtaBand({ toForm = false }) {
   const revealRef = useReveal();
   return (
     <section ref={revealRef} className="section section--screen cta" data-section="09 · Book a demo" data-theme="paper" aria-labelledby="cta-title">
@@ -21,9 +26,15 @@ export default function CtaBand() {
           A short call, on your schedule. We’ll walk through the modules your school needs.
         </p>
         <div className="cta__actions" data-animate="fade-up">
-          <Link className="btn cta__btn" to="/demo">
-            Book a demo <span className="btn__arrow" aria-hidden="true">→</span>
-          </Link>
+          {toForm ? (
+            <button type="button" className="btn cta__btn" onClick={scrollToTop}>
+              Book a demo <span className="btn__arrow" aria-hidden="true">↑</span>
+            </button>
+          ) : (
+            <Link className="btn cta__btn" to="/demo">
+              Book a demo <span className="btn__arrow" aria-hidden="true">→</span>
+            </Link>
+          )}
           <a className="btn btn--ghost" href={site.contact.whatsapp.href} target="_blank" rel="noreferrer">
             WhatsApp {site.contact.whatsapp.value}
           </a>
