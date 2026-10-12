@@ -154,8 +154,9 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
       pre-rendered. Admin at `/admin` (`api/admin.js`): password login; saves
       commit to GitHub so Vercel republishes. In dev it writes local files and
       the password is "admin". Check with `node scripts/admincheck.mjs`.
-- [x] App store badges in the footer (`site.apps`, `AppBadges.jsx`). They stay
-      hidden until store URLs are filled in. A different company's "Smartshala"
+- [x] App store badges in the footer (`site.apps`, `AppBadges.jsx`). Each store
+      shows as a non-clickable "Coming soon" badge until its URL is filled in
+      (the owner asked for coming soon on 2026-10-12). A different company's "Smartshala"
       app is on Google Play (com.gurubramha.loyola); never link to a search.
 - [x] Animation skills from github.com/iart-ai (six repos, 23 skills) are
       installed locally in `.claude/skills/` and git-ignored (one pack has no

@@ -10,31 +10,38 @@ const icons = {
   )
 };
 
+const STORES = [
+  { key: 'play', icon: icons.play, small: 'Get it on', name: 'Google Play' },
+  { key: 'appStore', icon: icons.apple, small: 'Download on the', name: 'App Store' }
+];
+
 /**
- * Store badges for the principal and teacher apps, from `site.apps`. An app
- * or store without a link is simply not shown, so nothing points to a
- * listing that doesn't exist (a different company's "Smartshala" app is on
- * Google Play — never send schools to a search).
+ * Store badges for the principal and teacher apps, from `site.apps`.
+ *
+ * A store with a link in site.js is a real, clickable badge. A store without
+ * one shows as "Coming soon" — not a link, on purpose: a different company's
+ * "Smartshala" app is on Google Play, so we never send schools to a search
+ * or a listing that isn't ours. Fill in the URLs and the badges go live.
  */
 export default function AppBadges() {
-  const apps = site.apps.filter((a) => a.play || a.appStore);
-  if (!apps.length) return null;
+  if (!site.apps.length) return null;
   return (
     <div className="appb">
       <p className="label">Get the apps</p>
-      {apps.map((a) => (
+      {site.apps.map((a) => (
         <div className="appb__app" key={a.name}>
           <span className="appb__name">{a.name}</span>
           <div className="appb__row">
-            {a.play && (
-              <a className="appb__badge" href={a.play} target="_blank" rel="noreferrer" aria-label={`${a.name} on Google Play`}>
-                {icons.play}<span><small>Get it on</small>Google Play</span>
-              </a>
-            )}
-            {a.appStore && (
-              <a className="appb__badge" href={a.appStore} target="_blank" rel="noreferrer" aria-label={`${a.name} on the App Store`}>
-                {icons.apple}<span><small>Download on the</small>App Store</span>
-              </a>
+            {STORES.map((s) =>
+              a[s.key] ? (
+                <a key={s.key} className="appb__badge" href={a[s.key]} target="_blank" rel="noreferrer" aria-label={`${a.name} on ${s.name}`}>
+                  {s.icon}<span><small>{s.small}</small>{s.name}</span>
+                </a>
+              ) : (
+                <span key={s.key} className="appb__badge appb__badge--soon" aria-label={`${a.name} on ${s.name}: coming soon`}>
+                  {s.icon}<span><small>Coming soon on</small>{s.name}</span>
+                </span>
+              )
             )}
           </div>
         </div>

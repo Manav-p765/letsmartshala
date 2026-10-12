@@ -18,3 +18,7 @@
 .appb__badge svg { width: 1.35rem; height: 1.35rem; }
 .appb__badge span { display: grid; font-size: 0.95rem; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; }
 .appb__badge small { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.02em; opacity: 0.8; }
+/* Not on the store yet: same badge, quieter, and not a link. */
+.appb__badge--soon { background: transparent; color: var(--fg-2) !important; box-shadow: inset 0 0 0 1px var(--line); cursor: default; }
+.appb__badge--soon:hover { translate: none; box-shadow: inset 0 0 0 1px var(--line); }
+.appb__badge--soon small { opacity: 1; color: var(--gold-ink); font-weight: 600; }

@@ -27,9 +27,9 @@ export const site = {
     { id: 'whatsapp', label: 'WhatsApp', handle: '+91 78630 41196', href: 'https://wa.me/917863041196' }
   ],
 
-  // Store links for the Flutter apps. Paste the real listing URLs here
-  // (e.g. https://play.google.com/store/apps/details?id=…); a badge only
-  // appears once its link is filled in.
+  // Store links for the Flutter apps. An empty link shows that badge as
+  // "Coming soon" (not clickable); paste the real listing URL to make it live,
+  // e.g. https://play.google.com/store/apps/details?id=…
   apps: [
     { name: 'Principal app', play: '', appStore: '' },
     { name: 'Teacher app', play: '', appStore: '' }
