@@ -114,6 +114,6 @@ export const faq = [
   },
   {
     q: 'How much does it cost?',
-    a: 'It depends on the size of your school. Book a demo and we’ll share a quote that fits.'
+    a: 'It depends on the size of your school, so we share pricing in a short meeting. Book a demo and we’ll walk you through it.'
   }
 ];

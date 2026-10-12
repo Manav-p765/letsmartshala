@@ -7,7 +7,8 @@ import { pricing } from '../data/pages.js';
 import './Pages.css';
 
 /**
- * Prices aren't public yet, so this page explains what a quote depends on
+ * Prices are never shown on the site (owner's rule): pricing is shared in a
+ * meeting. This page explains what pricing depends on
  * and asks for the school's details — no invented plan names or numbers.
  * When pricing arrives, add plans to data/pages.js and render them here.
  */
@@ -17,13 +18,13 @@ export default function PricingPage() {
   return (
     <div ref={revealRef}>
       <PageHero id="pricing-title" eyebrow={pricing.eyebrow} title={pricing.title} lede={pricing.lede}>
-        <span className="price-tag">Quotes in ₹ · GST invoices</span>
+        <span className="price-tag">Shared in a meeting · billed in ₹ with GST invoices</span>
       </PageHero>
 
-      <section className="section" data-theme="white" aria-label="Get a quote">
+      <section className="section" data-theme="white" aria-label="Book a pricing meeting">
         <div className="container price-grid">
           <div>
-            <h2 className="display block-title" data-animate="fade-up">What your quote depends on</h2>
+            <h2 className="display block-title" data-animate="fade-up">What your pricing depends on</h2>
             <div className="price-factors" style={{ marginTop: '1.5rem' }} data-animate="stagger">
               {pricing.factors.map((f) => (
                 <div className="card" key={f.title}>
@@ -38,7 +39,7 @@ export default function PricingPage() {
             </div>
           </div>
           <div data-animate="fade-up">
-            <LeadForm title="Get a quote" note="Tell us about your school and we’ll call with pricing that fits." submit="Get my quote" />
+            <LeadForm title="Book a pricing meeting" note="Tell us about your school. We’ll call to fix a time and walk you through pricing." submit="Book my meeting" />
           </div>
         </div>
       </section>

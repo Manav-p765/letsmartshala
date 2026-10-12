@@ -63,3 +63,5 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 - Release timeline on About comes from the CRM's commit history (Sep–Oct 2026).
 - Blog starter posts (2) are general practical guides; no external statistics.
 - **Open:** Play Store / App Store URLs for the principal and teacher apps (badges hidden until set). If the apps are distributed as APKs instead, say so.
+
+- **Pricing (owner's rule, 2026-10-12):** prices and plan names are never shown on the site; pricing is shared in a meeting booked through the form. This closes the "pricing — will give later" question.

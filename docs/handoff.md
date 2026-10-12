@@ -61,6 +61,9 @@ content questions live in `docs/content.md`.
   and no "sample data" line.
 - **Reveals:** `useReveal()` per section. Nothing is hidden by CSS.
   `data-animate="in"` adds `.is-in` through an IntersectionObserver.
+- **Pricing rule (owner, 2026-10-12):** never show prices or plan names anywhere
+  on the site. To learn pricing, a visitor fills in the form and books a
+  meeting. The Pricing page explains what pricing depends on and has the form.
 - **Owner's preferences:**
   - Professional, not playful.
   - Floating elements are welcome, but they must not pull attention from the

@@ -177,11 +177,12 @@ export const solutions = {
 };
 
 export const pricing = {
-  meta: 'SmartShala pricing depends on your school’s size. Book a demo for a quote.',
+  meta: 'SmartShala pricing depends on your school’s size. Book a meeting and we’ll walk you through it.',
   eyebrow: 'Pricing',
   title: ['Priced for your', 'school’s size.'],
-  lede: 'Plans depend on how many students and staff your school has. Tell us about your school and we’ll share a quote — no obligation.',
-  // Plan names and prices are not public yet (owner: "will give later").
+  lede: 'Pricing depends on how many students and staff your school has, so we share it in a short meeting rather than on a price list. Fill in the form and we’ll book one with you — no obligation.',
+  // Owner's rule (2026-10-12): prices and plan names are NEVER shown on the site.
+  // To learn pricing, a visitor fills in the form and books a meeting.
   included: [
     'Every module in your plan, on the web app',
     'Principal and teacher apps',
