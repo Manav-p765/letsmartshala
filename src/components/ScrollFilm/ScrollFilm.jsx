@@ -7,8 +7,8 @@
  * frame (the film's draw(frame) is pure, so scrubbing is instant both ways).
  * The chapter caption under the frame and a progress rail follow along.
  *
- * Sound can't follow a scrub, so "Watch with sound" opens the film on its
- * own page, and the MP4 is offered for sharing.
+ * Sound can't follow a scrub, so "Watch with sound" opens the film in an
+ * overlay with its score.
  *
  * Reduced motion: no pinning (a pinned, scroll-driven scene is a vestibular
  * trigger) — the film sits in a normal frame with its own Play button.
@@ -28,7 +28,7 @@ const CHAPTERS = [
  *  shown as readable text under the frame on phones, where the in-film captions are tiny. */
 const CAPTIONS = [[0.9,5,"Why is the school office always catching up?"],[5.6,10,"Aarav joins Class 7-B. The office writes him in."],[10.4,17.5,"Then four more people write him in. Again."],[17.8,20,"Copies drift: Roll 12 here, Roll 21 there."],[20.3,22.5,"The principal waits till evening for today’s fees."],[22.8,25,"Defaulters turn up at the end of term."],[27.8,30,"So we put the whole school in one place."],[30.3,35,"Aarav is written once. Every office reads it."],[37.6,42.3,"Principal, teachers, accountant, office — the same live numbers."]];
 
-export default function ScrollFilm({ src, mp4, title }) {
+export default function ScrollFilm({ src, title }) {
   const sectionRef = useRef(null);
   const frameRef = useRef(null);
   const [scrubbing, setScrubbing] = useState(false);
@@ -144,7 +144,6 @@ export default function ScrollFilm({ src, mp4, title }) {
           <p className="sfilm__links">
             {scrubbing && <span className="sfilm__hint">Scroll to play the story</span>}
             <button type="button" ref={openerRef} className="sfilm__watch" onClick={() => setWatching(true)}>▶ Watch with sound</button>
-            <a href={mp4} download="SmartShala-story.mp4">Download MP4</a>
           </p>
         </div>
       </div>

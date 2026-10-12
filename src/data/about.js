@@ -17,7 +17,6 @@ export const hero = {
   lede: 'We built SmartShala so the people who run a school spend their day on the school, not on the registers. Scroll, and the story plays.',
   film: {
     src: '/film/smartshala-story.html',
-    mp4: '/film/smartshala-story.mp4',
     title: 'SmartShala — the story (34 seconds, animated)',
     note: '34 seconds · press Play for sound'
   }

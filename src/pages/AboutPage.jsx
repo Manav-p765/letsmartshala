@@ -41,7 +41,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <ScrollFilm src={hero.film.src} mp4={hero.film.mp4} title={hero.film.title} />
+      <ScrollFilm src={hero.film.src} title={hero.film.title} />
 
       <section className="section ab-diff" data-theme="white" aria-labelledby="diff-title">
         <div className="container">
