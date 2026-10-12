@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Brand from '../components/Brand/Brand.jsx';
 import { Fact } from '../components/Dummy/Dummy.jsx';
+import SocialLinks from '../components/ui/SocialLinks.jsx';
 import { nav, site } from '../data/site.js';
 import './Footer.css';
 
@@ -18,6 +19,7 @@ export default function Footer() {
         <div className="footer__about">
           <Brand size="lg" />
           <p className="footer__line">{site.tagline}.</p>
+          <SocialLinks className="footer__social" />
         </div>
 
         <nav aria-label="Footer">

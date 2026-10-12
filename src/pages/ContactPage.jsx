@@ -1,6 +1,7 @@
 import PageHero from '../components/ui/PageHero.jsx';
 import ModuleIcon from '../components/ui/ModuleIcon.jsx';
 import LeadForm from '../components/LeadForm/LeadForm.jsx';
+import SocialLinks from '../components/ui/SocialLinks.jsx';
 import useReveal from '../hooks/useReveal.js';
 import usePageMeta from '../hooks/usePageMeta.js';
 import { contact } from '../data/pages.js';
@@ -35,6 +36,10 @@ export default function ContactPage() {
                   <div><span>{w.label}</span><strong>{w.field.value}</strong></div>
                 </a>
               ))}
+            </div>
+            <div className="contact-social">
+              <p className="label">Follow SmartShala</p>
+              <SocialLinks withHandle />
             </div>
             <p className="contact-hours">{site.legalName} · SmartShala</p>
           </div>

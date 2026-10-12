@@ -5,6 +5,8 @@
   gap: 2.5rem;
 }
 .footer__line { margin-top: 1rem; max-width: 24ch; color: var(--fg-2); }
+.footer__social { margin-top: 1.4rem; }
+.footer .footer__social { display: flex; gap: 0.5rem; }
 .footer .label { margin-bottom: 1rem; color: var(--fg-3); }
 .footer ul { display: grid; gap: 0.6rem; color: var(--fg-2); }
 .footer a { transition: color var(--dur) var(--ease-out); }

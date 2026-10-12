@@ -20,6 +20,13 @@ export const site = {
     email: { value: 'support@letssmartshala.com', href: 'mailto:support@letssmartshala.com' }
   },
 
+  // Official social profiles. Add more here (facebook, linkedin, youtube,
+  // x); each needs an icon in components/ui/SocialLinks.jsx.
+  social: [
+    { id: 'instagram', label: 'Instagram', handle: '@letssmartshala', href: 'https://www.instagram.com/letssmartshala/' },
+    { id: 'whatsapp', label: 'WhatsApp', handle: '+91 78630 41196', href: 'https://wa.me/917863041196' }
+  ],
+
   // Inbox that receives demo-form leads.
   leadsInbox: 'support@letssmartshala.com'
 };

@@ -146,6 +146,8 @@
 .contact-cards a.card { display: flex; align-items: center; gap: 1rem; }
 .contact-cards .card span:not(.icon-tile) { display: block; font-size: 0.8rem; color: var(--fg-3); }
 .contact-cards .card strong { font-size: 1.1rem; letter-spacing: -0.01em; }
+.contact-social { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.contact-social .label { margin-bottom: 1rem; color: var(--fg-3); }
 .contact-hours { margin-top: 1.25rem; font-size: 0.88rem; color: var(--fg-3); }
 
 /* ---- Security ---- */
