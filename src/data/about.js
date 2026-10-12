@@ -1,82 +1,64 @@
 /**
- * The About page story: where the school office's day breaks, and what
- * SmartShala does about each break. Every "after" maps to a real CRM
- * feature (docs/content.md). The release timeline is taken from the CRM's
- * own commit history (Sep–Oct 2026). The founding story (who started it,
- * when, why) is NOT here because we haven't been told it — see
- * docs/content.md, open questions.
+ * The About page: a 3D story in six chapters (components/About3D), then
+ * principles and real releases. Every claim maps to a real CRM feature
+ * (docs/content.md); the release list comes from the CRM's own commit
+ * history (Sep–Oct 2026). The founding story (who, when, why) is NOT here
+ * because we haven't been told it — see docs/content.md, open questions.
  */
 export const aboutMeta = {
   title: 'About',
-  description: 'Why SmartShala exists: the registers, re-typing and waiting that slow down Indian school offices, and how one system fixes each of them.'
+  description: 'Why SmartShala exists: the registers, re-typing and waiting that slow down Indian school offices, and how one system fixes them.'
 };
 
-export const aboutHero = {
-  eyebrow: 'About SmartShala',
-  title: ['A school runs on', 'a thousand small records.'],
-  lede: 'Admission forms, attendance registers, fee receipts, mark sheets, bus lists, salary sheets. We built SmartShala so the people who run a school spend their day on the school, not on the registers.',
-  // The paper registers scattered around the hero.
-  registers: [
-    { name: 'Admission register', line: 'Aarav Sharma · 7-B', tilt: -7 },
-    { name: 'Attendance register', line: 'P P A P P L P', tilt: 5 },
-    { name: 'Fee receipt book', line: 'No. 2041 · ₹12,500', tilt: -4 },
-    { name: 'Mark sheet', line: 'Maths 36 / 40', tilt: 6 },
-    { name: 'Bus list', line: 'Route 4 · Sector 4', tilt: -5 },
-    { name: 'Salary sheet', line: '24 / 25 days', tilt: 4 }
-  ]
-};
-
-export const problem = {
-  eyebrow: 'Where it starts',
-  title: ['One new student.', 'Five registers.'],
-  lede: 'When Aarav joins Class 7-B, his name is written again and again — by five different people, in five different places.',
-  copies: [
-    { who: 'Office', where: 'Admission register', note: 'written' },
-    { who: 'Class teacher', where: 'Attendance register', note: 'copied' },
-    { who: 'Accountant', where: 'Fee card', note: 'copied again' },
-    { who: 'Transport', where: 'Bus list', note: 'and again' },
-    { who: 'Subject teachers', where: 'Mark sheets', note: 'every exam' }
-  ],
-  kicker: 'Same child. Same spelling — hopefully. And when a roll number changes, five registers need fixing.'
-};
-
-/** The story: each "before" (on paper) and the "after" (in SmartShala). */
-export const story = {
-  eyebrow: 'What we set out to fix',
-  title: ['Where the day broke,', 'and what we built.'],
-  pairs: [
-    {
-      icon: 'students',
-      before: { title: 'The same details, written five times', scrawl: 'Roll no. changed — fix in 5 places!' },
-      after: { title: 'One student record every office reads', text: 'Added once, with guardian details, Aadhaar and APAAR IDs and documents. The class teacher, accountant, transport and exam teachers all work from it.' }
-    },
-    {
-      icon: 'reports',
-      before: { title: 'The principal waits for numbers', scrawl: 'Fees today? — will tell by evening' },
-      after: { title: 'The day’s picture, before anyone asks', text: 'Staff in, classes marked, fees collected and leave waiting — on the principal’s dashboard and phone, plus a daily report.' }
-    },
-    {
-      icon: 'fees',
-      before: { title: 'Defaulters found at the end of term', scrawl: '23 pending?? since July' },
-      after: { title: 'Defaulters visible from the first missed instalment', text: 'Fee heads and instalments per class, payments by UPI, cheque or DD, receipt PDFs, ledgers — and a defaulters list that is always current.' }
-    },
-    {
-      icon: 'attendance',
-      before: { title: 'Periods spent on registers', scrawl: 'Roll call: 10 min × 6 periods' },
-      after: { title: 'Roll call and marks on the teacher app', text: 'Teachers mark attendance, set homework and enter marks for their own subjects — and see their own timetable and pay slips.' }
-    },
-    {
-      icon: 'payroll',
-      before: { title: 'Salaries worked out by hand', scrawl: 'Count the punch register again' },
-      after: { title: 'Payroll from punch-ins and shifts', text: 'Staff punch in on the app; shifts and pay profiles turn attendance into salary slips that staff can see themselves.' }
-    },
-    {
-      icon: 'timetable',
-      before: { title: 'Last year in a cupboard', scrawl: 'Which almirah has 2024–25?' },
-      after: { title: 'History that stays with the record', text: 'Every student profile keeps its edit history and activity logs show who changed what; the new session starts with a rollover, not a new register.' }
-    }
-  ]
-};
+/** One entry per 3D chapter; `scene` names what the 3D stage shows. */
+export const chapters = [
+  {
+    scene: 'paper',
+    eyebrow: 'About SmartShala',
+    title: ['A school runs on', 'a thousand small records.'],
+    text: 'Admission registers, attendance registers, fee receipt books, mark sheets, bus lists. Every office keeps its own — on paper, or in a spreadsheet only one person understands.',
+    hint: 'Scroll to see what happens to them'
+  },
+  {
+    scene: 'copies',
+    eyebrow: 'Where it starts',
+    title: ['One new student.', 'Five registers.'],
+    text: 'When Aarav joins Class 7-B, the office writes his name in the admission register. Then the class teacher copies it. Then the accountant. Then transport. Then every exam’s mark sheet.'
+  },
+  {
+    scene: 'break',
+    eyebrow: 'Where the day breaks',
+    title: ['Five copies drift', 'five different ways.'],
+    points: [
+      'A roll number changes in one register, not the other four.',
+      'The principal asks for today’s fees — and waits till evening.',
+      'Defaulters are found at the end of term, not the first missed instalment.'
+    ]
+  },
+  {
+    scene: 'one',
+    eyebrow: 'What we built',
+    title: ['So we put it all', 'in one place.'],
+    text: 'SmartShala keeps one record for every student — guardian details, Aadhaar and APAAR IDs, class, fees, attendance, marks — entered once, and read by every office that needs it.'
+  },
+  {
+    scene: 'connect',
+    eyebrow: 'Everyone, one school',
+    title: ['Every desk works from', 'the same numbers.'],
+    points: [
+      'The principal sees staff in, classes marked and fees collected — live.',
+      'Teachers mark attendance and enter marks on their app.',
+      'The accountant records UPI, cheque or DD payments; receipts and ledgers update.',
+      'The office adds and imports students once.'
+    ]
+  },
+  {
+    scene: 'yours',
+    eyebrow: 'Your data stays yours',
+    title: ['Your school, in', 'its own database.'],
+    text: 'Every school on SmartShala gets its own separate database. Inside the school, each person sees only their part — checked on the server for every request — and every change is logged.'
+  }
+];
 
 export const principles = {
   eyebrow: 'How we build it',
