@@ -78,20 +78,34 @@ export default function ScrollFilm({ src, mp4, title }) {
     let raf = 0;
     let last = -1;
     let ready = false;
+    let shown = 0;       // the frame on screen, easing toward the scroll's frame
 
     const post = (frame) => iframe.contentWindow?.postMessage({ smartshalaFilm: true, frame }, location.origin);
+    // Scroll sets a target frame; the shown frame eases toward it each animation
+    // frame, so a hard flick of the wheel glides through the story instead of jumping.
     const tick = () => {
       raf = 0;
+      if (!ready) return;
       const r = section.getBoundingClientRect();
       const travel = Math.max(1, r.height - window.innerHeight);
       const p = Math.min(1, Math.max(0, -r.top / travel));
-      // The film reports its own frame count (it plays faster than story time).
       const frames = iframe.contentWindow?.FRAMES || 1018;
-      const frame = Math.round(p * (frames - 1));
-      if (frame !== last && ready) { last = frame; post(frame); setProgress(p); }
+      const target = p * (frames - 1);
+      shown += (target - shown) * 0.16;
+      if (Math.abs(target - shown) < 0.5) shown = target;
+      const frame = Math.round(shown);
+      if (frame !== last) { last = frame; post(frame); setProgress(shown / (frames - 1)); }
+      if (shown !== target) raf = requestAnimationFrame(tick);
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick); };
-    const onLoad = () => { ready = true; last = -1; tick(); };
+    const onLoad = () => {
+      ready = true; last = -1;
+      // Start on the frame the current scroll position calls for, without easing in from 0.
+      const r = section.getBoundingClientRect();
+      const frames = iframe.contentWindow?.FRAMES || 1018;
+      shown = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - window.innerHeight))) * (frames - 1);
+      tick();
+    };
 
     iframe.addEventListener('load', onLoad);
     // The iframe may already have loaded (cached) before this effect ran.

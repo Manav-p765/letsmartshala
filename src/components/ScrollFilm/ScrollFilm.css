@@ -1,7 +1,8 @@
-/* Scroll-scrubbed film: ~8 screens of scroll for the ~34 s film — brisk at a
-   normal scroll speed, slow enough to read each caption. */
+/* Scroll-scrubbed film: ~16 screens of scroll for the whole story, so each
+   caption gets about two screens of scrolling — the owner found 8 too quick.
+   (Playback speed for "Watch with sound" is set separately, in the film.) */
 .sfilm { position: relative; padding-block: 0 var(--section-y); }
-.sfilm.is-scrub { height: 800svh; padding: 0; }
+.sfilm.is-scrub { height: 1600svh; padding: 0; }
 .sfilm__stick {
   display: grid;
   align-content: center;
