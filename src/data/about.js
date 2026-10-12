@@ -8,7 +8,7 @@
  */
 export const aboutMeta = {
   title: 'About',
-  description: 'Why SmartShala exists: one new student, five registers, and an office always catching up — told in a 47-second film, and how one system fixes it.'
+  description: 'Why SmartShala exists: one new student, five registers, and an office always catching up — told in a 34-second film, and how one system fixes it.'
 };
 
 export const hero = {
@@ -18,8 +18,8 @@ export const hero = {
   film: {
     src: '/film/smartshala-story.html',
     mp4: '/film/smartshala-story.mp4',
-    title: 'SmartShala — the story (47 seconds, animated)',
-    note: '47 seconds · press Play for sound'
+    title: 'SmartShala — the story (34 seconds, animated)',
+    note: '34 seconds · press Play for sound'
   }
 };
 

@@ -15,9 +15,10 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { prefersReducedMotion, isMotionPaused } from '../../lib/motion.js';
+import { stopScroll, startScroll } from '../../lib/smooth.js';
 import './ScrollFilm.css';
 
-const FRAMES = 1425;           // 47.5 s × 30 fps — must match the film
+const STORY = 47.5;            // the film's story-seconds (chapters and captions are in these)
 const CHAPTERS = [
   [0, 'Paper registers'], [5, 'One student'], [10, 'Five copies'], [17.5, 'Things drift'],
   [25, 'One place'], [30, 'One record'], [35, 'Everyone connected'], [42.5, 'SmartShala']
@@ -32,6 +33,27 @@ export default function ScrollFilm({ src, mp4, title }) {
   const frameRef = useRef(null);
   const [scrubbing, setScrubbing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [watching, setWatching] = useState(false);
+  const watchRef = useRef(null);
+  const openerRef = useRef(null);
+
+  // "Watch with sound": the film in an overlay on this page, starting with sound.
+  // Close with ✕, Esc or a click on the backdrop; focus returns to the link.
+  useEffect(() => {
+    if (!watching) return;
+    stopScroll();
+    document.documentElement.style.overflow = 'hidden';
+    const onKey = (e) => e.key === 'Escape' && setWatching(false);
+    window.addEventListener('keydown', onKey);
+    watchRef.current?.querySelector('.sfilm__close')?.focus();
+    return () => {
+      startScroll();
+      document.documentElement.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+      openerRef.current?.focus();
+    };
+  }, [watching]);
+  const startWithSound = (e) => e.currentTarget.contentWindow?.postMessage({ smartshalaFilm: true, play: true }, location.origin);
 
   // Reduced motion (normal player): tell the film when it is on screen and
   // whether "Pause animations" is on, so its silent preview stops when unseen.
@@ -63,7 +85,9 @@ export default function ScrollFilm({ src, mp4, title }) {
       const r = section.getBoundingClientRect();
       const travel = Math.max(1, r.height - window.innerHeight);
       const p = Math.min(1, Math.max(0, -r.top / travel));
-      const frame = Math.round(p * (FRAMES - 1));
+      // The film reports its own frame count (it plays faster than story time).
+      const frames = iframe.contentWindow?.FRAMES || 1018;
+      const frame = Math.round(p * (frames - 1));
       if (frame !== last && ready) { last = frame; post(frame); setProgress(p); }
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick); };
@@ -82,7 +106,7 @@ export default function ScrollFilm({ src, mp4, title }) {
     };
   }, []);
 
-  const t = progress * 47.5;
+  const t = progress * STORY;
   const chapter = [...CHAPTERS].reverse().find(([at]) => t >= at)?.[1];
   const say = CAPTIONS.find(([a, z]) => t >= a - 0.4 && t <= z + 0.4)?.[2] || (t >= 42.5 ? 'SmartShala — the whole school day, in one system.' : '');
 
@@ -99,17 +123,26 @@ export default function ScrollFilm({ src, mp4, title }) {
               <span className="sfilm__now">{chapter}</span>
               <span className="sfilm__track">
                 <i style={{ transform: `scaleX(${progress})` }} />
-                {CHAPTERS.map(([at]) => <b key={at} style={{ left: `${(at / 47.5) * 100}%` }} className={t >= at ? 'is-past' : ''} />)}
+                {CHAPTERS.map(([at]) => <b key={at} style={{ left: `${(at / STORY) * 100}%` }} className={t >= at ? 'is-past' : ''} />)}
               </span>
             </div>
           )}
           <p className="sfilm__links">
             {scrubbing && <span className="sfilm__hint">Scroll to play the story</span>}
-            <a href={src} target="_blank" rel="noreferrer">Watch with sound ↗</a>
+            <button type="button" ref={openerRef} className="sfilm__watch" onClick={() => setWatching(true)}>▶ Watch with sound</button>
             <a href={mp4} download="SmartShala-story.mp4">Download MP4</a>
           </p>
         </div>
       </div>
+
+      {watching && (
+        <div className="sfilm__modal" ref={watchRef} role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.target === e.currentTarget && setWatching(false)}>
+          <div className="sfilm__modal-frame">
+            <iframe src={src} title={title} allow="autoplay" onLoad={startWithSound} />
+          </div>
+          <button type="button" className="sfilm__close" onClick={() => setWatching(false)} aria-label="Close the film">✕ <span>Close</span></button>
+        </div>
+      )}
     </section>
   );
 }

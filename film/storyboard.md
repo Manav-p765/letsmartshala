@@ -1,6 +1,6 @@
 # SmartShala story film — storyboard
 
-Explainer, 47.5 s, 1920×1080, 30 fps. Made with the `javascript-animation` +
+Explainer, authored as 47.5 story-seconds and played at 1.4× (≈34 s), 1920×1080, 30 fps. Made with the `javascript-animation` +
 `soundtrack` skills: every frame is drawn in code (`smartshala-story.html`),
 and the score is synthesised in the same page.
 

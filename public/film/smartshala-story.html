@@ -7,7 +7,7 @@
 <style>
   html,body{margin:0;height:100%;background:#F5EFE6;overflow:hidden}
   body{display:grid;place-items:center}
-  canvas{width:100%;height:100%;object-fit:contain;display:block}
+  canvas{width:min(100vw,calc(100vh * 16 / 9));height:auto;aspect-ratio:16/9;display:block}
   .ui{position:fixed;left:50%;top:4.5%;translate:-50% 0;display:flex;gap:.5em;font:600 15px "Segoe UI",system-ui,sans-serif}
   .ui{font-size:clamp(11px,2.4vw,15px)!important;white-space:nowrap}
   .ui button[hidden],.ui[hidden],.bar[hidden]{display:none}
@@ -16,6 +16,9 @@
   .ui button.ghost{background:rgba(255,253,248,.92);color:#0E1D61;box-shadow:inset 0 0 0 1px rgba(14,29,97,.15)}
   .ui.is-quiet{opacity:0;transition:opacity .5s}
   body:hover .ui.is-quiet{opacity:1}
+  .back{position:fixed;left:2.2%;top:4.5%;display:inline-flex;align-items:center;gap:.45em;padding:.55em 1em;border-radius:999px;background:rgba(255,253,248,.92);color:#0E1D61;box-shadow:inset 0 0 0 1px rgba(14,29,97,.15);font:600 clamp(11px,2.2vw,15px) "Segoe UI",system-ui,sans-serif;text-decoration:none}
+  .back:hover{background:#fff}
+  .back[hidden]{display:none}
   .bar{position:fixed;left:0;bottom:0;height:3px;background:#003DE5;transform-origin:left;width:100%}
 </style>
 </head>
@@ -26,11 +29,15 @@
   <button type="button" id="pause" class="ghost" hidden>❚❚ Pause</button>
 </div>
 <div class="bar" id="bar" hidden></div>
+<a class="back" id="back" href="/about" hidden>← Back to SmartShala</a>
 <script>
 // SmartShala story film. Every pixel is computed (zero assets); draw(frame) is a
 // pure function of the frame number, so the live preview and the MP4 render match.
 // Storyboard: film/storyboard.md. Skills: javascript-animation + soundtrack.
-const W = 1920, H = 1080, FPS = 30, DUR = 47.5, FRAMES = Math.round(FPS * DUR);
+// The story is authored in story-seconds (0–47.5, see film/storyboard.md) and plays
+// SPEED× faster: picture, cuts and score all read the same clock, so they stay locked.
+const SPEED = 1.4;
+const W = 1920, H = 1080, FPS = 30, DUR = 47.5, FRAMES = Math.round(FPS * DUR / SPEED);
 const cv = document.getElementById('c');
 let ctx = cv.getContext('2d');
 
@@ -509,7 +516,7 @@ function world(t) {
 }
 
 function draw(frame) {
-  const t = frame / FPS;
+  const t = frame / FPS * SPEED;
   LOOK.wobble = t < 25 ? 1.1 : lerp(1.1, 0, ease(prog(t, 25, 27.5)));
   BOIL = Math.floor(frame / LOOK.boil); LAYOUT = [];
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.filter = 'none'; ctx.globalAlpha = 1;
@@ -528,7 +535,7 @@ function draw(frame) {
   window.LAYOUT = LAYOUT.filter(o => o.x < W && o.y < H && o.x + o.w > 0 && o.y + o.h > 0);
 }
 window.draw = draw; window.FRAMES = FRAMES; window.FPS = FPS;
-window.CUES = [5, 10, 17.5, 20, 22.5, 25, 27.5, 30, 35, 42.5];
+window.CUES = [5, 10, 17.5, 20, 22.5, 25, 27.5, 30, 35, 42.5].map(s => s / SPEED);
 
 // ---------- the score (soundtrack skill: written for this film) ----------
 // D major, 96 BPM, one chord per bar; a tanpura-like drone; clock-tick woodblocks in the
@@ -544,6 +551,7 @@ const CHORDS = [ // one per bar (MIDI)
 ];
 window.SCORE = ac => {
   const T0 = ac.currentTime + (ac instanceof OfflineAudioContext ? 0 : .05);
+  const at = s => T0 + s / SPEED;            // story-seconds → audio time
   const hz = m => 440 * Math.pow(2, (m - 69) / 12);
   const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 3; comp.connect(ac.destination);
   const master = ac.createGain(); master.gain.value = .8; master.connect(comp);
@@ -566,26 +574,26 @@ window.SCORE = ac => {
   // drone: D and A, filtered saws, swelling in; silent through the break bar
   const droneOut = ac.createGain(); droneOut.connect(bus);
   const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = .4; lp.connect(droneOut);
-  [[38, 0], [45, 4], [50, -3]].forEach(([m, det]) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det; const g = ac.createGain(); g.gain.value = .05; o.connect(g); g.connect(lp); o.start(T0); o.stop(T0 + DUR + 1); });
-  droneOut.gain.setValueAtTime(0, T0); droneOut.gain.linearRampToValueAtTime(.9, T0 + 2.5);
-  droneOut.gain.setValueAtTime(.9, T0 + 25); droneOut.gain.linearRampToValueAtTime(0, T0 + 25.4);
-  droneOut.gain.setValueAtTime(0, T0 + 27.5); droneOut.gain.linearRampToValueAtTime(.9, T0 + 28.5);
-  droneOut.gain.setValueAtTime(.9, T0 + DUR - 2.5); droneOut.gain.linearRampToValueAtTime(0, T0 + DUR);
+  [[38, 0], [45, 4], [50, -3]].forEach(([m, det]) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz(m); o.detune.value = det; const g = ac.createGain(); g.gain.value = .05; o.connect(g); g.connect(lp); o.start(T0); o.stop(at(DUR) + 1); });
+  droneOut.gain.setValueAtTime(0, T0); droneOut.gain.linearRampToValueAtTime(.9, at(2.5));
+  droneOut.gain.setValueAtTime(.9, at(25)); droneOut.gain.linearRampToValueAtTime(0, at(25.4));
+  droneOut.gain.setValueAtTime(0, at(27.5)); droneOut.gain.linearRampToValueAtTime(.9, at(28.5));
+  droneOut.gain.setValueAtTime(.9, at(DUR - 2.5)); droneOut.gain.linearRampToValueAtTime(0, at(DUR));
   // pad + plucked melody, bar by bar
   CHORDS.forEach((ch, bar) => {
     if (!ch) return;
-    const t = T0 + bar * BAR, end = bar >= 17;
-    ch.forEach((m, k) => { tone(t, 'triangle', hz(m), .045, .5, .9, bus, BAR - .3); tone(t, 'sine', hz(m - 12), .03, .6, 1, bus, BAR - .3); });
+    const t = at(bar * BAR), end = bar >= 17, len = (BAR - .3) / SPEED;
+    ch.forEach((m, k) => { tone(t, 'triangle', hz(m), .045, .4, .7, bus, len); tone(t, 'sine', hz(m - 12), .03, .45, .8, bus, len); });
     if (bar >= 2 && bar !== 10) {                       // a soft plucked line: chord tones on beats 1 and 3 (+ an 8th in the busy bars)
       const notes = [ch[ch.length - 1] + 12, ch[1] + 12, ch[0] + 12, ch[1] + 12];
-      notes.forEach((m, k) => { if (end && k > 0) return; tone(t + k * BEAT, 'sine', hz(m), .08, .004, .35); tone(t + k * BEAT, 'triangle', hz(m * 1 + 12), .015, .002, .12); });
+      notes.forEach((m, k) => { if (end && k > 0) return; tone(t + k * BEAT / SPEED, 'sine', hz(m), .08, .004, .28); tone(t + k * BEAT / SPEED, 'triangle', hz(m * 1 + 12), .015, .002, .1); });
     }
   });
   // clock ticks (paper era) — woodblock on every beat, a quicker run while the principal waits
-  for (let bt = 8; bt < 40; bt++) { const t = T0 + bt * BEAT; tone(t, 'sine', bt % 4 === 0 ? 1180 : 1420, bt >= 28 ? .11 : .07, .001, .03); }
-  for (let k = 0; k < 16; k++) tone(T0 + 20.6 + k * .11, 'sine', 1500, .05, .001, .02);
+  for (let bt = 8; bt < 40; bt++) { const t = at(bt * BEAT); tone(t, 'sine', bt % 4 === 0 ? 1180 : 1420, bt >= 28 ? .11 : .07, .001, .03); }
+  for (let k = 0; k < 16; k++) tone(at(20.6 + k * .11), 'sine', 1500, .05, .001, .02);
   // soft low tom, from the copies on (not in the break)
-  for (let bt = 16; bt < 76; bt++) { if (bt >= 40 && bt < 44) continue; if (bt % 4 === 0 || (bt >= 56 && bt % 4 === 2)) { const t = T0 + bt * BEAT, o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(70, t + .16); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.32, t + .004); g.gain.setTargetAtTime(0, t + .004, .1); o.connect(g); g.connect(bus); o.start(t); o.stop(t + .8); } }
+  for (let bt = 16; bt < 76; bt++) { if (bt >= 40 && bt < 44) continue; if (bt % 4 === 0 || (bt >= 56 && bt % 4 === 2)) { const t = at(bt * BEAT), o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(70, t + .16); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.32, t + .004); g.gain.setTargetAtTime(0, t + .004, .1); o.connect(g); g.connect(bus); o.start(t); o.stop(t + .8); } }
   // sound for every visible action
   const FX = {
     scratch: t => { for (let k = 0; k < 6; k++) hiss(t + k * .17, 'bandpass', 2600 + (k % 3) * 500, 3, .09, .01, .05); },
@@ -598,7 +606,7 @@ window.SCORE = ac => {
     ping: t => tone(t, 'sine', hz(81), .05, .002, .3),
     resolve: t => { [62, 69, 74, 78].forEach((m, k) => tone(t + k * .05, 'sine', hz(m), .06, .01, 1.8)); }
   };
-  EVENTS.forEach(([s, name]) => FX[name] && FX[name](T0 + s));
+  EVENTS.forEach(([s, name]) => FX[name] && FX[name](at(s)));
 };
 
 // ---------- live playback (skipped by the renderer, which loads ?render) ----------
@@ -607,6 +615,12 @@ if (!params.has('render')) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ui = document.getElementById('ui'), playBtn = document.getElementById('play'), pauseBtn = document.getElementById('pause'), bar = document.getElementById('bar');
   ui.hidden = false; bar.hidden = false;
+  // Opened on its own (a shared link, or a new tab): offer the way back to the site.
+  if (window.top === window) {
+    const back = document.getElementById('back');
+    back.hidden = false;
+    back.addEventListener('click', (e) => { if (window.opener && history.length <= 1) { e.preventDefault(); window.close(); } });
+  }
   let start = performance.now(), paused = reduce, pausedAt = reduce ? Math.round(FRAMES * .93) : 0, ac = null, raf = 0;
   const frameNow = () => paused ? pausedAt : Math.floor((performance.now() - start) / 1000 * FPS);
   const loop = () => {
@@ -638,6 +652,7 @@ if (!params.has('render')) {
   let scrub = false;
   addEventListener('message', (e) => {
     if (e.origin !== location.origin || !e.data || !e.data.smartshalaFilm) return;
+    if (e.data.play) { playBtn.click(); return; }           // the About page's "Watch with sound" overlay
     if (typeof e.data.frame === 'number') {
       if (!scrub) { scrub = true; cancelAnimationFrame(raf); ui.hidden = true; if (ac) { ac.close(); ac = null; } }
       const fr = Math.max(0, Math.min(FRAMES - 1, Math.round(e.data.frame)));

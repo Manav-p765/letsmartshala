@@ -1,7 +1,7 @@
-/* Scroll-scrubbed film: ~13 screens of scroll for 47.5 s of film keeps the
-   pace close to real time at a normal scroll speed. */
+/* Scroll-scrubbed film: ~8 screens of scroll for the ~34 s film — brisk at a
+   normal scroll speed, slow enough to read each caption. */
 .sfilm { position: relative; padding-block: 0 var(--section-y); }
-.sfilm.is-scrub { height: 1300svh; padding: 0; }
+.sfilm.is-scrub { height: 800svh; padding: 0; }
 .sfilm__stick {
   display: grid;
   align-content: center;
@@ -45,3 +45,51 @@
   .sfilm__now { min-width: 0; }
   .sfilm__rail b { display: none; }
 }
+
+.sfilm__watch { color: var(--blue-2); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; font-size: inherit; }
+
+/* ---- "Watch with sound" overlay ---- */
+.sfilm__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 2.5rem);
+  background: rgb(14 29 97 / 0.82);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sfilm__modal { animation: sfilm-fade 0.3s var(--ease-out); }
+  .sfilm__modal-frame { animation: sfilm-rise 0.45s var(--ease-out); }
+}
+@keyframes sfilm-fade { from { opacity: 0; } }
+@keyframes sfilm-rise { from { opacity: 0; translate: 0 16px; } }
+.sfilm__modal-frame {
+  position: relative;
+  width: min(100%, calc((100svh - 6rem) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: 0 40px 100px -30px rgb(0 0 0 / 0.6);
+}
+.sfilm__modal-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.sfilm__close {
+  position: fixed;
+  top: clamp(0.75rem, 2.5vw, 1.5rem);
+  right: clamp(0.75rem, 2.5vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.75rem;
+  padding-inline: 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  box-shadow: var(--shadow-2);
+}
+.sfilm__close:hover { background: var(--paper); }
+@media (max-width: 480px) { .sfilm__close span { display: none; } .sfilm__close { width: 2.75rem; padding: 0; justify-content: center; } }
