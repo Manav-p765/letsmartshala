@@ -199,3 +199,18 @@ body {
    column (and the page) wider than the screen. */
 :where([class*='__grid'], [class*='-grid'], .container) > * { min-width: 0; }
 :where(a[href^='mailto:'], .contact-cards strong) { overflow-wrap: anywhere; }
+
+/* "Pause animations" (footer): freeze every CSS animation where it is. */
+.motion-paused *, .motion-paused *::before, .motion-paused *::after { animation-play-state: paused !important; }
+.motion-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: var(--fs-small);
+  color: var(--fg-2);
+}
+.motion-toggle:hover { color: var(--fg); }
+.motion-toggle__icon { font-size: 0.6rem; letter-spacing: -0.1em; }

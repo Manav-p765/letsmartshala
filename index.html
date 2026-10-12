@@ -33,6 +33,10 @@
         "sameAs": ["https://www.instagram.com/letssmartshala/"]
       }
     </script>
+    <script>
+      // Apply the visitor's "Pause animations" choice before first paint.
+      try { if (localStorage.getItem('ss-motion') === 'paused') document.documentElement.classList.add('motion-paused'); } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

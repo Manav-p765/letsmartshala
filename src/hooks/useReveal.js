@@ -51,13 +51,13 @@ export default function useReveal() {
       });
       all('[data-animate="lines"]').forEach((group) => {
         gsap.from(group.querySelectorAll('.line-mask > *'), {
-          yPercent: 110, duration: 1.1, stagger: 0.1, ease: 'power4.out',
+          yPercent: 110, duration: 0.9, stagger: 0.08, ease: 'power4.out',
           scrollTrigger: { trigger: group, start: 'top 88%', ...ONCE }
         });
       });
       all('[data-animate="stagger"]').forEach((group) => {
         gsap.from(group.children, {
-          y: 36, autoAlpha: 0, duration: 0.85, stagger: 0.09, ease: 'power3.out',
+          y: 28, autoAlpha: 0, duration: 0.7, stagger: 0.06, ease: 'power3.out',
           scrollTrigger: { trigger: group, start: 'top 88%', ...ONCE }
         });
       });

@@ -242,7 +242,7 @@ export default function Tour() {
                   <span className="tour__icon"><ModuleIcon name={m.icon} /></span>
                   <span className="tour__text">
                     <strong>{m.name}</strong>
-                    <span>{m.line}</span>
+                    <span className="tour__line"><span>{m.line}</span></span>
                     {i === active && <i className="tour__timer" key={active} aria-hidden="true" />}
                   </span>
                 </button>

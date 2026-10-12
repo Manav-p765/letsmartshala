@@ -35,7 +35,16 @@
 .st-card__eyebrow { display: flex; align-items: center; gap: 0.6rem; color: var(--hi); }
 .st-card__eyebrow span { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--navy); color: var(--white); font-size: 0.65rem; letter-spacing: 0; }
 .st-card__title { margin-top: 1rem; font-size: clamp(2rem, 1.2rem + 2.4vw, 3.4rem); }
-.st-card__title span { display: block; }
+/* Each title line rises out of its own mask when the chapter becomes active. */
+.st-card__title > span { display: block; overflow: hidden; padding-block: 0.06em 0.1em; margin-block: -0.06em -0.1em; }
+.st-card__title > span > span { display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  .st-card__title > span > span { translate: 0 105%; transition: translate var(--dur-hero) var(--ease-out); }
+  .st-card__title > span:nth-child(2) > span { transition-delay: 0.08s; }
+  .st-ch.is-active .st-card__title > span > span { translate: 0 0; }
+  .st-card__text, .st-card__points, .mg { opacity: 0; translate: 0 12px; transition: opacity var(--dur) var(--ease-out) 0.2s, translate var(--dur) var(--ease-out) 0.2s; }
+  .st-ch.is-active .st-card__text, .st-ch.is-active .st-card__points, .st-ch.is-active .mg { opacity: 1; translate: 0 0; }
+}
 .st-ch--first .st-card__title { font-size: clamp(2.4rem, 1.3rem + 3.3vw, 4.4rem); }
 .st-card__text { margin-top: 1.1rem; font-size: var(--fs-lede); line-height: 1.55; color: var(--fg-2); }
 .st-card__points { display: grid; gap: 0.6rem; margin-top: 1.2rem; }
@@ -43,7 +52,7 @@
 .st-card__points li::before { content: ''; position: absolute; left: 0.2rem; top: 0.55em; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px rgb(var(--blue-rgb) / 0.14); }
 .st-card__hint { margin-top: 1.8rem; font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
 .st-card__hint span { display: inline-block; }
-@media (prefers-reduced-motion: no-preference) { .st-card__hint span { animation: st-nudge 1.6s ease-in-out infinite; } }
+@media (prefers-reduced-motion: no-preference) { .st-card__hint span { animation: st-nudge 1.6s ease-in-out 4; } }
 @keyframes st-nudge { 50% { translate: 0 4px; } }
 
 /* ---- Chapter dots (inside the sticky stage, so they leave with it) ---- */
@@ -72,7 +81,7 @@
 /* ---- Motion graphics (play when their chapter is active) ---- */
 .mg { margin-top: 1.6rem; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
 .mg svg { shape-rendering: geometricPrecision; }
-.mg [style*='--i'] { --d: calc(0.15s + var(--i) * 0.14s); }
+.mg [style*='--i'] { --d: calc(0.15s + var(--i) * var(--stagger)); }
 
 .mg-stack { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .mg-stack span {
@@ -102,7 +111,9 @@
 .mg-one__dot .micon { width: 1.6rem; height: 1.6rem; }
 
 .mg-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
-.mg-roles span { display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.75rem; border-radius: 12px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line), 0 0 0 0 rgb(var(--blue-rgb) / 0.3); font-size: 0.9rem; font-weight: 600; }
+.mg-roles span { position: relative; display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.75rem; border-radius: 12px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); font-size: 0.9rem; font-weight: 600; }
+/* The "live" ping is a ring on a pseudo-element: only transform and opacity animate. */
+.mg-roles span::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 2px rgb(var(--blue-rgb) / 0.35); opacity: 0; pointer-events: none; }
 .mg-roles .micon { width: 1.1rem; height: 1.1rem; color: var(--blue); }
 
 .mg-lock { display: flex; align-items: center; gap: 0.9rem; }
@@ -125,13 +136,13 @@
   .is-active .mg-one > svg path { stroke-dashoffset: 0; transition-delay: var(--d); }
   .mg-one__dot { scale: 0.3; opacity: 0; transition: scale 0.6s var(--ease-spring), opacity 0.3s; }
   .is-active .mg-one__dot { scale: 1; opacity: 1; transition-delay: 1.1s; }
-  .is-active .mg-roles span { animation: mg-ping 2.4s calc(var(--d) + 0.6s) infinite; }
+  .is-active .mg-roles span::after { animation: mg-ping 1.6s var(--ease-out) calc(var(--d) + 0.6s) 3; }
   /* Lock: the shackle drops shut. */
   .mg-lock__shackle { translate: 0 -8px; transition: translate 0.5s var(--ease-spring); }
   .is-active .mg-lock__shackle { translate: 0 0; transition-delay: 0.5s; }
 }
 @keyframes mg-shake { 25% { rotate: -2deg; } 75% { rotate: 2deg; } }
-@keyframes mg-ping { 0% { box-shadow: inset 0 0 0 1px var(--line), 0 0 0 0 rgb(var(--blue-rgb) / 0.35); } 60%, 100% { box-shadow: inset 0 0 0 1px var(--line), 0 0 0 10px rgb(var(--blue-rgb) / 0); } }
+@keyframes mg-ping { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.12, 1.35); } }
 
 /* ---- Phones: the stage fills the screen, cards sit at the bottom ---- */
 @media (max-width: 900px) {

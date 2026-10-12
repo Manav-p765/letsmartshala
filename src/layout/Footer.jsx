@@ -3,6 +3,7 @@ import Brand from '../components/Brand/Brand.jsx';
 import { Fact } from '../components/Dummy/Dummy.jsx';
 import SocialLinks from '../components/ui/SocialLinks.jsx';
 import AppBadges from '../components/ui/AppBadges.jsx';
+import MotionToggle from '../components/ui/MotionToggle.jsx';
 import { nav, site } from '../data/site.js';
 import './Footer.css';
 
@@ -53,7 +54,10 @@ export default function Footer() {
 
       <div className="container footer__base">
         <p>© {new Date().getFullYear()} {site.legalName}. SmartShala is a product of {site.legalName}.</p>
-        <p lang="hi" className="footer__hi">शाला — school</p>
+        <div className="footer__base-right">
+          <MotionToggle />
+          <p lang="hi" className="footer__hi">शाला — school</p>
+        </div>
       </div>
     </footer>
   );

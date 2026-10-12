@@ -4,3 +4,6 @@ dist
 .env.local
 shots/
 *.log
+
+# Agent skills (installed locally from github.com/iart-ai; see docs/handoff.md)
+.claude/skills/

@@ -22,6 +22,7 @@
  */
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { isMotionPaused } from '../../lib/motion.js';
 
 const COL = {
   paper: '#FFFDF6', ivory: '#F5EFE6', navy: '#0E1D61', blue: '#003DE5', blue2: '#2456E6',
@@ -384,6 +385,7 @@ export async function createStoryScene(container, { reduced = false } = {}) {
   let visible = true;
   let w = 1, h = 1;
   let camDistance = 1;
+  let ambientT = 0;
 
   const resize = () => {
     w = container.clientWidth || 1;
@@ -412,8 +414,11 @@ export async function createStoryScene(container, { reduced = false } = {}) {
     raf = 0;
     if (!visible || document.hidden) return;
     const dt = Math.min(clockT.getDelta(), 0.05);
-    const t = clockT.elapsedTime;
-    const since = t - changedAt;
+    // "Pause animations": chapter changes still happen, ambient motion freezes.
+    const still = reduced || isMotionPaused();
+    if (!still) ambientT += dt;
+    const t = ambientT;
+    const since = clockT.elapsedTime - changedAt;
 
     for (const it of items) {
       const pose = it.poses[chapter];
@@ -430,7 +435,7 @@ export async function createStoryScene(container, { reduced = false } = {}) {
       o.scale.setScalar(Math.max(it.cur.s, 0.0001));
       o.visible = it.cur.s > 0.01 && it.cur.o > 0.01;
       for (const m of it.mats) m.opacity = it.cur.o * (m.userData.base ?? 1);
-      if (it.idle && !reduced) it.idle(o, t, chapter);
+      if (it.idle && !still) it.idle(o, t, chapter);
     }
     glow.material.opacity = tabletItem.cur.o;
 
@@ -441,7 +446,7 @@ export async function createStoryScene(container, { reduced = false } = {}) {
     pulseMat.opacity = linkMat.opacity > 0.05 ? Math.min(1, linkMat.opacity * 1.8) : 0;
     links.visible = linkMat.opacity > 0.02;
     for (const p of pulses) {
-      const f = reduced ? 0.5 : (t * 0.45 + p.offset) % 1;
+      const f = reduced ? 0.5 : (t * 0.45 + p.offset) % 1; // frozen while paused (t stops)
       p.mesh.position.lerpVectors(p.back ? p.to : p.from, p.back ? p.from : p.to, f);
     }
     // Dome: chapter 5.

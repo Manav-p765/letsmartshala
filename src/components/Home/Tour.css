@@ -62,17 +62,17 @@
 .tour__item.is-active .tour__icon { background: var(--blue); color: #fff; }
 .tour__icon .micon { width: 1.15rem; height: 1.15rem; }
 .tour__text strong { display: block; font-size: 0.975rem; font-weight: 650; line-height: 2.25rem; }
-.tour__text span {
+/* The active module's line opens with the grid 0fr→1fr trick (no height animation). */
+.tour__line {
   display: grid;
   grid-template-rows: 0fr;
   font-size: 0.85rem;
   color: var(--fg-2);
-  overflow: hidden;
-  max-height: 0;
   opacity: 0;
-  transition: max-height 0.5s var(--ease-out), opacity 0.4s;
+  transition: grid-template-rows var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out);
 }
-.tour__item.is-active .tour__text span { max-height: 3em; opacity: 1; margin-top: -0.35rem; }
+.tour__line > span { overflow: hidden; min-height: 0; }
+.tour__item.is-active .tour__line { grid-template-rows: 1fr; opacity: 1; margin-top: -0.35rem; }
 @media (max-height: 760px) { .tour__more { display: none; } }
 .tour__more { margin-top: 1.25rem; font-size: 0.8rem; color: var(--fg-3); line-height: 1.6; }
 .tour__more .label { margin-right: 0.5rem; }

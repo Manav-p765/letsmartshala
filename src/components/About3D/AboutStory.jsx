@@ -153,7 +153,7 @@ export default function AboutStory() {
                 <div className="st-card">
                   <p className="label st-card__eyebrow"><span>{String(i + 1).padStart(2, '0')}</span>{c.eyebrow}</p>
                   <H className="display st-card__title" id={i === 0 ? 'about-title' : undefined}>
-                    {c.title.map((l) => <span key={l}>{l}</span>)}
+                    {c.title.map((l) => <span key={l}><span>{l}</span></span>)}
                   </H>
                   {c.text && <p className="st-card__text">{c.text}</p>}
                   {c.points && (
