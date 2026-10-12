@@ -108,4 +108,6 @@ them again.
 - URL (goes in Vercel as `CRM_LEAD_URL`): `https://smartshala-backend.onrender.com/api/v1/crm/leads/website`
 - Auth: `Authorization: Bearer <token>`; the same value is `CRM_LEAD_TOKEN` on Vercel and `WEBSITE_LEAD_TOKEN` on the backend.
 - Answers: 201 `{"leadCode":"LD-000123","created":true}`; 400 invalid body; 401 bad token. `created:false` = the school already had an open deal and the repeat was noted on it. Rate limit 60/min per IP.
-- Checked 2026-10-12 from outside: a POST to that URL (no token, and with a dummy token) answered 400 `TENANT_CONTEXT_REQUIRED`, the same as any unknown `/api/v1` path, not 401. So the route did not look deployed on that server yet.
+- Checked 2026-10-12 (evening) from outside: both paths answer 401 `WEBSITE_TOKEN_INVALID` to a dummy token, as documented, so the route is live. One earlier request got no answer for 60 s, probably while the server was restarting; the website gives the CRM 8 s and relies on the email as backup.
+- `/api/crm/leads/website` (no `/v1`) is the same endpoint. Any 2xx is success; `role` is free text; unknown fields are ignored.
+- The token is sent separately by the CRM team; until they set it on their side, every request gets 401.
