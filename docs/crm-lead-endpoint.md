@@ -102,3 +102,10 @@ them again.
 >   it can be set as CRM_LEAD_URL / CRM_LEAD_TOKEN on the website's Vercel
 >   project. Do not include the token itself in chat; set it in both
 >   places directly.
+
+## Endpoint given by the CRM team (2026-10-12)
+
+- URL (goes in Vercel as `CRM_LEAD_URL`): `https://smartshala-backend.onrender.com/api/v1/crm/leads/website`
+- Auth: `Authorization: Bearer <token>`; the same value is `CRM_LEAD_TOKEN` on Vercel and `WEBSITE_LEAD_TOKEN` on the backend.
+- Answers: 201 `{"leadCode":"LD-000123","created":true}`; 400 invalid body; 401 bad token. `created:false` = the school already had an open deal and the repeat was noted on it. Rate limit 60/min per IP.
+- Checked 2026-10-12 from outside: a POST to that URL (no token, and with a dummy token) answered 400 `TENANT_CONTEXT_REQUIRED`, the same as any unknown `/api/v1` path, not 401. So the route did not look deployed on that server yet.

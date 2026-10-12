@@ -16,7 +16,9 @@
  *   CRM_LEAD_TOKEN  shared secret, sent as "Authorization: Bearer <token>"
  *   RESEND_API_KEY  email delivery
  *   LEAD_TO         inbox for leads (default support@letssmartshala.com)
- *   LEAD_FROM       verified sender, e.g. "SmartShala Website <leads@letssmartshala.com>"
+ *   LEAD_FROM       verified sender, e.g. "SmartShala <leads@letssmartshala.com>"
+ *   LEAD_TEMPLATE   Resend template id (default "demo-lead-notification");
+ *                   set to "none" to send the plain built-in email instead
  *
  * With neither CRM nor email configured: in local dev the lead is printed
  * to the terminal and accepted; in production it answers 503 so the form
@@ -110,23 +112,54 @@ async function sendToCrm(url, lead) {
   }
 }
 
+/** The values the Resend template (LEAD_TEMPLATE) fills in. All strings. */
+function templateVariables(lead) {
+  const digits = lead.phone.replace(/\D/g, '');
+  return {
+    LEAD_NAME: lead.name,
+    SCHOOL: lead.school,
+    STUDENTS: String(lead.students),
+    ROLE: lead.role,
+    PHONE: lead.phone,
+    PHONE_TEL: `tel:+${digits}`,
+    WHATSAPP_URL: `https://wa.me/${digits}`,
+    // Email is optional on the form; a template variable must not be empty.
+    LEAD_EMAIL: lead.email || 'Not given',
+    PAGE: lead.page || '/',
+    RECEIVED_AT: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }) + ' IST'
+  };
+}
+
+async function postEmail(key, content) {
+  const lead = content.lead;
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: process.env.LEAD_FROM || 'SmartShala Website <onboarding@resend.dev>',
+      to: [process.env.LEAD_TO || 'support@letssmartshala.com'],
+      reply_to: lead.email || undefined,
+      subject: `Demo request: ${lead.school} (${lead.students} students, ${lead.role})`,
+      ...content.body
+    })
+  });
+  if (!r.ok) console.error(`[lead] Resend error (${content.kind})`, r.status, await r.text().catch(() => ''));
+  return r.ok;
+}
+
+/**
+ * Emails the lead with the Resend template. If Resend rejects that (template
+ * missing, unpublished, a variable renamed), the plain built-in email goes
+ * out instead — a lead is never lost to a template problem.
+ */
 async function sendEmail(key, lead) {
-  const { html, text } = emailBody(lead);
+  const template = process.env.LEAD_TEMPLATE || 'demo-lead-notification';
   try {
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.LEAD_FROM || 'SmartShala Website <onboarding@resend.dev>',
-        to: [process.env.LEAD_TO || 'support@letssmartshala.com'],
-        reply_to: lead.email || undefined,
-        subject: `Demo request: ${lead.school} (${lead.students} students, ${lead.role})`,
-        html,
-        text
-      })
-    });
-    if (!r.ok) console.error('[lead] Resend error', r.status, await r.text().catch(() => ''));
-    return r.ok;
+    if (template !== 'none') {
+      const sent = await postEmail(key, { kind: 'template', lead, body: { template: { id: template, variables: templateVariables(lead) } } });
+      if (sent) return true;
+    }
+    return await postEmail(key, { kind: 'plain', lead, body: emailBody(lead) });
   } catch (e) {
     console.error('[lead] Resend unreachable:', e.message);
     return false;

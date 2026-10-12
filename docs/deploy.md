@@ -37,6 +37,7 @@ redeploy.
 | `RESEND_API_KEY` | Lead emails (**required**; without it the form shows the phone/WhatsApp fallback instead of sending) | API key from resend.com |
 | `LEAD_TO` | Inbox for leads | `support@letssmartshala.com` (the default) |
 | `LEAD_FROM` | Sender address | `SmartShala Website <leads@letssmartshala.com>`, after the domain is verified in Resend |
+| `LEAD_TEMPLATE` | Optional. Resend template id for the lead email (default `demo-lead-notification`). If the template fails, the plain built-in email is sent instead. `none` = always plain. |
 | `VITE_GA4_ID` | Google Analytics | `G-XXXXXXX` |
 | `VITE_GADS_ID` | Google Ads | `AW-XXXXXXXXX` |
 | `VITE_GADS_LEAD_LABEL` | Google Ads lead conversion | The conversion label for "demo request" |
