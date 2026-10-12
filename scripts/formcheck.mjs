@@ -17,6 +17,7 @@ console.log('errors shown on empty submit:', await p.locator('.lf__error').count
 await p.screenshot({ path: 'shots/demo-errors.png' });
 await p.fill('#lf-name', 'Sunita Sharma');
 await p.fill('#lf-school', 'Green Valley Public School');
+await p.fill('#lf-students', '650');
 await p.click('.lf__role:has-text("Principal")');
 await p.fill('#lf-phone', '98765 43210');
 await p.fill('#lf-email', 'sunita@example.com');

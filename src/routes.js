@@ -9,6 +9,9 @@ export const lazyPages = {
   about: () => import('./pages/AboutPage.jsx'),
   contact: () => import('./pages/ContactPage.jsx'),
   security: () => import('./pages/SecurityPage.jsx'),
-  legal: () => import('./pages/LegalPage.jsx')
+  legal: () => import('./pages/LegalPage.jsx'),
+  blog: () => import('./pages/BlogPage.jsx'),
+  blogPost: () => import('./pages/BlogPostPage.jsx'),
+  admin: () => import('./pages/AdminPage.jsx')
 };
 

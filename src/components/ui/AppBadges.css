@@ -1,0 +1,20 @@
+.appb { display: grid; gap: 0.8rem; margin-top: 1.6rem; }
+.appb .label { margin-bottom: 0 !important; }
+.appb__app { display: grid; gap: 0.4rem; }
+.appb__name { font-size: 0.82rem; font-weight: 600; color: var(--fg-2); }
+.appb__row { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.appb__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  height: 2.75rem;
+  padding: 0 0.95rem 0 0.75rem;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff !important;
+  transition: translate var(--dur) var(--ease-out), box-shadow var(--dur);
+}
+.appb__badge:hover { translate: 0 -2px; box-shadow: var(--shadow-2); }
+.appb__badge svg { width: 1.35rem; height: 1.35rem; }
+.appb__badge span { display: grid; font-size: 0.95rem; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; }
+.appb__badge small { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.02em; opacity: 0.8; }

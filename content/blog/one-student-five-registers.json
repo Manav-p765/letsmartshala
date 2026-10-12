@@ -1,0 +1,14 @@
+{
+  "slug": "one-student-five-registers",
+  "title": "One student, five registers: why school data gets typed again and again",
+  "excerpt": "An admission becomes a register entry, a class list, a fee card, a bus list and a mark sheet — each written by hand, by someone different. Here’s where the time goes, and how to stop it.",
+  "date": "2026-10-12",
+  "author": "SmartShala team",
+  "tags": [
+    "School office",
+    "Admissions"
+  ],
+  "status": "published",
+  "cover": "",
+  "body": "When a new student joins, the office doesn’t make one record. It makes five.\n\nThe **admission register** gets the student’s details. The **class teacher** copies the name into the attendance register. The **accountant** opens a fee card. If the child takes the bus, someone adds them to the **route list**. And at exam time, the name goes onto every **mark sheet**.\n\nSame child, same spelling — written five times, by five people, in five places.\n\n## Where the time actually goes\n\nTyping is the small part. The real cost shows up later:\n\n- **Mismatches.** A roll number changes in one register but not the others, and a report card goes out with the wrong name.\n- **Waiting.** The principal asks how many fees are pending, and someone has to add up the fee cards by hand.\n- **Late surprises.** Defaulters are found at the end of term, not when the first instalment is missed.\n- **Lost history.** When a register is full, last year’s entries go into a cupboard and are hard to find again.\n\n## One record, many views\n\nThe fix isn’t to type faster. It’s to type once.\n\nIn SmartShala, a student is added once — with guardian details, Aadhaar and APAAR IDs and documents — and every office reads from that one record. The class teacher sees them on the roll call. The accountant assigns the fee structure for their class. Transport adds them to a route and the fee appears on their ledger. Marks entered by subject teachers flow into one report card.\n\n> Nobody re-types what someone else already entered.\n\n## Getting started without a big bang\n\nYou don’t have to move everything at once. Most schools start with:\n\n1. **Student records** — import your existing list in bulk.\n2. **Fees** — the module that saves the office the most hours.\n3. **Attendance** — because teachers feel the difference on day one.\n\nEverything else can follow when the office is ready.\n\n[Book a demo](/demo) and we’ll show you how this works with your own classes and fee heads."
+}

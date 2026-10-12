@@ -56,3 +56,10 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 - Legal pages (privacy, terms, refunds) are **drafts**: shown with a "pending legal review" banner, `noindex`, with [bracketed] gaps for the registered address, grievance officer, liability and refund terms.
 - Security page states only what the code shows (per-school database, server-checked roles, activity logs, token/cookie sign-in, Razorpay, export/deletion on request). Hosting region, backup schedule and certifications are not claimed; the page invites questions.
 - Demo form roles: Principal, Owner / Trustee, Administrator, Accountant, Teacher, Other. Email is optional; an Indian mobile number is required.
+
+## Added 2026-10-12
+
+- About page tells the problem→solution story from product facts only. **Open:** the founding story (who started SmartShala, when, why, first schools) — the client asked for "how we built this"; add it to `src/data/about.js` when supplied.
+- Release timeline on About comes from the CRM's commit history (Sep–Oct 2026).
+- Blog starter posts (2) are general practical guides; no external statistics.
+- **Open:** Play Store / App Store URLs for the principal and teacher apps (badges hidden until set). If the apps are distributed as APKs instead, say so.

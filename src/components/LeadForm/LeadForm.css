@@ -49,6 +49,7 @@
 .lf__role:has(input:focus-visible) { outline: 2px solid var(--blue-2); outline-offset: 2px; }
 
 .lf__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.lf__row--school { grid-template-columns: 1fr 8.5rem; }
 .lf__hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
 .lf__submit { width: 100%; height: 3.15rem; margin-top: 0.2rem; }
@@ -58,4 +59,4 @@
 .lf__fine[role='alert'] { padding: 0.7rem 0.8rem; border-radius: 10px; background: color-mix(in srgb, var(--bad) 8%, transparent); color: var(--bad); }
 
 .lf--compact { padding: 1.25rem; gap: 0.8rem; }
-@media (max-width: 520px) { .lf__row { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .lf__row, .lf__row--school { grid-template-columns: 1fr; } }

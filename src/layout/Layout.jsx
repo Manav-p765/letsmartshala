@@ -47,7 +47,7 @@ export default function Layout({ minimal = false }) {
   // Once the page is idle, fetch the other routes' code so clicks are instant.
   useEffect(() => {
     const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 2500));
-    const id = idle(() => Object.values(lazyPages).forEach((load) => load().catch(() => {})));
+    const id = idle(() => Object.entries(lazyPages).forEach(([k, load]) => k !== 'admin' && load().catch(() => {})));
     return () => (window.cancelIdleCallback || clearTimeout)(id);
   }, []);
 

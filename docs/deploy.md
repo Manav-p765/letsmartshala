@@ -26,6 +26,11 @@ redeploy.
 
 | Variable | Needed for | Value |
 |---|---|---|
+| `CRM_LEAD_URL` | Leads into the sales CRM | The CRM's website-lead endpoint (see `docs/crm-lead-endpoint.md`) |
+| `CRM_LEAD_TOKEN` | Leads into the sales CRM | Shared secret, same value set on the CRM |
+| `ADMIN_PASSWORD` | Blog admin at `/admin` (**required** to sign in) | A long password only the team knows |
+| `GITHUB_TOKEN` | Blog admin saving posts (**required**) | GitHub fine-grained token: only repo letsmartshala, permission "Contents: Read and write" |
+| `ADMIN_SECRET` | Optional | Signs admin sessions; defaults to ADMIN_PASSWORD |
 | `RESEND_API_KEY` | Lead emails (**required**; without it the form shows the phone/WhatsApp fallback instead of sending) | API key from resend.com |
 | `LEAD_TO` | Inbox for leads | `support@letssmartshala.com` (the default) |
 | `LEAD_FROM` | Sender address | `SmartShala Website <leads@letssmartshala.com>`, after the domain is verified in Resend |
@@ -61,3 +66,14 @@ submission; a refresh or a direct visit doesn't count.
 - The legal pages are drafts, marked as such and not indexed. Have them
   reviewed, fill in the [bracketed] parts, then set `reviewed: true` in
   `src/data/legal.js`.
+
+## Blog admin
+
+- Go to `https://<site>/admin` and sign in with `ADMIN_PASSWORD`.
+- Saving or publishing a post commits `content/blog/<slug>.json` (and any
+  images, to `public/blog-media/`) to GitHub. Vercel then rebuilds, and the
+  post is live in about a minute. Each change shows in GitHub history, so
+  any post can be restored from there.
+- Create the token at GitHub → Settings → Developer settings →
+  Fine-grained tokens. Choose Repository access: only
+  `Manav-p765/letsmartshala`, and Permissions → Contents: Read and write.

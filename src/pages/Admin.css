@@ -1,0 +1,88 @@
+/* The admin is a tool, not a page: plain, dense, calm. */
+.adm { min-height: 100svh; background: var(--paper); color: var(--ink); font-size: 0.95rem; --fg: var(--ink); --fg-2: rgb(var(--navy-rgb) / 0.7); --fg-3: rgb(var(--navy-rgb) / 0.5); --line: rgb(var(--navy-rgb) / 0.12); --chip: rgb(var(--navy-rgb) / 0.05); --hi: var(--gold-ink); }
+.adm--center { display: grid; place-items: center; padding: 1.5rem; }
+
+.adm-login { display: grid; gap: 0.7rem; width: min(24rem, 100%); padding: 2rem; border-radius: 20px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-2); }
+.adm-login__mark { width: 2.6rem; height: 2.6rem; }
+.adm-login__mark svg { width: 100%; height: 100%; }
+.adm-login h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
+.adm-login p { color: var(--fg-2); }
+.adm-login label { margin-top: 0.5rem; font-size: 0.82rem; font-weight: 600; }
+.adm-login__back { margin-top: 0.4rem; font-size: 0.85rem; color: var(--fg-3); text-align: center; }
+
+.adm input, .adm textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+}
+.adm input:focus, .adm textarea:focus { outline: none; background: var(--white); box-shadow: inset 0 0 0 1.5px var(--blue-2), 0 0 0 4px rgb(var(--blue-rgb) / 0.1); }
+
+.adm-bar { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem clamp(1rem, 3vw, 2rem); background: rgb(var(--white-rgb) / 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.adm-bar__brand { display: flex; align-items: center; gap: 0.55rem; font-weight: 800; letter-spacing: -0.03em; }
+.adm-bar__brand svg { width: 1.7rem; height: 1.7rem; }
+.adm-bar__brand span { margin-left: 0.3rem; font-weight: 500; color: var(--fg-3); letter-spacing: 0; }
+.adm-bar__right { display: flex; align-items: center; gap: 0.6rem; }
+.adm-pill { padding: 0.25rem 0.65rem; border-radius: var(--radius-pill); background: rgb(var(--gold-rgb) / 0.18); color: var(--gold-ink); font-size: 0.75rem; font-weight: 600; }
+
+.adm-flash, .adm-error--bar { margin: 1rem auto 0; width: min(72rem, calc(100% - 2rem)); padding: 0.75rem 1rem; border-radius: 12px; }
+.adm-flash { background: rgb(15 138 74 / 0.1); color: var(--ok); }
+.adm-error { color: var(--bad); font-size: 0.85rem; }
+.adm-error--bar { background: rgb(200 36 44 / 0.08); }
+.adm-error--bar button { margin-left: 0.6rem; text-decoration: underline; }
+.adm-note--warn { padding: 0.6rem 0.8rem; border-radius: 10px; background: rgb(var(--gold-rgb) / 0.15); color: var(--gold-ink) !important; font-size: 0.85rem; }
+
+.adm-main { width: min(72rem, calc(100% - 2rem)); margin: 1.5rem auto 4rem; }
+.adm-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+.adm-head h1 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; letter-spacing: -0.03em; }
+.adm-head p { color: var(--fg-3); }
+.adm-head__actions { display: flex; gap: 0.5rem; }
+.adm-link { color: var(--blue-2); font-weight: 600; }
+
+.adm-list { display: grid; gap: 0.5rem; }
+.adm-empty { padding: 2rem; border-radius: 14px; border: 1.5px dashed var(--line); text-align: center; color: var(--fg-3); }
+.adm-row { display: grid; grid-template-columns: 7rem 1fr auto auto; align-items: center; gap: 1rem; padding: 0.6rem; border-radius: 14px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.adm-row__cover .pcover { border-radius: 9px; }
+.adm-row__main { display: grid; gap: 0.15rem; min-width: 0; }
+.adm-row__main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-row__main span { font-size: 0.8rem; color: var(--fg-3); }
+.adm-status { padding: 0.2rem 0.6rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; }
+.adm-status--published { background: rgb(15 138 74 / 0.1); color: var(--ok); }
+.adm-status--draft { background: var(--chip); color: var(--fg-2); }
+.adm-row__actions { display: flex; gap: 0.3rem; }
+.adm-row__actions a, .adm-row__actions button { padding: 0.4rem 0.7rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: var(--blue-2); }
+.adm-row__actions a:hover, .adm-row__actions button:hover { background: var(--chip); }
+.adm-row__actions .danger { color: var(--bad); }
+
+.adm-editor__grid { display: grid; grid-template-columns: 1fr 20rem; gap: 1rem; align-items: start; }
+.adm-card { display: grid; gap: 0.8rem; padding: 1.2rem; border-radius: 16px; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); }
+.adm-card > h2 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg-3); }
+.adm .adm-title { padding: 0.4rem 0; background: none; box-shadow: none; font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; letter-spacing: -0.03em; }
+.adm .adm-excerpt { resize: vertical; }
+.adm-tabs { display: flex; gap: 0.3rem; border-bottom: 1px solid var(--line); }
+.adm-tabs button { padding: 0.5rem 0.9rem; font-weight: 600; color: var(--fg-3); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.adm-tabs button[aria-selected='true'] { color: var(--ink); border-bottom-color: var(--blue-2); }
+.adm-toolbar { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+.adm-toolbar button { padding: 0.35rem 0.6rem; border-radius: 7px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); font-size: 0.82rem; }
+.adm-toolbar button:hover { background: var(--ivory); }
+.adm .adm-body { min-height: 26rem; resize: vertical; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; }
+.adm-preview { margin-top: 0; min-height: 26rem; }
+.adm-hint { font-size: 0.78rem; color: var(--fg-3); }
+
+.adm-side { display: grid; gap: 1rem; position: sticky; top: 4.5rem; }
+.adm-side__row { display: flex; align-items: center; gap: 0.8rem; }
+.adm-side label.btn { cursor: pointer; }
+.adm-fields label { display: grid; gap: 0.3rem; font-size: 0.82rem; font-weight: 600; }
+.adm-slug { display: flex; align-items: center; border-radius: 10px; background: var(--paper); box-shadow: inset 0 0 0 1px var(--line); }
+.adm-slug span { padding-left: 0.8rem; color: var(--fg-3); font-weight: 400; }
+.adm .adm-slug input { box-shadow: none; background: none; padding-left: 0.1rem; }
+
+@media (max-width: 900px) {
+  .adm-editor__grid { grid-template-columns: 1fr; }
+  .adm-side { position: static; }
+  .adm-row { grid-template-columns: 5rem 1fr; }
+  .adm-status, .adm-row__actions { grid-column: 2; justify-self: start; }
+}

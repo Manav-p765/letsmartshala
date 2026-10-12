@@ -27,6 +27,14 @@ export const site = {
     { id: 'whatsapp', label: 'WhatsApp', handle: '+91 78630 41196', href: 'https://wa.me/917863041196' }
   ],
 
+  // Store links for the Flutter apps. Paste the real listing URLs here
+  // (e.g. https://play.google.com/store/apps/details?id=…); a badge only
+  // appears once its link is filled in.
+  apps: [
+    { name: 'Principal app', play: '', appStore: '' },
+    { name: 'Teacher app', play: '', appStore: '' }
+  ],
+
   // Inbox that receives demo-form leads.
   leadsInbox: 'support@letssmartshala.com'
 };
@@ -36,5 +44,6 @@ export const nav = [
   { label: 'Solutions', to: '/solutions' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'About', to: '/about' },
+  { label: 'Blog', to: '/blog' },
   { label: 'Contact', to: '/contact' }
 ];

@@ -197,19 +197,6 @@ export const pricing = {
   ]
 };
 
-export const about = {
-  meta: 'SmartShala is a school management CRM built for Indian schools, by Hybrid Monks LLP.',
-  eyebrow: 'About',
-  title: ['A school runs on', 'a thousand small records.'],
-  lede: 'Admissions forms, attendance registers, fee receipts, mark sheets, bus lists, salary sheets. SmartShala puts them in one system, so the people who run a school spend their day on the school.',
-  beliefs: [
-    { title: 'Built for Indian schools', text: 'Class and section, roll numbers, Aadhaar and APAAR, fee heads and instalments, UPI, cheque and DD, the academic session. The words your office already uses.' },
-    { title: 'Everyone, one school', text: 'The principal, office, teachers and accountant work from the same records, each in their own view. Nobody re-types what someone else entered.' },
-    { title: 'Your data stays yours', text: 'Every school gets its own database, and access inside the school depends on each person’s role.' }
-  ],
-  company: 'SmartShala is a product of Hybrid Monks LLP.'
-};
-
 export const contact = {
   meta: 'Contact SmartShala: call or WhatsApp +91 78630 41196, email support@letssmartshala.com, or book a demo.',
   eyebrow: 'Contact',

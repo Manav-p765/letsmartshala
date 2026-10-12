@@ -1,0 +1,14 @@
+{
+  "slug": "fee-collection-checklist",
+  "title": "Fee collection without the receipt book: a checklist for school offices",
+  "excerpt": "Instalments, UPI and cheques, adjustments, defaulters. A practical checklist for running fee collection that the principal can see at a glance.",
+  "date": "2026-10-10",
+  "author": "SmartShala team",
+  "tags": [
+    "Fees",
+    "School office"
+  ],
+  "status": "published",
+  "cover": "",
+  "body": "Fee collection is where a school office spends most of its hours — and where small mistakes cost the most. Here’s a checklist we’d use to set it up properly, whether you run it on paper or in software.\n\n## Before the session starts\n\n- **Write down every fee head.** Tuition, admission, exam, activity, transport — each as its own head, so reports can show where money comes from.\n- **Decide the instalments.** Term-wise or quarterly, with due dates set at the start, not chased later.\n- **Assign by class, adjust by student.** Most students in a class pay the same; siblings and concessions are exceptions you record, not exceptions you remember.\n\n## Every time a payment comes in\n\n- **Record the mode.** UPI, cheque or demand draft — and the reference number, so it can be reconciled.\n- **Issue a receipt immediately**, with a number that never repeats.\n- **Post it to the student’s ledger**, so the balance is always current.\n\n## Every week\n\n- **Look at the defaulters list** while it is still short.\n- **Send reminders early** — a reminder before the due date gets paid faster than a notice after it.\n- **Check cheques that haven’t cleared.**\n\n## At the end of the term\n\n- Compare **collected against expected**, by class.\n- Carry balances forward instead of starting new cards.\n- Keep the year’s receipts searchable — parents ask for copies.\n\n## How SmartShala handles it\n\nFee structures with heads and instalments, payments by UPI, cheque or DD, receipt PDFs, student ledgers, adjustments and a defaulters list are all built in — and the principal sees today’s collection on their dashboard without asking for it.\n\n[See the fees module](/features#fees-receipts) or [book a demo](/demo)."
+}

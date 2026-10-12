@@ -14,6 +14,9 @@ const AboutPage = lazy(lazyPages.about);
 const ContactPage = lazy(lazyPages.contact);
 const SecurityPage = lazy(lazyPages.security);
 const LegalPage = lazy(lazyPages.legal);
+const BlogPage = lazy(lazyPages.blog);
+const BlogPostPage = lazy(lazyPages.blogPost);
+const AdminPage = lazy(lazyPages.admin);
 
 // A blank screen the height of a page, so the footer doesn't jump up while a route loads.
 const Fallback = () => <div style={{ minHeight: '100svh' }} aria-busy="true" />;
@@ -23,6 +26,8 @@ export default function App() {
     <Suspense fallback={<Fallback />}>
       <Routes>
         {/* Ad landing and thank-you: brand + one button, nothing to wander off to. */}
+        {/* The blog admin is a tool: no site chrome. */}
+        <Route path="admin" element={<AdminPage />} />
         <Route element={<Layout minimal />}>
           <Route path="demo" element={<DemoPage />} />
           <Route path="thank-you" element={<ThankYouPage />} />
@@ -38,6 +43,8 @@ export default function App() {
           <Route path="privacy" element={<LegalPage doc="privacy" />} />
           <Route path="terms" element={<LegalPage doc="terms" />} />
           <Route path="refunds" element={<LegalPage doc="refunds" />} />
+          <Route path="blog" element={<BlogPage />} />
+          <Route path="blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

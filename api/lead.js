@@ -2,19 +2,25 @@
  * POST /api/lead — a demo request from the site's form.
  *
  * Validates the fields, drops obvious bots (honeypot + too-fast submits),
- * and emails the lead to the sales inbox through Resend's HTTP API (plain
- * fetch, no SDK). Runs as a Vercel serverless function; in local dev the
- * same handler is mounted by vite.config.js.
+ * then delivers the lead to two places at once:
+ *   1. the SmartShala sales CRM (POST to CRM_LEAD_URL), so it lands in the
+ *      leads pipeline — the contract is in docs/crm-lead-endpoint.md;
+ *   2. the sales inbox, by email through Resend's HTTP API (plain fetch).
+ * The visitor sees success if at least one of them took the lead.
  *
- * Environment (set in Vercel → Project → Settings → Environment Variables):
- *   RESEND_API_KEY  required in production
- *   LEAD_TO         inbox that receives leads (default support@letssmartshala.com)
+ * Runs as a Vercel serverless function; in local dev the same handler is
+ * mounted by vite.config.js.
+ *
+ * Environment (Vercel → Project → Settings → Environment Variables):
+ *   CRM_LEAD_URL    CRM endpoint that creates a lead
+ *   CRM_LEAD_TOKEN  shared secret, sent as "Authorization: Bearer <token>"
+ *   RESEND_API_KEY  email delivery
+ *   LEAD_TO         inbox for leads (default support@letssmartshala.com)
  *   LEAD_FROM       verified sender, e.g. "SmartShala Website <leads@letssmartshala.com>"
- *                   (the letssmartshala.com domain must be verified in Resend — DNS records)
  *
- * Without RESEND_API_KEY: in local dev the lead is printed to the terminal
- * and accepted; in production it answers 503 so the form can show the
- * phone/WhatsApp fallback instead of pretending it worked.
+ * With neither CRM nor email configured: in local dev the lead is printed
+ * to the terminal and accepted; in production it answers 503 so the form
+ * shows the phone/WhatsApp fallback instead of pretending it worked.
  */
 
 const ROLES = ['Principal', 'Owner / Trustee', 'Administrator', 'Accountant', 'Teacher', 'Other'];
@@ -23,11 +29,12 @@ const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_conten
 const clean = (v, max = 200) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
 const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-/** Returns { lead } or { errors } — field name → message. */
+/** Returns { lead } or { errors } — field name → message. Shared with the form. */
 export function validate(body) {
   const lead = {
     name: clean(body.name, 80),
     school: clean(body.school, 120),
+    students: clean(body.students, 8).replace(/[^\d]/g, ''),
     role: clean(body.role, 40),
     phone: clean(body.phone, 20).replace(/[^\d+]/g, ''),
     email: clean(body.email, 120).toLowerCase(),
@@ -38,6 +45,9 @@ export function validate(body) {
   const errors = {};
   if (lead.name.length < 2) errors.name = 'Please enter your name.';
   if (lead.school.length < 2) errors.school = 'Please enter your school’s name.';
+  const n = Number(lead.students);
+  if (!lead.students || !(n >= 1 && n <= 10000)) errors.students = 'Roughly how many students? (1–10,000)';
+  else lead.students = n;
   if (!ROLES.includes(lead.role)) errors.role = 'Please choose your role.';
   // Indian mobile numbers: 10 digits starting 6–9, optional +91 / 0 prefix.
   const digits = lead.phone.replace(/^\+?91/, '').replace(/^0/, '');
@@ -50,7 +60,7 @@ export function validate(body) {
 
 function emailBody(lead) {
   const rows = [
-    ['Name', lead.name], ['School', lead.school], ['Role', lead.role],
+    ['Name', lead.name], ['School', lead.school], ['Students', String(lead.students)], ['Role', lead.role],
     ['Phone', lead.phone], ['Email', lead.email || '—'], ['Page', lead.page || '—'],
     ...UTM.filter((k) => lead[k]).map((k) => [k, lead[k]])
   ];
@@ -63,6 +73,64 @@ function emailBody(lead) {
     <p style="font-family:sans-serif;font-size:14px"><a href="tel:${esc(lead.phone.replace(/\s/g, ''))}">Call</a> · <a href="${esc(wa)}">WhatsApp</a></p>`;
   const text = rows.map(([k, v]) => `${k}: ${v}`).join('\n');
   return { html, text };
+}
+
+/** POSTs the lead to the CRM (docs/crm-lead-endpoint.md). True on 2xx. */
+async function sendToCrm(url, lead) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.CRM_LEAD_TOKEN ? { Authorization: `Bearer ${process.env.CRM_LEAD_TOKEN}` } : {})
+      },
+      body: JSON.stringify({
+        source: 'website',
+        name: lead.name,
+        schoolName: lead.school,
+        numberOfStudents: lead.students,
+        role: lead.role,
+        phone: lead.phone.replace(/\s/g, ''),
+        email: lead.email || null,
+        page: lead.page || null,
+        utm: Object.fromEntries(UTM.filter((k) => lead[k]).map((k) => [k, lead[k]])),
+        submittedAt: new Date().toISOString()
+      })
+    });
+    if (!r.ok) console.error('[lead] CRM error', r.status, await r.text().catch(() => ''));
+    return r.ok;
+  } catch (e) {
+    console.error('[lead] CRM unreachable:', e.message);
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function sendEmail(key, lead) {
+  const { html, text } = emailBody(lead);
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: process.env.LEAD_FROM || 'SmartShala Website <onboarding@resend.dev>',
+        to: [process.env.LEAD_TO || 'support@letssmartshala.com'],
+        reply_to: lead.email || undefined,
+        subject: `Demo request: ${lead.school} (${lead.students} students, ${lead.role})`,
+        html,
+        text
+      })
+    });
+    if (!r.ok) console.error('[lead] Resend error', r.status, await r.text().catch(() => ''));
+    return r.ok;
+  } catch (e) {
+    console.error('[lead] Resend unreachable:', e.message);
+    return false;
+  }
 }
 
 export default async function handler(req, res) {
@@ -78,7 +146,7 @@ export default async function handler(req, res) {
   body = body || {};
 
   // Bots: a hidden field humans never fill, and forms submitted in under 2s.
-  // Answer "ok" so they don't retry, but send nothing.
+  // Answer "ok" so they don't retry, but deliver nothing.
   if (body.website || (Number(body.elapsed) > 0 && Number(body.elapsed) < 2000)) {
     return res.status(200).json({ ok: true });
   }
@@ -86,33 +154,22 @@ export default async function handler(req, res) {
   const { lead, errors } = validate(body);
   if (errors) return res.status(400).json({ ok: false, errors });
 
+  const crm = process.env.CRM_LEAD_URL;
   const key = process.env.RESEND_API_KEY;
-  if (!key) {
+  if (!crm && !key) {
     if (!process.env.VERCEL) {
-      console.log('\n[lead] (dev, not emailed — no RESEND_API_KEY)\n', lead, '\n');
+      console.log('\n[lead] (dev — no CRM_LEAD_URL or RESEND_API_KEY; not delivered)\n', lead, '\n');
       return res.status(200).json({ ok: true, dev: true });
     }
-    console.error('[lead] RESEND_API_KEY is not set; lead not delivered:', lead);
+    console.error('[lead] no delivery configured; lead not delivered:', lead);
     return res.status(503).json({ ok: false, error: 'not_configured' });
   }
 
-  const { html, text } = emailBody(lead);
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.LEAD_FROM || 'SmartShala Website <onboarding@resend.dev>',
-      to: [process.env.LEAD_TO || 'support@letssmartshala.com'],
-      reply_to: lead.email || undefined,
-      subject: `Demo request: ${lead.school} (${lead.role})`,
-      html,
-      text
-    })
-  });
-
-  if (!r.ok) {
-    console.error('[lead] Resend error', r.status, await r.text().catch(() => ''), lead);
-    return res.status(502).json({ ok: false, error: 'send_failed' });
-  }
-  return res.status(200).json({ ok: true });
+  const [toCrm, toEmail] = await Promise.all([
+    crm ? sendToCrm(crm, lead) : null,
+    key ? sendEmail(key, lead) : null
+  ]);
+  if (toCrm === true || toEmail === true) return res.status(200).json({ ok: true });
+  console.error('[lead] every delivery failed:', lead);
+  return res.status(502).json({ ok: false, error: 'send_failed' });
 }

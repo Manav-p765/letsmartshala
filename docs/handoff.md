@@ -142,6 +142,20 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
 - [x] Official logo (docs/logo): white SS on the blue tile, single-colour
       wordmark, no pill around it in the nav. Responsive pass at 320–1920px;
       `node scripts/overflow.mjs <width>` must report "ok" for every route.
+- [x] Form: "No. of students" (required, 1–10,000)
+- [x] Leads → CRM: `api/lead.js` POSTs to `CRM_LEAD_URL`, with email alongside.
+      Contract and CRM-session prompt in `docs/crm-lead-endpoint.md`. The CRM
+      endpoint isn't built yet (the local CRM copy at D:workcampusloom is old).
+- [x] About page: visual story (`src/data/about.js`): paper registers,
+      one student five registers, six before→after pairs, principles, real
+      releases. The founding story is still needed from the owner.
+- [x] Blog: `/blog` and `/blog/:slug`, posts in `content/blog/*.json`;
+      admin at `/admin` (`api/admin.js`, GitHub-backed; local files in dev,
+      password "admin" in dev). Check it with `node scripts/admincheck.mjs`.
+- [x] App store badges in the footer (`site.apps`). They stay hidden until
+      store URLs are filled in. Note: a different company's "Smartshala" app
+      is on Google Play (com.gurubramha.loyola); never link to a search.
+- [ ] Vercel env: ADMIN_PASSWORD, GITHUB_TOKEN, CRM_LEAD_URL/TOKEN (deploy.md)
 - [ ] Set `RESEND_API_KEY` in Vercel: until then the live form shows the
       call/WhatsApp fallback. Then add the domain and DNS (`docs/deploy.md`).
 - [ ] Legal review of the privacy, terms and refund drafts; fill in the

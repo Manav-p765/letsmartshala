@@ -12,15 +12,24 @@
 // Usage: npm run build   (runs `vite build && node scripts/prerender.mjs`)
 import { chromium } from 'playwright';
 import { preview } from 'vite';
-import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 const SITE = 'https://letssmartshala.com';
 // [route, indexed?]
 const ROUTES = [
   ['/', true], ['/features', true], ['/solutions', true], ['/pricing', true],
   ['/about', true], ['/contact', true], ['/security', true], ['/demo', true],
-  ['/thank-you', false], ['/privacy', false], ['/terms', false], ['/refunds', false]
+  ['/thank-you', false], ['/privacy', false], ['/terms', false], ['/refunds', false],
+  ['/blog', true],
+  // Every published post, from content/blog/*.json.
+  ...readdirSync('content/blog')
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => JSON.parse(readFileSync(`content/blog/${f}`, 'utf8')))
+    .filter((p) => p.status === 'published')
+    .map((p) => [`/blog/${p.slug}`, true])
 ];
+// Shell-only routes: a real file so direct visits work, never prerendered or listed.
+const SHELL_ONLY = ['/admin'];
 
 copyFileSync('dist/index.html', 'dist/app.html');
 
@@ -30,6 +39,10 @@ copyFileSync('dist/index.html', 'dist/app.html');
 // below runs, it overwrites these with fully rendered HTML.
 for (const [route] of ROUTES) {
   if (route === '/') continue;
+  mkdirSync(`dist${route}`, { recursive: true });
+  copyFileSync('dist/app.html', `dist${route}/index.html`);
+}
+for (const route of SHELL_ONLY) {
   mkdirSync(`dist${route}`, { recursive: true });
   copyFileSync('dist/app.html', `dist${route}/index.html`);
 }
@@ -45,6 +58,7 @@ ${ROUTES.filter(([, i]) => i).map(([r]) => `  <url><loc>${SITE}${r}</loc><lastmo
 writeFileSync('dist/robots.txt', `User-agent: *
 Allow: /
 Disallow: /thank-you
+Disallow: /admin
 
 Sitemap: ${SITE}/sitemap.xml
 `);

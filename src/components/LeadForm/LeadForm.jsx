@@ -1,5 +1,6 @@
 /**
- * The demo-request form: name, school, role, mobile, email (optional).
+ * The demo-request form: name, school, number of students, role, mobile,
+ * email (optional).
  *
  * Validates as you go (on blur, then live once a field has an error),
  * keeps UTM/click IDs from the landing URL so the lead email says which ad
@@ -17,7 +18,7 @@ import './LeadForm.css';
 
 const ROLES = ['Principal', 'Owner / Trustee', 'Administrator', 'Accountant', 'Teacher', 'Other'];
 const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
-const EMPTY = { name: '', school: '', role: '', phone: '', email: '', website: '' };
+const EMPTY = { name: '', school: '', students: '', role: '', phone: '', email: '', website: '' };
 
 export default function LeadForm({ title = 'Book a free demo', note = 'A short call at a time that suits you. No obligation.', submit = 'Book my demo', compact = false }) {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ export default function LeadForm({ title = 'Book a free demo', note = 'A short c
     e.preventDefault();
     const errs = check(values);
     setErrors(errs);
-    setTouched({ name: true, school: true, role: true, phone: true, email: true });
+    setTouched({ name: true, school: true, students: true, role: true, phone: true, email: true });
     if (Object.keys(errs).length) {
       e.currentTarget.querySelector(`[name="${Object.keys(errs)[0]}"]`)?.focus();
       return;
@@ -105,7 +106,10 @@ export default function LeadForm({ title = 'Book a free demo', note = 'A short c
       </header>
 
       {field('name', 'Your name', { autoComplete: 'name', placeholder: 'e.g. Sunita Sharma' })}
-      {field('school', 'School name', { autoComplete: 'organization', placeholder: 'e.g. Green Valley Public School' })}
+      <div className="lf__row lf__row--school">
+        {field('school', 'School name', { autoComplete: 'organization', placeholder: 'e.g. Green Valley Public School' })}
+        {field('students', 'No. of students', { inputMode: 'numeric', autoComplete: 'off', placeholder: 'e.g. 650', maxLength: 5 })}
+      </div>
 
       <div className={`lf__field${errors.role && touched.role ? ' has-error' : ''}`}>
         <span className="lf__label" id="lf-role-label">Your role</span>
