@@ -142,6 +142,58 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
 - [x] Official logo (docs/logo): white SS on the blue tile, single-colour
       wordmark, no pill around it in the nav. Responsive pass at 320–1920px;
       `node scripts/overflow.mjs <width>` must report "ok" for every route.
+- [x] Form: "No. of students" (required, 1–10,000), next to School name
+- [x] Leads → CRM: `api/lead.js` POSTs each lead to `CRM_LEAD_URL` (Bearer
+      `CRM_LEAD_TOKEN`), with email alongside; success if either one delivers.
+      Contract and a prompt for the CRM's Claude session are in
+      `docs/crm-lead-endpoint.md`. The CRM endpoint is NOT built yet (the local
+      CRM copy at D:\work\campusloom is older than the live CRM).
+- [x] Social links (Instagram @letssmartshala, WhatsApp) in the footer and on
+      the contact page (`site.social`, `components/ui/SocialLinks.jsx`)
+- [x] Blog: `/blog` and `/blog/:slug`, posts in `content/blog/*.json`,
+      pre-rendered. Admin at `/admin` (`api/admin.js`): password login; saves
+      commit to GitHub so Vercel republishes. In dev it writes local files and
+      the password is "admin". Check with `node scripts/admincheck.mjs`.
+- [x] App store badges in the footer (`site.apps`, `AppBadges.jsx`). They stay
+      hidden until store URLs are filled in. A different company's "Smartshala"
+      app is on Google Play (com.gurubramha.loyola); never link to a search.
+- [x] Animation skills from github.com/iart-ai (six repos, 23 skills) are
+      installed locally in `.claude/skills/` and git-ignored (one pack has no
+      license). To reinstall: clone the repos and copy each `skills/<name>`.
+- [x] Motion language (from the skills), "Corporate": `--ease-out` for
+      entrances, `--ease-in` for exits, `--dur` 0.4s / `--dur-hero` 0.8s,
+      `--stagger` 60ms, overshoot ≤ 3%; loops animate only transform and
+      opacity. The footer has a "Pause animations" button (WCAG 2.2.2,
+      `lib/motion.js` → `html.motion-paused`).
+- [x] **About page** = a story film + supporting sections:
+      - The film: `public/film/smartshala-story.html`, made with the
+        javascript-animation + soundtrack skills. Every frame is drawn in
+        code (zero assets) and the score is synthesised in the page.
+        Storyboard: `film/storyboard.md`. It is authored in story-seconds
+        (0–47.5) and plays at `SPEED` 1.4 (about 34 s).
+      - On the page it is **scroll-driven** (`components/ScrollFilm`): a
+        sticky frame, 1600svh of travel, where scroll position picks the frame
+        through postMessage, with easing. The owner asked for this, and for
+        the slower scroll travel.
+      - "Watch with sound" opens an in-page overlay (Close button, Esc).
+        The film page opened on its own shows "← Back to SmartShala".
+      - No download link (the owner asked for it removed). The MP4 is kept at
+        `film/smartshala-story.mp4` for social posts and is not served.
+      - Reduced motion: no pinning; a normal player.
+      - Below the film: "The difference" (red-pen strike + rising line),
+        principles, releases. The earlier 3D story (three.js) was removed;
+        it is in commit 22ceaa1.
+      - Re-rendering: with ffmpeg and ffprobe on PATH (the ffmpeg-static and
+        ffprobe-static npm packages work), run the skill's `render.mjs`,
+        `layout-check.mjs` and the soundtrack skill's `sync-check.mjs`. Last
+        run: layout CLEAN, zero assets, 10/10 cuts on the beat. On Windows,
+        `asset-audit.mjs` reports a false positive for the page's own URL.
+      - Check the page with `node scripts/scrollfilm-check.mjs <w> <h>`.
+      - Still missing: the real founding story (who, when, why).
+- [ ] Vercel env for the blog admin: `ADMIN_PASSWORD`, `GITHUB_TOKEN`
+      (see `docs/deploy.md`)
+- [ ] CRM team builds the lead endpoint; then set `CRM_LEAD_URL` and
+      `CRM_LEAD_TOKEN` in Vercel
 - [ ] Set `RESEND_API_KEY` in Vercel: until then the live form shows the
       call/WhatsApp fallback. Then add the domain and DNS (`docs/deploy.md`).
 - [ ] Legal review of the privacy, terms and refund drafts; fill in the
