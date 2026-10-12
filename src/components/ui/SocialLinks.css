@@ -15,6 +15,8 @@
 .social__icon svg { width: 1.2rem; height: 1.2rem; }
 .social a:hover .social__icon { translate: 0 -2px; box-shadow: none; color: #fff; }
 .social a:hover .social__icon--instagram { background: linear-gradient(45deg, #F58529, #DD2A7B 50%, #8134AF); }
+.social a:hover .social__icon--facebook { background: #1877F2; }
+.social a:hover .social__icon--linkedin { background: #0A66C2; }
 .social a:hover .social__icon--whatsapp { background: #25D366; }
 .social--handles { flex-direction: column; gap: 0.8rem; }
 .social__text span { display: block; font-size: 0.78rem; color: var(--fg-3); }

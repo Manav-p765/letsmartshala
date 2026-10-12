@@ -30,7 +30,7 @@
         "logo": "https://letssmartshala.com/apple-touch-icon.png",
         "email": "support@letssmartshala.com",
         "telephone": "+91-78630-41196",
-        "sameAs": ["https://www.instagram.com/letssmartshala/"]
+        "sameAs": ["https://www.instagram.com/letssmartshala/", "https://www.facebook.com/letssmartshala", "https://www.linkedin.com/company/smart-shala"]
       }
     </script>
     <script>
@@ -40,6 +40,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Saved (prerendered) home page on a small screen: switch the hero to its
+      // phone arrangement before first paint, as the app will when it starts.
+      // Keep the width in step with NARROW in DayArcHero.jsx.
+      (function () {
+        var stage = document.querySelector('[data-static] .hero__stage');
+        if (stage && window.matchMedia('(max-width: 900px)').matches) stage.classList.add('is-narrow');
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
