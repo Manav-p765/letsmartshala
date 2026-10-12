@@ -8,7 +8,7 @@ export const site = {
   tagline: 'School management CRM for Indian schools',
   legalName: 'Hybrid Monks LLP',
 
-  siteUrl: 'https://letssmartshala.com',
+  siteUrl: 'https://www.letssmartshala.com',
 
   // The CRM's current deployment. Swap for the production app domain once it exists.
   appUrl: 'https://campus-loom.vercel.app',

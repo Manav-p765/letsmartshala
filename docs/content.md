@@ -22,7 +22,7 @@ confirmed is either left out or shown on the page with a **Dummy** tag.
 
 | Topic | Why | Status |
 |---|---|---|
-| WhatsApp messages to parents | Provider runs in dry-run without credentials | Ask owner if live |
+| WhatsApp messages to parents | Provider runs in dry-run without credentials | Owner (2026-10-12): not needed — leave it off the site |
 | AI assistant | Exists, capabilities depend on config | Ask owner |
 | Parent app | Not found in code | Don't mention |
 | Library, inventory, GPS bus tracking | Not found in code | Don't mention |

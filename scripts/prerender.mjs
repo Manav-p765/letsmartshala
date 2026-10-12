@@ -14,7 +14,7 @@ import { chromium } from 'playwright';
 import { preview } from 'vite';
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 
-const SITE = 'https://letssmartshala.com';
+const SITE = 'https://www.letssmartshala.com';
 // [route, indexed?]
 const ROUTES = [
   ['/', true], ['/features', true], ['/solutions', true], ['/pricing', true],

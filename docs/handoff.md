@@ -81,6 +81,14 @@ content questions live in `docs/content.md`.
   text is still in `data/pages.js` → `demo.next`, `demo.covers`).
 - **Social (2026-10-12):** Instagram, Facebook (`letssmartshala`), LinkedIn
   (`company/smart-shala`) and WhatsApp, from `site.social`.
+- **Domain (2026-10-12):** the site is live at `https://www.letssmartshala.com`
+  (main address); `letssmartshala.com` redirects to it. DNS is at Hostinger;
+  `app`, `api`, `backend` belong to the CRM. Canonical links, sitemap and
+  share previews use the www address.
+- **Leads (2026-10-12):** Resend domain verified, template
+  `demo-lead-notification` published, CRM endpoint and token set in Vercel.
+- **WhatsApp messages to parents (owner, 2026-10-12):** not needed — do not
+  mention or claim it anywhere on the site.
 - **Owner's preferences:**
   - Professional, not playful.
   - Floating elements are welcome, but they must not pull attention from the
@@ -198,8 +206,9 @@ removed at the owner's request). Use these names with the owner: 01 Hero (day ar
         the slower scroll travel.
       - "Watch with sound" opens an in-page overlay (Close button, Esc).
         The film page opened on its own shows "← Back to SmartShala".
-      - No download link (the owner asked for it removed). The MP4 is kept at
-        `film/smartshala-story.mp4` for social posts and is not served.
+      - No download link (the owner asked for it removed). The MP4 render was
+        deleted from the repo on 2026-10-12 (owner's call; the repo is public).
+        It can be rendered again from the film page with the skill's `render.mjs`.
       - Reduced motion: no pinning; a normal player.
       - Below the film: "The difference" (red-pen strike + rising line),
         principles, releases. The earlier 3D story (three.js) was removed;
