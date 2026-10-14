@@ -7,3 +7,6 @@ shots/
 
 # Agent skills (installed locally from github.com/iart-ai; see docs/handoff.md)
 .claude/skills/
+
+# Local video/brag tool output (not part of the site)
+brag-output/
