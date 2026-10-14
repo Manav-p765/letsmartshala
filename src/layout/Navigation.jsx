@@ -17,19 +17,20 @@ export default function Navigation({ minimal = false }) {
   const headerRef = useRef(null);
   const { pathname } = useLocation();
 
-  // Read which section sits under the bar (its data-theme) so the pills
-  // switch to dark glass over dark sections. One check per frame at most.
+  // Switch the pills to dark glass while a dark section (data-theme night,
+  // navy or blue) sits under the bar. One check per frame at most, and only
+  // the dark sections are measured — none on most pages, so no work at all.
+  // (elementsFromPoint was used here before; its hit test cost ~1 s of a
+  // slow phone's start-up.)
   useEffect(() => {
     let raf = 0;
     const check = () => {
       raf = 0;
       setScrolled(window.scrollY > 12);
+      const dark = document.querySelectorAll('#main [data-theme="night"], #main [data-theme="navy"], #main [data-theme="blue"]');
+      if (!dark.length) return setOnDark(false);
       const y = (headerRef.current?.getBoundingClientRect().bottom || 80) - 20;
-      const under = document
-        .elementsFromPoint(window.innerWidth / 2, y)
-        .find((el) => !headerRef.current?.contains(el))
-        ?.closest('[data-theme]');
-      setOnDark(['night', 'navy', 'blue'].includes(under?.dataset.theme));
+      setOnDark([...dark].some((el) => { const r = el.getBoundingClientRect(); return r.top <= y && r.bottom > y; }));
     };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(check); };
     check();
