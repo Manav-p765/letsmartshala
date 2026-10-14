@@ -34,7 +34,7 @@ p { position: absolute; left: 152px; bottom: 74px; font-size: 26px; color: rgb(1
 <span class="sun" style="left: 1093px; top: 189px"></span>
 <div class="brand"><svg viewBox="360 330 512 585"><path d="${MARK_PATH}" fill="currentColor" fill-rule="evenodd"/></svg><span>Smart<b>Shala</b></span></div>
 <h1>The whole school day,<br>in <em>one</em> system.</h1>
-<p>School management CRM for Indian schools · letssmartshala.com</p>
+<p>School management ERP for Indian schools · letssmartshala.com</p>
 </body></html>`;
 
 mkdirSync('public/share', { recursive: true });

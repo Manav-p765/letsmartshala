@@ -39,7 +39,7 @@ export function pageKeyFor(pathname) {
   const path = pathname.replace(/\/+$/, '') || '/';
   if (path === '/') return null;
   if (path === '/thank-you') return 'thanks';
-  if (['/privacy', '/terms', '/refunds'].includes(path)) return 'legal';
+  if (['/privacy', '/terms'].includes(path)) return 'legal';
   if (path.startsWith('/blog/')) return 'blogPost';
   const key = path.slice(1);
   return key in lazyPages ? key : null;

@@ -89,6 +89,7 @@ content questions live in `docs/content.md`.
   `demo-lead-notification` published, CRM endpoint and token set in Vercel.
 - **WhatsApp messages to parents (owner, 2026-10-12):** not needed — do not
   mention or claim it anywhere on the site.
+- **Owner's calls (2026-10-14):** say "ERP", not "CRM", in all site wording (the lead hand-off to the sales CRM keeps its name in code/docs). The Transport section is removed from the Features page (and transport from its lists and the sample student profile); other transport mentions on home, Solutions and About still stand unless the owner says otherwise. The refund policy page is removed (route, footer link, sitemap).
 - **Owner's preferences:**
   - Professional, not playful.
   - Floating elements are welcome, but they must not pull attention from the

@@ -5,7 +5,7 @@
  */
 export const site = {
   name: 'SmartShala',
-  tagline: 'School management CRM for Indian schools',
+  tagline: 'School management ERP for Indian schools',
   legalName: 'Hybrid Monks LLP',
 
   siteUrl: 'https://www.letssmartshala.com',

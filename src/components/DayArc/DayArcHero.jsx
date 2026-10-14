@@ -274,7 +274,7 @@ export default function DayArcHero() {
 
         <div className="hero__copy container" ref={copyRef}>
           <p className="label hero__eyebrow" data-intro>
-            School management CRM<span className="hero__eyebrow-more"> · Built for Indian schools</span>
+            School management ERP<span className="hero__eyebrow-more"> · Built for Indian schools</span>
           </p>
           <h1 id="hero-title" className="display hero__title">
             <span className="line-mask"><span>The whole school day,</span></span>

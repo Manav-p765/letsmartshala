@@ -7,7 +7,7 @@
  */
 
 export const demo = {
-  meta: 'Book a free SmartShala demo. See admissions, attendance, fees, exams, transport and payroll for your school in one CRM.',
+  meta: 'Book a free SmartShala demo. See admissions, attendance, fees, exams and payroll for your school in one system.',
   eyebrow: 'Free demo · For Indian schools',
   title: ['See your school', 'run on one system.'],
   accent: 'one system.',
@@ -45,7 +45,7 @@ export const thanks = {
 };
 
 export const features = {
-  meta: 'Every SmartShala module: admissions, student records, attendance, fees, exams, homework, timetable, transport, payroll, communication and reports.',
+  meta: 'Every SmartShala module: admissions, student records, attendance, fees, exams, homework, timetable, payroll, communication and reports.',
   eyebrow: 'Features',
   title: ['Everything the office,', 'staff room and principal use.'],
   lede: 'One system, shared students, classes and staff. Start with what you need; every module reads from the same records.',
@@ -82,7 +82,7 @@ export const features = {
       short: 'Fees',
       icon: 'fees',
       text: 'Every rupee recorded, receipted and reconciled.',
-      items: ['Fee structures with heads and instalments', 'Assign fees by class or by student', 'Payments by UPI, cheque or DD', 'Adjustments kept on the student’s ledger', 'Receipt PDFs for every payment', 'Defaulters list and fee reminders', 'Transport fee added for bus students']
+      items: ['Fee structures with heads and instalments', 'Assign fees by class or by student', 'Payments by UPI, cheque or DD', 'Adjustments kept on the student’s ledger', 'Receipt PDFs for every payment', 'Defaulters list and fee reminders']
     },
     {
       name: 'Exams & report cards',
@@ -99,14 +99,6 @@ export const features = {
       icon: 'homework',
       text: 'Set, track and check, by class and subject.',
       items: ['Homework by class and subject with due dates', 'Maximum marks where needed', 'Submission tracking and status', 'Shows on each student’s profile']
-    },
-    {
-      name: 'Transport',
-      screen: 'transport',
-      short: 'Transport',
-      icon: 'transport',
-      text: 'Buses, routes and who rides them.',
-      items: ['Vehicles and routes', 'Ordered stops on each route', 'Assign students to routes and stops', 'Transport fee on the student’s fees', 'Transport report']
     },
     {
       name: 'Staff, leave & payroll',
@@ -130,7 +122,7 @@ export const features = {
       short: 'Reports',
       icon: 'reports',
       text: 'The day’s picture, without asking for it.',
-      items: ['Role-based dashboards', 'Daily principal report', 'Attendance and fee risk insights', 'Class, exam, teacher and transport reports', 'Activity logs of who changed what']
+      items: ['Role-based dashboards', 'Daily principal report', 'Attendance and fee risk insights', 'Class, exam and teacher reports', 'Activity logs of who changed what']
     }
   ]
 };

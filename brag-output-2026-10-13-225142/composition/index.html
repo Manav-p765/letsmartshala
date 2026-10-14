@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1920,height=1080" />
+    <title>SmartShala Morning</title>
+    <style>
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #071433; }
+      canvas { display: block; width: 1920px; height: 1080px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1920" height="1080" aria-label="SmartShala product launch video"></canvas>
+    <script>
+      const W = 1920, H = 1080, DURATION = 21, canvas = document.querySelector('#c'), ctx = canvas.getContext('2d');
+      const C = { navy:'#0E1D61', night:'#071433', blue:'#003DE5', blue2:'#2456E6', paper:'#F5EFE6', white:'#FFFDF8', gold:'#B8964F', goldInk:'#84662A', sky:'#6FA8FF', green:'#0F8A4A', red:'#C8242C', muted:'#68708D', line:'rgba(14,29,97,.12)' };
+      const sans = '"Segoe UI", Arial, sans-serif';
+      const serif = 'Georgia, "Times New Roman", serif';
+      const clamp = (n, a=0, b=1) => Math.max(a, Math.min(b, n));
+      const prog = (t, a, b) => clamp((t-a)/(b-a));
+      const out = n => 1 - Math.pow(1-clamp(n), 3);
+      const inout = n => { n=clamp(n); return n<.5 ? 4*n*n*n : 1-Math.pow(-2*n+2,3)/2; };
+      const enter = (t, at, dur=.45) => out(prog(t, at, at+dur));
+      const pulse = (t, speed=1) => .5 + .5*Math.sin(t*speed*Math.PI*2);
+      const bob = (t, amount=8, speed=1) => Math.sin(t*speed*Math.PI*2)*amount;
+      const rr = (x,y,w,h,r,fill,stroke) => { ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();} };
+      const text = (s,x,y,size,weight=600,color=C.navy,align='left',family=sans,alpha=1) => { ctx.save();ctx.globalAlpha=alpha;ctx.font=`${weight} ${size}px ${family}`;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y);ctx.restore(); };
+      const line = (x1,y1,x2,y2,color,width=2,alpha=1) => { ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore(); };
+      const shadow = () => { ctx.shadowColor='rgba(14,29,97,.16)';ctx.shadowBlur=30;ctx.shadowOffsetY=16; };
+      const clearShadow = () => { ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0; };
+      const sceneBase = (bg) => { ctx.fillStyle=bg;ctx.fillRect(0,0,W,H); };
+      function logo(x,y,s,alpha=1){ ctx.save();ctx.globalAlpha=alpha;rr(x,y,s,s,s*.24,C.blue);text('Ss',x+s/2,y+s*.54,s*.42,800,'#fff','center');ctx.restore(); }
+      function pill(label,x,y,w,color=C.blue,alpha=1){rr(x,y,w,44,22,color);text(label,x+w/2,y+23,17,800,'#fff','center',sans,alpha);}
+      function check(x,y,color=C.green){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x-9,y);ctx.lineTo(x-2,y+7);ctx.lineTo(x+11,y-9);ctx.stroke();ctx.restore();}
+      function appFrame(x,y,w,h,title,sub,alpha=1){ctx.save();ctx.globalAlpha=alpha;shadow();rr(x,y,w,h,28,C.white);clearShadow();rr(x,y,w,76,28,C.navy);ctx.fillStyle=C.navy;ctx.fillRect(x,y+38,w,38);logo(x+24,y+15,46);text('SmartShala',x+82,y+38,26,800,'#fff');text(title,x+w-34,y+30,21,700,'#fff','right');text(sub,x+w-34,y+53,15,600,'rgba(255,255,255,.62)','right');ctx.restore();}
+      function metric(x,y,w,label,value,bar,color,alpha=1){ctx.save();ctx.globalAlpha=alpha;rr(x,y,w,188,18,'#fff',C.line);text(label,x+24,y+34,18,700,C.muted);text(value,x+24,y+86,42,850,C.navy);rr(x+24,y+132,w-48,12,6,'#E8EAF0');rr(x+24,y+132,(w-48)*bar*inout(alpha),12,6,color);if(alpha>.7){ctx.globalAlpha=(alpha-.7)*.7;rr(x+24+(w-48)*bar*inout(alpha)-24,y+132,24,12,6,'rgba(255,255,255,.72)');}ctx.restore();}
+      function header(label,headline,sub,t,light=false){const a=enter(t,0,.55),x=120-(1-a)*48; text(label,x,110,19,800,light?'#8FB0FF':C.goldInk,'left',sans,a);text(headline,x,185,64,850,light?'#fff':C.navy,'left',sans,a);text(sub,x,244,25,600,light?'rgba(255,255,255,.7)':C.muted,'left',sans,a);}
+      function sceneHook(t){sceneBase(C.night);const a=enter(t,.08,.6);ctx.save();ctx.globalAlpha=.18*a;ctx.strokeStyle=C.sky;ctx.lineWidth=4;ctx.beginPath();ctx.arc(960,1180,790,Math.PI,Math.PI*2);ctx.stroke();ctx.restore();
+        text('07:50 AM',120,160,28,800,'#8FB0FF','left',sans,a);text('Before the first bell,',120,310,86,850,'#fff','left',sans,a);text('the whole school is already moving.',120,405,61,400,'#D7E4FF','left',serif,a);
+        const p=enter(t,.45,.6),seconds=t*1.7;ctx.save();ctx.translate(1330,345+bob(t,.9,.45));ctx.scale(.92+.08*p,.92+.08*p);ctx.globalAlpha=p;rr(-155,-155,310,310,44,'rgba(255,255,255,.07)','rgba(255,255,255,.18)');ctx.strokeStyle='#8FB0FF';ctx.lineWidth=6;ctx.beginPath();ctx.arc(0,0,93,0,Math.PI*2);ctx.stroke();ctx.save();ctx.rotate(seconds);line(0,0,0,-78,'#8FB0FF',3);ctx.restore();ctx.save();ctx.rotate(.45+t*.05);line(0,0,0,-62,'#fff',7);ctx.restore();ctx.save();ctx.rotate(2.05+t*.012);line(0,0,0,-50,'#fff',7);ctx.restore();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,9,0,7);ctx.fill();text('School day',0,140,20,700,'rgba(255,255,255,.64)','center');ctx.restore();
+        pill('PRINCIPAL VIEW',120,530,204,C.blue2,a);text('Staff, attendance and fees',120,620,27,700,'rgba(255,255,255,.72)','left',sans,a);text('ready before assembly.',120,660,27,700,'rgba(255,255,255,.72)','left',sans,a);
+      }
+      function scenePrincipal(t){sceneBase(C.paper);header('07:50 AM  /  PRINCIPAL', 'The school, at a glance.', 'A live view before the first bell.',t);const a=enter(t,.32,.5);appFrame(120,315+(1-a)*38,1680,638,'Principal - Today','Morning overview',a);
+        ctx.save();ctx.globalAlpha=a;ctx.fillStyle='#F1F4FF';ctx.fillRect(120,391,188,562);text('TODAY',155,438,16,800,C.blue);[['Overview',true],['Attendance'],['Fees'],['Reports']].forEach(([s,on],i)=>{if(on)rr(142,470+i*66,144,44,12,'#DDE6FF');text(s,165,492+i*66,18,on?800:650,on?C.blue:C.muted);});ctx.restore();
+        metric(350,432,412,'Staff in','38 / 41',.93,C.green,enter(t,.55));metric(790,432,412,'Attendance','94%',.94,C.blue,enter(t,.72));metric(1230,432,512,'Fees today','Rs 1,26,908',.72,C.blue2,enter(t,.89));
+        const q=enter(t,1.1);ctx.save();ctx.globalAlpha=q;rr(350,664,1392,224,18,'#F8F9FD',C.line);text('School status',382,708,21,800,C.navy);pill('LIVE',618,686,78,C.red,.86+.14*pulse(t,1.5));text('3 classes started',382,754,19,650,C.muted);text('2 classes still to mark',382,802,19,650,C.muted);line(820,708,1640,708,C.line,2);['Office ready','Teachers checking in','Fees collecting'].forEach((s,i)=>{const x=850+i*260,glow=.55+.45*pulse(t+i*.23,1.25);ctx.save();ctx.globalAlpha=glow;ctx.fillStyle=i===2?C.blue:C.green;ctx.beginPath();ctx.arc(x,770,8+3*glow,0,7);ctx.fill();ctx.restore();text(s,x+18,770,17,700,C.navy);});ctx.restore();
+      }
+      function sceneAttendance(t){sceneBase(C.white);header('09:50 AM  /  TEACHER', 'Roll call without the paper chase.', 'Class 7-B, Period 1',t);const a=enter(t,.25);appFrame(120,315,1680,636,'Attendance','Class 7-B  |  Thursday',a);
+        ctx.save();ctx.globalAlpha=a;rr(158,425,520,115,18,'#F3F6FF');text('38 present',190,462,35,850,C.navy);text('2 absent  |  1 late',190,501,20,700,C.muted);pill('SAVE ATTENDANCE',430,458,206,C.blue);ctx.restore();
+        const rows=[['Aarav Sharma','P',C.green],['Ananya Iyer','P',C.green],['Arjun Nair','A',C.red],['Diya Mehta','P',C.green]];rows.forEach((r,i)=>{const p=enter(t,.6+i*.32,.28);const y=575+i*78+(1-p)*30;ctx.save();ctx.globalAlpha=p;rr(160,y,1580,58,12,i===2?'#FFF5F4':'#FAFBFD',C.line);if(i===0&&t>1.8){ctx.globalAlpha=.18*(1-pulse(t,1.4));rr(166,y+8,210,42,10,'#BBD0FF');ctx.globalAlpha=p;}text(r[0],196,y+29,21,750,C.navy);text('Class 7-B',660,y+29,18,650,C.muted);rr(1515,y+10,160,38,19,r[2]);text(r[1]==='P'?'Present':'Absent',1595,y+29,17,800,'#fff','center');ctx.restore();});
+        const p=enter(t,1.95,.35),fill=inout(prog(t,1.95,2.7));ctx.save();ctx.globalAlpha=p;rr(160,900,1580,28,14,'#E6EAF2');rr(160,900,1580*fill,14,7,C.blue);if(fill>.1){ctx.globalAlpha=.42*pulse(t,2);rr(160+1580*fill-46,900,46,14,7,'#8FB0FF');}text('Attendance is saved for 7-B.',160,970,22,800,C.navy);ctx.restore();
+      }
+      function sceneFees(t){sceneBase(C.paper);header('10:20 AM  /  ACCOUNTANT', 'Every rupee, accounted for.', 'Collection Command Center',t);const a=enter(t,.25);appFrame(120,315,1680,640,'Fees & receipts','Term 2 - 2026-27',a);
+        ctx.save();ctx.globalAlpha=a;rr(160,430,960,430,18,'#FAFBFD',C.line);text('Student',192,475,17,800,C.muted);text('Mode',720,475,17,800,C.muted);text('Amount',880,475,17,800,C.muted);text('Receipt',1080,475,17,800,C.muted,'right');line(190,505,1088,505,C.line);[['Aarav Sharma','UPI','Rs 12,500','R-2041'],['Diya Mehta','Cheque','Rs 8,000','R-2040'],['Kabir Rao','DD','Rs 15,200','R-2039']].forEach((r,i)=>{const rp=enter(t,.55+i*.22,.3),y=555+i*86+(1-rp)*24;ctx.save();ctx.globalAlpha=a*rp;rr(174,y-26,930,54,10,i===0?'#F1F5FF':'rgba(255,255,255,0)');text(r[0],192,y,21,750,C.navy);text(r[1],720,y,19,700,C.muted);text(r[2],880,y,21,800,C.navy);text(r[3],1080,y,17,800,C.blue,'right');line(190,y+38,1088,y+38,C.line);ctx.restore();});ctx.restore();
+        const p=enter(t,.85);ctx.save();ctx.translate(1430,645);ctx.scale(.9+.1*p,.9+.1*p);ctx.translate(-1430,-645);ctx.globalAlpha=p;shadow();rr(1160,430,540,430,22,'#fff');clearShadow();text('Receipt R-2041',1200,478,23,850,C.navy);text('Aarav Sharma  |  Class 7-B',1200,515,18,650,C.muted);line(1200,552,1660,552,C.line);text('UPI payment received',1200,600,20,700,C.muted);text('Rs 12,500',1200,660,54,850,C.navy);rr(1200,720,460,78,16,'#E7F7EF');ctx.save();ctx.globalAlpha=.25+.75*pulse(t,1.4);check(1234,759,C.green);ctx.restore();text('Receipt PDF ready',1265,759,23,850,C.green);ctx.restore();
+      }
+      function sceneRecord(t){sceneBase(C.night);header('ONE STUDENT  /  MANY LIVE UPDATES','One record. Everywhere it matters.','Aarav Sharma updates across the school.',t,true);const a=enter(t,.3);ctx.save();ctx.globalAlpha=.18*a;ctx.strokeStyle=C.sky;ctx.lineWidth=3;ctx.beginPath();ctx.arc(960,1210,860,Math.PI,Math.PI*2);ctx.stroke();ctx.setLineDash([14,18]);ctx.lineDashOffset=-t*54;line(470,840,1450,840,'#8FB0FF',2,.55);ctx.restore();
+        ctx.save();ctx.globalAlpha=a;shadow();rr(380,320,1160,570,28,C.white);clearShadow();rr(380,320,1160,82,28,C.blue);ctx.fillStyle=C.blue;ctx.fillRect(380,361,1160,41);logo(414,337,44);text('Student record',482,360,23,800,'#fff');ctx.beginPath();ctx.arc(478,494,58,0,7);ctx.fillStyle=C.blue;ctx.fill();text('AS',478,496,29,850,'#fff','center');text('Aarav Sharma',568,475,38,850,C.navy);text('Class 7-B  |  Roll 12  |  Adm. no. 2019/0412',568,522,20,700,C.muted);
+        [['Attendance','94%',C.green],['Fee balance','Rs 0',C.blue],['Transport','Route 4',C.goldInk]].forEach((r,i)=>{const p=enter(t,.75+i*.25);const x=440+i*354;ctx.save();ctx.globalAlpha=p;rr(x,620,318,150,18,'#F7F8FC',C.line);text(r[0],x+24,660,18,700,C.muted);text(r[1],x+24,715,33,850,r[2]);ctx.restore();});
+        const p=enter(t,1.55);ctx.save();ctx.globalAlpha=p;rr(440,802,1060,48,14,'#F0F4FF');text('APAAR ID linked  |  Guardian details verified  |  Receipt R-2041 generated',470,826,18,800,C.navy);ctx.restore();ctx.restore();
+      }
+      function sceneEnd(t){sceneBase(C.blue);const a=enter(t,.2,.55);ctx.save();ctx.globalAlpha=.14*a;ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(960,1130,820,Math.PI+t*.08,Math.PI*2+t*.08);ctx.stroke();ctx.restore();ctx.save();ctx.translate(960,301+bob(t,.8,.38));ctx.scale(.94+.06*a,.94+.06*a);ctx.translate(-960,-301);ctx.globalAlpha=a;rr(864,205,192,192,46,'#fff');text('Ss',960,309,80,800,C.blue,'center');ctx.restore();text('Every office. One school.',960,490,74,850,'#fff','center',sans,a);text('SmartShala keeps the day in one shared system.',960,575,28,600,'rgba(255,255,255,.76)','center',sans,a);const p=enter(t,1.25,.4);ctx.save();ctx.globalAlpha=p;rr(700,680,520,82,41,'#fff');ctx.globalAlpha=p*(.18+.16*pulse(t,1.1));rr(700,680,520,82,41,'#D5E1FF');text('Book a demo  |  letssmartshala.com',960,721,25,850,C.blue,'center');ctx.restore();text('SMARTSHALA',960,862,19,800,'rgba(255,255,255,.6)','center',sans,a);}
+      function draw(t){ctx.clearRect(0,0,W,H);if(t<3.4)sceneHook(t);else if(t<7)scenePrincipal(t-3.4);else if(t<10.2)sceneAttendance(t-7);else if(t<14)sceneFees(t-10.2);else if(t<17.8)sceneRecord(t-14);else sceneEnd(t-17.8);}
+      let begun=false, startAt=0;window.start=()=>{if(begun)return;begun=true;startAt=performance.now();const tick=now=>{const t=Math.min(DURATION,(now-startAt)/1000);draw(t);if(t<DURATION)requestAnimationFrame(tick);else window.__done=true;};requestAnimationFrame(tick);};window.draw=draw;window.DURATION=DURATION;
+      if(!new URLSearchParams(location.search).has('render')) window.start();
+    </script>
+  </body>
+</html>

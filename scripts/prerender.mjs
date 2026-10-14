@@ -19,7 +19,7 @@ const SITE = 'https://www.letssmartshala.com';
 const ROUTES = [
   ['/', true], ['/features', true], ['/solutions', true], ['/pricing', true],
   ['/about', true], ['/contact', true], ['/security', true], ['/demo', true],
-  ['/thank-you', false], ['/privacy', false], ['/terms', false], ['/refunds', false],
+  ['/thank-you', false], ['/privacy', false], ['/terms', false],
   ['/blog', true],
   // Every published post, from content/blog/*.json.
   ...readdirSync('content/blog')

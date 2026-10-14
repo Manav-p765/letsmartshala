@@ -35,7 +35,6 @@ export default function App() {
           <Route path="security" element={<SecurityPage />} />
           <Route path="privacy" element={<LegalPage doc="privacy" />} />
           <Route path="terms" element={<LegalPage doc="terms" />} />
-          <Route path="refunds" element={<LegalPage doc="refunds" />} />
           <Route path="blog" element={<BlogPage />} />
           <Route path="blog/:slug" element={<BlogPostPage />} />
           <Route path="*" element={<NotFoundPage />} />

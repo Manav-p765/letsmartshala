@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="../../node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #f5efe6;
+        color: #0e1d61;
+        font-family: "Segoe UI", Arial, system-ui, sans-serif;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background:
+          linear-gradient(90deg, rgba(14, 29, 97, 0.045) 1px, transparent 1px) 0 0 / 48px 48px,
+          linear-gradient(0deg, rgba(14, 29, 97, 0.035) 1px, transparent 1px) 0 0 / 48px 48px,
+          #f5efe6;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        visibility: hidden;
+      }
+      .paper { background: #f5efe6; }
+      .night { background: #071433; color: #f2f5ff; }
+      .white { background: #fffdf8; }
+      .label {
+        margin: 0 0 22px;
+        color: #84662a;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+      .headline {
+        margin: 0;
+        font-size: 112px;
+        line-height: 0.94;
+        letter-spacing: 0;
+        font-weight: 850;
+      }
+      .headline em {
+        color: #2456e6;
+        font-family: Georgia, "Times New Roman", serif;
+        font-style: italic;
+        font-weight: 400;
+      }
+      .sub {
+        margin: 26px 0 0;
+        max-width: 780px;
+        color: rgba(14, 29, 97, 0.72);
+        font-size: 34px;
+        line-height: 1.32;
+        font-weight: 600;
+      }
+      .register-desk {
+        position: absolute;
+        left: 112px;
+        top: 116px;
+        width: 1110px;
+        height: 780px;
+      }
+      .register {
+        position: absolute;
+        width: 650px;
+        height: 430px;
+        padding: 42px;
+        border: 2px solid rgba(14, 29, 97, 0.16);
+        border-radius: 14px;
+        background: #fffdf8;
+        box-shadow: 0 24px 60px rgba(14, 29, 97, 0.12);
+        transform-origin: 50% 100%;
+      }
+      .register:nth-child(1) { left: 38px; top: 216px; transform: rotate(-7deg); }
+      .register:nth-child(2) { left: 188px; top: 158px; transform: rotate(4deg); }
+      .register:nth-child(3) { left: 334px; top: 222px; transform: rotate(-2deg); }
+      .register h3 { margin: 0 0 28px; font-size: 32px; color: #0e1d61; }
+      .row {
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid rgba(14, 29, 97, 0.13);
+        font-size: 24px;
+        color: rgba(14, 29, 97, 0.78);
+      }
+      .row strong { color: #0e1d61; }
+      .redline {
+        color: #c8242c;
+        border: 3px solid #c8242c;
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-weight: 850;
+        transform: rotate(-5deg);
+      }
+      .hook-copy {
+        position: absolute;
+        right: 116px;
+        top: 218px;
+        width: 570px;
+      }
+      .hook-copy h1 { font-size: 104px; }
+      .hook-copy .sub { font-size: 30px; }
+      .arc { position: absolute; left: 160px; top: 196px; width: 1600px; height: 620px; }
+      .arc path { fill: none; stroke-linecap: round; }
+      .arc .glow { stroke: rgba(111, 168, 255, 0.24); stroke-width: 84; }
+      .arc .track { stroke: rgba(242, 245, 255, 0.22); stroke-width: 6; }
+      .arc .progress { stroke: #6fa8ff; stroke-width: 10; stroke-dasharray: 1; stroke-dashoffset: 0.18; }
+      .sun {
+        position: absolute;
+        left: 1230px;
+        top: 205px;
+        width: 86px;
+        height: 86px;
+        border-radius: 50%;
+        background: #fffdf8;
+        box-shadow: 0 0 44px rgba(111, 168, 255, 0.75);
+      }
+      .clock {
+        position: absolute;
+        left: 1325px;
+        top: 226px;
+        padding: 10px 16px;
+        border: 1px solid rgba(242, 245, 255, 0.26);
+        border-radius: 999px;
+        color: #f2f5ff;
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .hero-copy { position: absolute; left: 126px; bottom: 120px; width: 1040px; }
+      .hero-copy .label { color: #8fb0ff; }
+      .hero-copy .sub { color: rgba(242, 245, 255, 0.72); }
+      .cta-row { display: flex; gap: 18px; margin-top: 34px; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 190px;
+        height: 64px;
+        border-radius: 999px;
+        padding: 0 30px;
+        background: #2456e6;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 850;
+      }
+      .button.ghost {
+        background: rgba(255,255,255,0.08);
+        color: #f2f5ff;
+        border: 1px solid rgba(242,245,255,0.22);
+      }
+      .desks-head, .flow-head, .india-head { position: absolute; left: 116px; top: 96px; }
+      .desks-grid {
+        position: absolute;
+        left: 116px;
+        right: 116px;
+        bottom: 96px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      .desk-card {
+        min-height: 560px;
+        padding: 30px;
+        border: 1px solid rgba(14, 29, 97, 0.13);
+        border-radius: 18px;
+        background: #fffdf8;
+        box-shadow: 0 18px 42px rgba(14, 29, 97, 0.1);
+      }
+      .preview {
+        height: 228px;
+        border-radius: 16px;
+        padding: 20px;
+        background: #071433;
+        color: #f2f5ff;
+        margin-bottom: 28px;
+        overflow: hidden;
+      }
+      .metric {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 18px;
+        font-size: 20px;
+      }
+      .bar {
+        grid-column: 1 / -1;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(242,245,255,0.16);
+        overflow: hidden;
+      }
+      .bar i { display: block; height: 100%; width: var(--w); border-radius: inherit; background: #8fb0ff; }
+      .desk-card h3 { margin: 0; font-size: 34px; }
+      .desk-card p { margin: 14px 0 22px; color: rgba(14, 29, 97, 0.72); font-size: 22px; line-height: 1.35; font-weight: 650; }
+      .points { margin: 0; padding: 0; list-style: none; }
+      .points li { padding: 10px 0; border-top: 1px solid rgba(14, 29, 97, 0.1); color: rgba(14, 29, 97, 0.68); font-size: 19px; }
+      .journey { position: absolute; left: 116px; right: 116px; bottom: 92px; }
+      .stations { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 28px; }
+      .station { padding: 18px 18px 16px; min-height: 118px; border-radius: 16px; background: rgba(14, 29, 97, 0.045); border: 1px solid rgba(14, 29, 97, 0.1); }
+      .dot { display: block; width: 22px; height: 22px; border-radius: 50%; background: #2456e6; margin-bottom: 12px; }
+      .station b { display: block; color: #84662a; font-size: 17px; margin-bottom: 6px; }
+      .station span:last-child { font-size: 21px; font-weight: 850; }
+      .file { padding: 30px; border-radius: 20px; background: #fffdf8; border: 1px solid rgba(14,29,97,0.12); box-shadow: 0 24px 64px rgba(14, 29, 97, 0.11); }
+      .file-head { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+      .avatar { width: 70px; height: 70px; border-radius: 50%; display: grid; place-items: center; background: #2456e6; color: white; font-size: 24px; font-weight: 900; }
+      .file-name strong { display: block; font-size: 30px; }
+      .file-name span { color: rgba(14,29,97,0.58); font-size: 20px; }
+      .meter { margin-left: auto; width: 420px; height: 14px; border-radius: 999px; background: rgba(14,29,97,0.08); overflow: hidden; }
+      .meter i { display: block; height: 100%; width: 100%; background: #2456e6; }
+      .stamp { margin-left: 12px; padding: 12px 22px; border: 3px solid #0f8a4a; border-radius: 999px; color: #0f8a4a; font-size: 24px; font-weight: 950; text-transform: uppercase; transform: rotate(-8deg); }
+      .file-cols { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+      .file-col { min-height: 184px; padding: 20px; border-radius: 14px; background: #f5efe6; border: 1px solid rgba(14,29,97,0.1); }
+      .file-label { display: block; margin-bottom: 16px; color: #84662a; font-size: 18px; font-weight: 900; text-transform: uppercase; }
+      .file-col div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid rgba(14,29,97,0.1); font-size: 17px; }
+      .file-col div span:first-child { color: rgba(14,29,97,0.55); }
+      .chip-field {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        padding: 260px 150px 130px;
+      }
+      .chip {
+        padding: 20px 28px;
+        border-radius: 999px;
+        background: #fffdf8;
+        border: 1px solid rgba(14,29,97,0.12);
+        color: #0e1d61;
+        font-size: 28px;
+        font-weight: 850;
+        box-shadow: 0 14px 32px rgba(14, 29, 97, 0.08);
+      }
+      .end-card {
+        display: grid;
+        place-items: center;
+        text-align: center;
+        background: radial-gradient(circle at 50% 42%, rgba(111,168,255,0.22), transparent 34%), #071433;
+        color: #f2f5ff;
+      }
+      .mark { width: 128px; height: 128px; object-fit: contain; margin-bottom: 28px; filter: drop-shadow(0 18px 40px rgba(111,168,255,0.28)); }
+      .brand-name { margin: 0; font-size: 116px; line-height: 0.9; letter-spacing: 0; font-weight: 900; }
+      .brand-tag { margin: 24px 0 0; color: rgba(242,245,255,0.74); font-size: 36px; font-weight: 650; }
+      .url { margin-top: 42px; color: #8fb0ff; font-size: 30px; font-weight: 850; }
+      .mini-line { position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(90deg, #003de5, #b8964f, #6fa8ff); }
+      .bg-breathe { position: absolute; inset: -120px; background: radial-gradient(circle at 72% 18%, rgba(111, 168, 255, 0.17), transparent 35%); pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22.93" data-width="1920" data-height="1080">
+      <audio class="clip" id="music" data-start="0" data-duration="22.93" data-track-index="1" data-volume="0.28" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="sfx-paper-fold" class="clip" data-start="2.55" data-duration="1" data-track-index="20" data-volume="0.55" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx-desk-1" class="clip" data-start="6.15" data-duration="1" data-track-index="21" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx-desk-2" class="clip" data-start="7.10" data-duration="1" data-track-index="22" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx-desk-3" class="clip" data-start="8.05" data-duration="1" data-track-index="23" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx-desk-4" class="clip" data-start="9.00" data-duration="1" data-track-index="24" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx-paid-stamp" class="clip" data-start="17.47" data-duration="1" data-track-index="25" data-volume="0.62" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx-final-bell" class="clip" data-start="22.35" data-duration="1" data-track-index="26" data-volume="0.58" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+
+      <section id="scene-registers" class="clip paper" data-start="0" data-duration="2.73" data-track-index="2">
+        <div class="register-desk">
+          <article class="register reg-a"><h3>Admission register</h3><div class="row"><span>Name</span><strong>Aarav Sharma</strong></div><div class="row"><span>Class</span><strong>7-B</strong></div><div class="row"><span>Roll</span><strong>12</strong></div></article>
+          <article class="register reg-b"><h3>Fee register</h3><div class="row"><span>Student</span><strong>Aarav Sharma</strong></div><div class="row"><span>Term 2</span><strong>INR 24,000</strong></div><div class="row"><span>Receipt</span><strong>Pending</strong></div></article>
+          <article class="register reg-c"><h3>Mark sheet</h3><div class="row"><span>Student</span><strong>Aarav Sharma</strong></div><div class="row"><span>Roll</span><strong class="redline">21?</strong></div><div class="row"><span>Status</span><strong>Check again</strong></div></article>
+        </div>
+        <div class="hook-copy"><p class="label">Before SmartShala</p><h1 class="headline">one student.<br />five registers.</h1><p class="sub">The same school day, rewritten by every desk.</p></div>
+      </section>
+
+      <section id="scene-arc" class="clip night" data-start="2.73" data-duration="3.27" data-track-index="3">
+        <div class="bg-breathe"></div>
+        <svg class="arc" viewBox="0 0 1600 620" aria-hidden="true"><path class="glow" d="M 110 520 C 330 62, 1260 62, 1490 520" /><path class="track" d="M 110 520 C 330 62, 1260 62, 1490 520" /><path class="progress" pathLength="1" d="M 110 520 C 330 62, 1260 62, 1490 520" /></svg>
+        <div class="sun"></div><div class="clock">4:30 PM</div>
+        <div class="hero-copy"><p class="label">School management CRM</p><h1 class="headline">The whole school day,<br />in <em>one</em> system.</h1><p class="sub">Admissions, attendance, fees, exams, transport and payroll for Indian schools.</p><div class="cta-row"><span class="button">Book a demo</span><span class="button ghost">See every module</span></div></div>
+      </section>
+
+      <section id="scene-desks" class="clip white" data-start="6" data-duration="4.93" data-track-index="4">
+        <div class="desks-head"><p class="label">One school, four desks</p><h2 class="headline">Everyone opens<br />the same school.</h2></div>
+        <div class="desks-grid">
+          <article class="desk-card desk-1"><div class="preview"><div class="metric"><span>Staff in</span><strong>38/41</strong><span class="bar"><i style="--w: 93%"></i></span></div><div class="metric"><span>Attendance</span><strong>94%</strong><span class="bar"><i style="--w: 94%"></i></span></div><div class="metric"><span>Fees today</span><strong>INR 1.84L</strong><span class="bar"><i style="--w: 72%"></i></span></div></div><h3>Principal</h3><p>Sees the whole school before the first bell.</p><ul class="points"><li>Attendance and fee risk</li><li>Daily report and analytics</li></ul></article>
+          <article class="desk-card desk-2"><div class="preview"><div class="metric"><span>students_2026.xlsx</span><strong>412</strong><span class="bar"><i style="--w: 100%"></i></span></div><div class="metric"><span>Importing records</span><strong>Done</strong><span class="bar"><i style="--w: 100%"></i></span></div></div><h3>Office admin</h3><p>Keeps records, classes and timetables in order.</p><ul class="points"><li>Bulk import</li><li>Classes, sections, subjects</li></ul></article>
+          <article class="desk-card desk-3"><div class="preview"><div class="metric"><span>7-B Period 1</span><strong>Saved</strong><span class="bar"><i style="--w: 86%"></i></span></div><div class="metric"><span>Aarav P</span><strong>Ananya P</strong><span class="bar"><i style="--w: 75%"></i></span></div></div><h3>Teacher</h3><p>Gets through the paperwork between periods.</p><ul class="points"><li>Attendance</li><li>Homework, marks, timetable</li></ul></article>
+          <article class="desk-card desk-4"><div class="preview"><div class="metric"><span>Receipt R-2041</span><strong>UPI</strong><span class="bar"><i style="--w: 100%"></i></span></div><div class="metric"><span>Aarav Sharma</span><strong>Paid</strong><span class="bar"><i style="--w: 100%"></i></span></div></div><h3>Accountant</h3><p>Closes the day with every rupee accounted for.</p><ul class="points"><li>Receipts and ledgers</li><li>Defaulters list updates</li></ul></article>
+        </div>
+      </section>
+
+      <section id="scene-flow" class="clip paper" data-start="10.93" data-duration="6.54" data-track-index="5">
+        <div class="flow-head"><p class="label">How it fits together</p><h2 class="headline">From admission<br />to fee receipt.</h2></div>
+        <div class="journey">
+          <div class="stations"><div class="station st-1"><span class="dot"></span><b>Office admin</b><span>Add or import the student</span></div><div class="station st-2"><span class="dot"></span><b>Office admin</b><span>Place them in a class</span></div><div class="station st-3"><span class="dot"></span><b>Principal</b><span>Assign the fee structure</span></div><div class="station st-4"><span class="dot"></span><b>Accountant</b><span>Record the payment</span></div><div class="station st-5"><span class="dot"></span><b>Accountant</b><span>Receipt and ledger, done</span></div></div>
+          <article class="file"><header class="file-head"><span class="avatar">AS</span><div class="file-name"><strong>Aarav Sharma</strong><span>Student file - 2026-27</span></div><span class="meter"><i></i></span><span class="stamp">Paid</span></header><div class="file-cols"><section class="file-col col-1"><span class="file-label">Admitted</span><div><span>Guardian</span><strong>R. Sharma</strong></div><div><span>APAAR ID</span><strong>Linked</strong></div></section><section class="file-col col-2"><span class="file-label">Class</span><div><span>Class</span><strong>7-B</strong></div><div><span>Roll</span><strong>12</strong></div></section><section class="file-col col-3"><span class="file-label">Fees</span><div><span>Term 2</span><strong>INR 24,000</strong></div><div><span>Transport</span><strong>Route 4</strong></div></section><section class="file-col col-4"><span class="file-label">Payment</span><div><span>Paid</span><strong>INR 12,500</strong></div><div><span>Mode</span><strong>UPI</strong></div></section><section class="file-col col-5"><span class="file-label">Receipt</span><div><span>Receipt</span><strong>R-2041 PDF</strong></div><div><span>Ledger</span><strong>Updated</strong></div></section></div></article>
+        </div>
+      </section>
+
+      <section id="scene-india" class="clip white" data-start="17.47" data-duration="2.19" data-track-index="6">
+        <div class="india-head"><p class="label">Built for Indian schools</p><h2 class="headline">Speaks the language<br />of your office.</h2></div>
+        <div class="chip-field"><span class="chip">Aadhaar</span><span class="chip">APAAR ID</span><span class="chip">Class & section</span><span class="chip">UPI</span><span class="chip">Cheque</span><span class="chip">Demand draft</span><span class="chip">Year-end rollover</span><span class="chip">Transport fee</span></div>
+      </section>
+
+      <section id="scene-end" class="clip end-card" data-start="19.66" data-duration="3.27" data-track-index="7">
+        <div><img class="mark" src="assets/brand/mark-256.webp" alt="" /><h2 class="brand-name">SmartShala</h2><p class="brand-tag">School management CRM for Indian schools</p><p class="url">Book a demo - letssmartshala.com</p></div>
+        <div class="mini-line"></div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#scene-registers .register", { opacity: 0, y: 80, rotation: -10, scale: 0.94 }, { opacity: 1, y: 0, rotation: 0, scale: 1, duration: 0.8, stagger: 0.16, ease: "power3.out" }, 0);
+      tl.fromTo("#scene-registers .hook-copy > *", { opacity: 0, y: 42 }, { opacity: 1, y: 0, duration: 0.68, stagger: 0.16, ease: "power3.out" }, 0.55);
+      tl.fromTo("#scene-registers .redline", { opacity: 0, scale: 1.35 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }, 1.55);
+      tl.to("#scene-registers", { opacity: 0, duration: 0.42, ease: "power2.inOut" }, 2.35);
+      tl.set("#scene-registers", { opacity: 0 }, 2.73);
+      tl.fromTo("#scene-arc .arc", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 2.73);
+      tl.fromTo("#scene-arc .sun", { opacity: 0, x: -620, y: 320, scale: 0.75 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 1.85, ease: "sine.inOut" }, 3.02);
+      tl.fromTo("#scene-arc .hero-copy > *", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.66, stagger: 0.16, ease: "power3.out" }, 3.22);
+      tl.to("#scene-arc .bg-breathe", { opacity: 0.48, scale: 1.05, duration: 2.4, yoyo: true, repeat: 2, ease: "sine.inOut" }, 2.73);
+      tl.to("#scene-arc", { opacity: 0, duration: 0.34, ease: "power2.inOut" }, 5.66);
+      tl.set("#scene-arc", { opacity: 0 }, 6.00);
+      tl.fromTo("#scene-desks .desks-head > *", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power3.out" }, 6.0);
+      tl.fromTo("#scene-desks .desk-card", { opacity: 0, y: 66, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.72, stagger: 0.36, ease: "power3.out" }, 6.7);
+      tl.fromTo("#scene-desks .bar i", { width: "0%" }, { width: (i, el) => el.style.getPropertyValue("--w"), duration: 1.05, stagger: 0.08, ease: "power2.out" }, 7.25);
+      tl.to("#scene-desks", { opacity: 0, duration: 0.36, ease: "power2.inOut" }, 10.57);
+      tl.set("#scene-desks", { opacity: 0 }, 10.93);
+      tl.fromTo("#scene-flow .flow-head > *", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.62, stagger: 0.12, ease: "power3.out" }, 10.93);
+      tl.fromTo("#scene-flow .station", { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.48, stagger: 0.45, ease: "power3.out" }, 12.05);
+      tl.fromTo("#scene-flow .file", { opacity: 0, y: 52, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "power3.out" }, 12.35);
+      tl.fromTo("#scene-flow .file-col", { opacity: 0.2, y: 34 }, { opacity: 1, y: 0, duration: 0.46, stagger: 0.52, ease: "power3.out" }, 13.0);
+      tl.fromTo("#scene-flow .meter i", { width: "0%" }, { width: "100%", duration: 2.6, ease: "power2.out" }, 13.0);
+      tl.fromTo("#scene-flow .stamp", { opacity: 0, scale: 1.5, rotation: -18 }, { opacity: 1, scale: 1, rotation: -8, duration: 0.42, ease: "power2.out" }, 16.95);
+      tl.to("#scene-flow", { opacity: 0, duration: 0.34, ease: "power2.inOut" }, 17.16);
+      tl.set("#scene-flow", { opacity: 0 }, 17.47);
+      tl.fromTo("#scene-india .india-head > *", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power3.out" }, 17.47);
+      tl.fromTo("#scene-india .chip", { opacity: 0, y: 32, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.42, stagger: 0.08, ease: "power3.out" }, 17.84);
+      tl.to("#scene-india", { opacity: 0, duration: 0.32, ease: "power2.inOut" }, 19.38);
+      tl.set("#scene-india", { opacity: 0 }, 19.66);
+      tl.fromTo("#scene-end .mark", { opacity: 0, y: 36, scale: 0.72 }, { opacity: 1, y: 0, scale: 1, duration: 0.62, ease: "power3.out" }, 19.66);
+      tl.fromTo("#scene-end .brand-name", { opacity: 0, y: 38 }, { opacity: 1, y: 0, duration: 0.64, ease: "power3.out" }, 20.16);
+      tl.fromTo("#scene-end .brand-tag", { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.58, ease: "power3.out" }, 20.75);
+      tl.fromTo("#scene-end .url", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.52, ease: "power3.out" }, 21.28);
+      tl.to("#scene-end .mini-line", { scaleX: 0, transformOrigin: "right center", duration: 0.42, ease: "power2.in" }, 22.45);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

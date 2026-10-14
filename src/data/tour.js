@@ -83,8 +83,7 @@ export const tour = [
       fields: [
         ['Guardian', 'Rakesh Sharma (Father)'],
         ['Aadhaar', 'XXXX XXXX 4821'],
-        ['APAAR ID', 'Linked'],
-        ['Transport', 'Route 4 · Sector 4']
+        ['APAAR ID', 'Linked']
       ],
       tabs: ['Overview', 'Attendance', 'Academics', 'Fees', 'Documents', 'Behaviour'],
       stats: [['Attendance', '94%'], ['Fee balance', '₹0'], ['Last exam', 'A1']]

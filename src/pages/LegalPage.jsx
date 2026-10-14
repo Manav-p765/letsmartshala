@@ -2,7 +2,7 @@ import usePageMeta from '../hooks/usePageMeta.js';
 import { legal } from '../data/legal.js';
 import './Pages.css';
 
-/** One template for privacy, terms and refunds. Unreviewed drafts say so, and aren't indexed. */
+/** One template for privacy and terms. Unreviewed drafts say so, and aren't indexed. */
 export default function LegalPage({ doc }) {
   const d = legal[doc];
   usePageMeta({ title: d.title, description: d.meta, path: d.path, noindex: !d.reviewed });

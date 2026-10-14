@@ -44,18 +44,5 @@ export const legal = {
       { h: 'Liability', p: ['[To be completed with legal advice: limitation of liability, indemnity, governing law and jurisdiction.]'] },
       { h: 'Contact', p: [`Questions about these terms: ${email}.`] }
     ]
-  },
-  refunds: {
-    path: '/refunds',
-    title: 'Refund & cancellation policy',
-    meta: 'Refund and cancellation policy for SmartShala subscriptions.',
-    reviewed: false,
-    updated,
-    sections: [
-      { h: 'Cancelling', p: [`A school can cancel its subscription by writing to ${email} from the principal’s or owner’s email address. Cancellation takes effect at the end of the current billing period unless agreed otherwise.`] },
-      { h: 'Refunds', p: ['[To be confirmed by SmartShala: whether and how unused periods are refunded, any time limit for refund requests, and how long refunds take to reach the original payment method.]'] },
-      { h: 'Your data after cancelling', p: ['Before your access ends you can ask for an export of your school’s data. After that, you can ask for it to be deleted.'] },
-      { h: 'Contact', p: [`Refund or cancellation questions: ${email}, or call/WhatsApp +91 78630 41196.`] }
-    ]
   }
 };
