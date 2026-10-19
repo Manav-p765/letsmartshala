@@ -94,6 +94,9 @@ const base = 'http://localhost:4179';
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
+// The Meta Pixel must not run here: it throws in headless Chromium (failing the
+// build) and would send the build's own visits to Meta as page views.
+await page.route(/facebook\.(net|com)/, (r) => r.abort());
 
 for (const [route] of ROUTES) {
   await page.goto(base + route, { waitUntil: 'networkidle' });
@@ -101,6 +104,8 @@ for (const [route] of ROUTES) {
   await page.waitForTimeout(400);
   let html = await page.content();
   // Runtime-only bits that shouldn't be baked into the static file.
+  // The pixel snippet in index.html adds this tag itself on every visit.
+  html = html.replace(/<script async="" src="https:\/\/connect\.facebook\.net\/[^"]*"><\/script>/g, '');
   html = html.replace(/ class="js"/, '').replace(/<html([^>]*) class="lenis[^"]*"/, '<html$1');
   // Links the app added for this page's own code and styles carry the
   // preview server's address; make them relative so they work when deployed.
