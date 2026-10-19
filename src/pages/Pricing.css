@@ -1,0 +1,299 @@
+/* ============================================
+   Pricing page. Shared pieces (.price-grid, .price-tag, .card, .checks)
+   live in Pages.css. Every entrance here plays once; the only loop is the
+   hero cards' slow sway, which the footer's "Pause animations" stops.
+   ============================================ */
+
+#quote { scroll-margin-top: var(--nav-h); }
+
+/* ---- Hero: plan cards hanging on dotted strings (wide screens only) ---- */
+.price-floats { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.price-float {
+  position: absolute;
+  top: calc(var(--nav-h) + 0.75rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 12.5rem;
+  transform-origin: 50% 0;
+}
+.price-float--left { left: clamp(1.5rem, 5vw, 6.5rem); }
+.price-float--right { right: clamp(1.5rem, 5vw, 6.5rem); }
+@media (prefers-reduced-motion: no-preference) {
+  /* A slow pendulum from the pin: under a degree each way. */
+  .price-float { animation: price-sway 9s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -2.3s); }
+}
+@keyframes price-sway {
+  from { rotate: -0.9deg; }
+  to { rotate: 0.9deg; }
+}
+.price-float__pin {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px rgb(var(--blue-rgb) / 0.5);
+}
+.price-float__string {
+  width: 2px;
+  height: var(--len);
+  background: radial-gradient(circle, rgb(var(--blue-rgb) / 0.45) 1px, transparent 1.2px) 50% 0 / 2px 6px repeat-y;
+  transform-origin: 50% 0;
+}
+.price-float__body {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.6rem 0.75rem 0.6rem 0.6rem;
+  border-radius: 14px;
+  background: rgb(var(--white-rgb) / 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 0 1px rgb(var(--navy-rgb) / 0.07), 0 10px 24px -14px rgb(var(--navy-rgb) / 0.3);
+}
+.price-float__icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9px;
+  background: rgb(var(--blue-rgb) / 0.07);
+  color: var(--blue);
+}
+.price-float__icon .micon { width: 1.1rem; height: 1.1rem; }
+.price-float__main { display: grid; min-width: 0; text-align: left; }
+.price-float__label { font-family: var(--font-mono); font-size: 0.625rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--hi); }
+.price-float__title { margin-top: 0.1rem; font-size: 0.6875rem; color: var(--fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.price-float__value { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; letter-spacing: -0.015em; color: var(--ink); white-space: nowrap; }
+@media (max-width: 1279px) { .price-floats { display: none; } }
+
+/* ---- Size slider: the page's signature moment ---- */
+.sizer {
+  position: relative;
+  max-width: 46rem;
+  margin: 0 auto clamp(2rem, 5vh, 3rem);
+  padding: clamp(1.25rem, 2.4vw, 1.9rem);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -40px rgb(var(--navy-rgb) / 0.35);
+}
+.sizer__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.sizer__label { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+.sizer__count { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.7rem, 1.2rem + 1.2vw, 2.3rem); letter-spacing: -0.035em; color: var(--blue); font-variant-numeric: tabular-nums; }
+
+/* Thumb is 1.5rem: its centre runs from 0.75rem to (100% - 0.75rem). */
+.sizer__track { --thumb: 1.5rem; position: relative; margin-top: 0.9rem; }
+.sizer__zone {
+  position: absolute;
+  top: 1rem; /* the middle of the 2rem-tall range input */
+  translate: 0 -50%;
+  left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--from));
+  width: calc((100% - var(--thumb)) * (var(--to) - var(--from)));
+  height: 1.4rem;
+  border-radius: var(--radius-pill);
+  background: rgb(var(--blue-rgb) / 0.07);
+  box-shadow: inset 0 0 0 1px rgb(var(--blue-rgb) / 0.14);
+  transition: left 0.5s var(--ease-out), width 0.5s var(--ease-out);
+}
+.sizer__range {
+  --track: 0.4rem;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 2rem;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+.sizer__range::-webkit-slider-runnable-track {
+  height: var(--track);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--blue-2) var(--fill), rgb(var(--navy-rgb) / 0.12) var(--fill));
+}
+.sizer__range::-moz-range-track { height: var(--track); border-radius: var(--radius-pill); background: rgb(var(--navy-rgb) / 0.12); }
+.sizer__range::-moz-range-progress { height: var(--track); border-radius: var(--radius-pill); background: var(--blue-2); }
+.sizer__range::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--thumb);
+  height: var(--thumb);
+  margin-top: calc((var(--track) - var(--thumb)) / 2);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: inset 0 0 0 2px var(--blue-2), 0 0 0 6px rgb(var(--blue-rgb) / 0.1), var(--shadow-2);
+  transition: scale var(--dur-micro) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+.sizer__range::-moz-range-thumb {
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 2px solid var(--blue-2);
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 0 0 6px rgb(var(--blue-rgb) / 0.1), var(--shadow-2);
+}
+.sizer__range:hover::-webkit-slider-thumb { box-shadow: inset 0 0 0 2px var(--blue-2), 0 0 0 9px rgb(var(--blue-rgb) / 0.12), var(--shadow-2); }
+.sizer__range:active::-webkit-slider-thumb { scale: 1.12; }
+.sizer__range:focus-visible { outline: none; }
+.sizer__range:focus-visible::-webkit-slider-thumb { box-shadow: inset 0 0 0 2px var(--blue-2), 0 0 0 5px rgb(var(--blue-rgb) / 0.3); }
+.sizer__range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 5px rgb(var(--blue-rgb) / 0.3); }
+
+/* Plan limits under the track: a tick and the student count. */
+.sizer__scale { position: relative; height: 1.4rem; }
+.sizer__scale span {
+  position: absolute;
+  top: 0;
+  left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--at));
+  translate: -50% 0;
+  padding-top: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  transition: color var(--dur) var(--ease-out);
+}
+.sizer__scale span::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.5px;
+  height: 0.35rem;
+  background: currentColor;
+}
+.sizer__scale span.is-past { color: var(--blue-2); }
+
+.sizer__result { margin-top: 0.7rem; color: var(--fg-2); font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.sizer__result strong { color: var(--ink); font-weight: 700; }
+.sizer__plan {
+  display: inline-block;
+  padding: 0.12rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--blue-2);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* ---- Plan cards ---- */
+.plans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; align-items: stretch; }
+.plan { position: relative; display: flex; flex-direction: column; }
+.plan.is-active { box-shadow: inset 0 0 0 2px var(--blue-2), 0 24px 48px -24px rgb(var(--blue-rgb) / 0.35); translate: 0 -6px; }
+.plan.is-active:hover { translate: 0 -8px; }
+.plan__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; min-height: 1.9rem; }
+.plan__fit {
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: rgb(var(--blue-rgb) / 0.08);
+  color: var(--blue-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.plan__for { margin-top: 0.25rem; font-size: 0.88rem; color: var(--fg-3); }
+.plan__price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.35rem; margin-top: 1.1rem; }
+.plan__from { font-size: 0.9rem; color: var(--fg-2); }
+.plan__amount { font-family: var(--font-display); font-size: clamp(1.9rem, 1.5rem + 1vw, 2.4rem); font-weight: 800; letter-spacing: -0.04em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.plan__per { font-size: 0.9rem; color: var(--fg-3); }
+.plan__note { margin-top: 0.2rem; font-size: 0.85rem; color: var(--hi); }
+.plan__plus { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.82rem; font-weight: 600; color: var(--fg-2); }
+.plan:first-child .plan__list { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.plan__list { margin-top: 0.6rem; margin-bottom: 1.5rem; }
+.plan__cta { margin-top: auto; width: 100%; }
+.plans__terms { margin-top: 1.5rem; text-align: center; font-size: 0.88rem; color: var(--fg-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .plan { transition: box-shadow var(--dur) var(--ease-out), translate 0.5s var(--ease-out); }
+  .plan__fit, .sizer__plan { animation: price-pop 0.45s var(--ease-spring) both; }
+}
+@keyframes price-pop {
+  from { opacity: 0; scale: 0.85; }
+}
+
+/* ---- Cost per student: the bars ---- */
+.scale { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+.scale__eyebrow { color: var(--hi); }
+.scale .block-title { margin-top: 0.8rem; }
+.scale__lede { margin-top: 1.1rem; max-width: 30rem; }
+.scale__chart {
+  padding: clamp(1.25rem, 2.6vw, 2rem);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -40px rgb(var(--navy-rgb) / 0.35);
+}
+.scale__chart ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.75rem, 2.5vw, 2rem);
+  align-items: end;
+  --bar-max: clamp(9rem, 24vh, 13rem);
+}
+.scale__chart li { display: grid; justify-items: center; align-content: end; }
+.scale__value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.3rem, 1rem + 0.8vw, 1.7rem);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.scale__bar {
+  width: min(100%, 5.5rem);
+  height: calc(var(--bar-max) * var(--h));
+  margin-top: 0.4rem;
+  border-radius: 12px 12px 4px 4px;
+  background: linear-gradient(180deg, rgb(var(--blue-rgb) / 0.22), rgb(var(--blue-rgb) / 0.08));
+  box-shadow: inset 0 0 0 1px rgb(var(--blue-rgb) / 0.18);
+  transform-origin: 50% 100%;
+}
+.scale__chart li.is-active .scale__bar { background: linear-gradient(180deg, var(--blue-2), var(--blue)); box-shadow: 0 16px 30px -16px rgb(var(--blue-rgb) / 0.7); }
+.scale__chart li.is-active .scale__value { color: var(--blue-2); }
+.scale__plan { margin-top: 0.7rem; font-weight: 700; font-size: 0.92rem; color: var(--ink); }
+.scale__n { font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-3); }
+.scale__chart figcaption { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--fg-3); }
+@media (prefers-reduced-motion: no-preference) {
+  /* Bars rise one after another when the chart comes into view. */
+  .js .scale__chart:not(.is-in) .scale__bar { scale: 1 0; }
+  .js .scale__chart:not(.is-in) .scale__value { opacity: 0; translate: 0 0.6rem; }
+  .scale__bar { transition: scale 1s var(--ease-out) calc(0.15s + var(--i) * 0.15s), background 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out); }
+  .scale__value { transition: opacity 0.6s var(--ease-out) calc(0.6s + var(--i) * 0.15s), translate 0.6s var(--ease-out) calc(0.6s + var(--i) * 0.15s), color 0.5s var(--ease-out); }
+}
+
+/* ---- Features-by-plan table ---- */
+.compare { margin-top: 1.75rem; overflow-x: auto; border-radius: var(--radius); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.compare table { width: 100%; min-width: 34rem; border-collapse: collapse; font-size: 0.93rem; }
+.compare th, .compare td { padding: 0.9rem 1rem; border-top: 1px solid var(--line); text-align: center; }
+.compare thead th { border-top: 0; font-family: var(--font-mono); font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); }
+.compare th[scope="row"], .compare thead th:first-child { text-align: left; font-weight: 500; color: var(--ink); }
+.compare thead th:first-child { color: var(--fg-3); }
+.compare tbody tr { transition: background-color var(--dur-micro) var(--ease-out); }
+.compare tbody tr:hover { background: rgb(var(--navy-rgb) / 0.025); }
+.compare .is-active { background: rgb(var(--blue-rgb) / 0.06); }
+.compare thead .is-active { color: var(--blue-2); }
+.compare__yes { width: 1.1rem; height: 1.1rem; fill: none; stroke: var(--blue-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.compare__yes path { stroke-dasharray: 15; }
+.compare__no { color: var(--fg-3); }
+@media (prefers-reduced-motion: no-preference) {
+  .compare th, .compare td { transition: background-color 0.45s var(--ease-out), color 0.45s var(--ease-out); }
+  /* Ticks draw themselves in, row by row, when the table comes into view. */
+  .js .compare:not(.is-in) .compare__yes path { stroke-dashoffset: 15; }
+  .compare__yes path { transition: stroke-dashoffset 0.5s var(--ease-out) calc(0.1s + var(--r) * 0.07s + var(--c) * 0.05s); }
+}
+
+/* ---- Included / quoted separately ---- */
+.price-terms { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.price-terms__head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.1rem; }
+.price-terms .checks { grid-template-columns: 1fr 1fr; }
+.price-terms__extra { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+.price-terms__extra li { position: relative; padding-left: 1.5rem; font-size: 0.93rem; color: var(--fg-2); }
+.price-terms__extra li::before { content: '+'; position: absolute; left: 0.2rem; color: var(--hi); font-weight: 700; }
+
+@media (max-width: 1100px) { .plans { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 960px) { .scale { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .plans, .price-terms, .price-terms .checks, .price-terms__extra { grid-template-columns: 1fr; }
+  /* All four plans stay on screen: no sideways scroll hiding Premium. */
+  .compare table { min-width: 0; font-size: 0.82rem; }
+  .compare th, .compare td { padding: 0.7rem 0.2rem; }
+  .compare th[scope="row"], .compare thead th:first-child { padding-left: 0.8rem; }
+  .compare thead th { font-size: 0.6rem; letter-spacing: 0; }
+}
