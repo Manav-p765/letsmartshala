@@ -172,8 +172,9 @@ export const pricing = {
   meta: 'SmartShala pricing: a complete school ERP from ₹9,999 a year, with no per-student billing. Starter, Growth, Premium and Enterprise plans by school size.',
   eyebrow: 'Pricing',
   title: ['Complete school ERP', 'from ₹9,999 a year.'],
-  lede: 'One yearly price for your school’s size, with no per-student billing. Pick the plan for the students you have on roll.',
+  lede: 'Plans are sized by the students you have on roll. Move the slider to see yours, with everything it includes.',
   terms: 'Prices are per year, exclude GST and are billed annually in advance.',
+  points: ['One yearly price, no per-student billing', 'Every module in your plan, on the web app', 'GST invoice for your subscription'],
   // From the owner's pricing and sales strategy document (2026-10-19).
   // `cap` is the plan's top student count; null = no cap (Enterprise is quoted).
   plans: [

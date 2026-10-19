@@ -67,7 +67,10 @@ content questions live in `docs/content.md`.
   ₹39,999 a year; ex-GST, billed annually in advance), with "no per-student
   billing" as the positioning. Data lives in `data/pages.js` → `pricing`; the
   home FAQ quotes the starting price. The page's signature moment is the
-  student-count slider that highlights the matching plan. Feature wording
+  hero's price card: a student-count slider that shows the plan, price, cost
+  per student and what it includes, and highlights that plan in the cards,
+  the per-student chart and the table below. (Cards hanging on strings in
+  the hero were tried and rejected by the owner, 2026-10-19.) Feature wording
   follows the code, not the document: "principal and teacher apps" (no
   parent app), "announcements to parents" (for "parent notifications"),
   "SMS usage" in the extras (WhatsApp left off).

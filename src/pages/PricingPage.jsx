@@ -1,7 +1,6 @@
-import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import PageHero from '../components/ui/PageHero.jsx';
 import ModuleIcon from '../components/ui/ModuleIcon.jsx';
 import LeadForm from '../components/LeadForm/LeadForm.jsx';
 import useReveal from '../hooks/useReveal.js';
@@ -18,24 +17,15 @@ const inr = (n) => '₹' + n.toLocaleString('en-IN');
 const planFor = (students) => pricing.plans.find((p) => p.cap === null || students <= p.cap);
 // Features a plan adds over the one before it (the first plan that has them).
 const newIn = (id) => pricing.features.filter((f) => f.plans[0] === id).map((f) => f.name);
+const prevOf = (id) => pricing.plans[pricing.plans.findIndex((p) => p.id === id) - 1];
 const capped = pricing.plans.filter((p) => p.cap);
 const perStudentAtCap = (p) => Math.round(p.price / p.cap);
-const plan = (id) => pricing.plans.find((p) => p.id === id);
 
 // The size slider runs to just past the last cap, so every plan is reachable.
 const MIN = 50;
 const MAX = 2500;
 const STEP = 10;
 const at = (n) => (n - MIN) / (MAX - MIN);
-
-// Two chains of cards hanging at the hero's edges (wide screens only): a pin
-// under the nav, then string, card, string, card. `len` is each string's
-// length in rem.
-const card = (id, icon) => ({ icon, label: plan(id).name, title: plan(id).students, value: `${inr(plan(id).price)} / year` });
-const FLOATS = [
-  { side: 'left', cards: [{ len: 4.5, ...card('starter', 'students') }, { len: 3, icon: 'receipt', label: 'Every plan', title: 'Billed yearly in advance', value: 'GST invoice' }] },
-  { side: 'right', cards: [{ len: 3, ...card('growth', 'attendance') }, { len: 3.5, ...card('premium', 'reports') }] }
-];
 
 /** Search engines read the plans as offers (prerendered into the page). */
 const jsonLd = {
@@ -79,121 +69,137 @@ function Amount({ value }) {
     const el = ref.current;
     // Already visible on a prerendered first load, or less motion asked: leave it.
     if (prefersReducedMotion() || (isStaticBoot() && isOnScreen(el))) return;
-    const o = { v: 0 };
-    setShown(0);
+    // Count from 40% up, starting the moment the price enters the screen, so a
+    // half-visible card never reads "₹0".
+    const o = { v: Math.round(value * 0.4) };
+    setShown(o.v);
     const st = ScrollTrigger.create({
-      trigger: el, start: 'top 92%', once: true,
-      onEnter: () => gsap.to(o, { v: value, duration: 1.2, ease: 'power3.out', onUpdate: () => setShown(Math.round(o.v)) })
+      trigger: el, start: 'top bottom', once: true,
+      onEnter: () => gsap.to(o, { v: value, duration: 1.1, ease: 'power3.out', onUpdate: () => setShown(Math.round(o.v)) })
     });
     return () => { st.kill(); gsap.killTweensOf(o); setShown(value); };
   }, [value]);
   return <span ref={ref} className="plan__amount">{inr(shown)}</span>;
 }
 
-/** The hero's hanging cards: strings drop, cards settle, then a slow sway (CSS). */
-function HeroFloats() {
-  const ref = useRef(null);
-  useLayoutEffect(() => {
-    const root = ref.current;
-    if (!root || prefersReducedMotion() || isStaticBoot() || getComputedStyle(root).display === 'none') return;
-    const ctx = gsap.context(() => {
-      gsap.from('.price-float__string', { scaleY: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out', delay: 0.3 });
-      gsap.from('.price-float__body', { y: -18, autoAlpha: 0, duration: 0.8, stagger: 0.12, ease: 'power3.out', delay: 0.75 });
-    }, root);
-    return () => ctx.revert();
-  }, []);
+/**
+ * The hero's price card — the page's signature moment. Drag to your number
+ * of students: the plan, its price and the cost per student update, and the
+ * same plan lights up everywhere below (cards, chart, table).
+ */
+function Estimator({ students, setStudents, current }) {
+  const sliderId = useId();
+  const price = useCountTo(current.price);
+  const perStudent = useCountTo(Math.round(current.price / students));
+  const prev = prevOf(current.id);
+  const adds = newIn(current.id);
   return (
-    <div className="price-floats" ref={ref} aria-hidden="true">
-      {FLOATS.map((f, i) => (
-        <div className={`price-float price-float--${f.side}`} key={f.side} style={{ '--i': i }}>
-          <span className="price-float__pin" />
-          {f.cards.map((c) => (
-            <Fragment key={c.label}>
-              <span className="price-float__string" style={{ '--len': `${c.len}rem` }} />
-              <div className="price-float__body">
-                <span className="price-float__icon"><ModuleIcon name={c.icon} /></span>
-                <span className="price-float__main">
-                  <span className="price-float__label">{c.label}</span>
-                  <span className="price-float__title">{c.title}</span>
-                  <span className="price-float__value">{c.value}</span>
-                </span>
-              </div>
-            </Fragment>
+    <div className="est" data-animate="fade-up">
+      <span className="est__tag est__tag--top" aria-hidden="true"><ModuleIcon name="students" /> No per-student billing</span>
+      <span className="est__tag est__tag--bottom" aria-hidden="true"><ModuleIcon name="receipt" /> GST invoice</span>
+
+      <div className="est__head">
+        <label className="est__label" htmlFor={sliderId}>How many students do you have?</label>
+        <output className="est__count" htmlFor={sliderId}>
+          {students >= MAX ? `${MAX.toLocaleString('en-IN')}+` : students.toLocaleString('en-IN')}
+        </output>
+      </div>
+      <div className="est__track">
+        <span className="est__zone" style={{ '--from': at(Math.max(current.min, MIN)), '--to': current.cap ? at(current.cap) : 1 }} aria-hidden="true" />
+        <input
+          id={sliderId}
+          className="est__range"
+          type="range"
+          min={MIN}
+          max={MAX}
+          step={STEP}
+          value={students}
+          onChange={(e) => setStudents(Number(e.target.value))}
+          aria-valuetext={`${students} students: ${current.name} plan`}
+          style={{ '--fill': `${at(students) * 100}%` }}
+        />
+        <div className="est__scale" aria-hidden="true">
+          {capped.map((p) => (
+            <span key={p.id} className={students > p.cap ? 'is-past' : undefined} style={{ '--at': at(p.cap) }}>
+              {p.cap.toLocaleString('en-IN')}
+            </span>
           ))}
         </div>
-      ))}
+      </div>
+
+      <div className="est__result" aria-live="polite">
+        <div className="est__plan">
+          <span className="est__badge" key={current.id}>{current.name}</span>
+          <span className="est__for">{current.bestFor}</span>
+        </div>
+        <div className="est__price">
+          {current.from && <span className="est__from">From</span>}
+          <strong>{inr(price)}</strong>
+          <span>/ year</span>
+        </div>
+        <p className="est__per">
+          {current.from ? 'Quoted for your school' : <>About <strong>{inr(perStudent)}</strong> per student a year</>}
+        </p>
+      </div>
+
+      <div className="est__includes">
+        <p>{prev ? `Everything in ${prev.name}, plus` : 'Includes'}</p>
+        <ul className="checks">
+          {(adds.length ? adds : ['Pricing and setup for your school’s size']).map((a) => <li key={a}>{a}</li>)}
+        </ul>
+      </div>
+
+      <a className="btn est__cta" href="#quote">
+        {current.from ? 'Get a quote' : `Book a demo for ${current.name}`} <span className="btn__arrow" aria-hidden="true">→</span>
+      </a>
     </div>
   );
 }
 
 /**
  * Plans and prices from the owner's pricing document (data/pages.js →
- * pricing). The signature moment is the size slider: drag to your number of
- * students and the plan that fits lights up everywhere on the page — its
- * card, its bar in the per-student chart, its column in the table.
+ * pricing). The hero holds the estimator; the cards, the per-student chart
+ * and the table below follow the plan it picks.
  */
 export default function PricingPage() {
   usePageMeta({ title: 'Pricing', description: pricing.meta, path: '/pricing' });
   const revealRef = useReveal();
   const [students, setStudents] = useState(450);
-  const sliderId = useId();
   const current = planFor(students);
-  const price = useCountTo(current.price);
-  const perStudent = useCountTo(Math.round(current.price / students));
-  const zoneFrom = at(Math.max(current.min, MIN));
-  const zoneTo = current.cap ? at(current.cap) : 1;
   const tallest = Math.max(...capped.map(perStudentAtCap));
 
   return (
     <div ref={revealRef}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <PageHero id="pricing-title" eyebrow={pricing.eyebrow} title={pricing.title} lede={pricing.lede} decor={<HeroFloats />}>
-        <span className="price-tag">No per-student billing · Prices exclude GST</span>
-      </PageHero>
 
-      <section className="section plans-section" data-theme="white" aria-labelledby="plans-title">
-        <div className="container">
-          <h2 className="sr-only" id="plans-title">Plans</h2>
-
-          <div className="sizer" data-animate="fade-up">
-            <div className="sizer__head">
-              <label className="sizer__label" htmlFor={sliderId}>How many students do you have?</label>
-              <output className="sizer__count" htmlFor={sliderId}>
-                {students >= MAX ? `${MAX.toLocaleString('en-IN')}+` : students.toLocaleString('en-IN')}
-              </output>
+      <section className="section page-hero price-hero" data-theme="paper" aria-labelledby="pricing-title">
+        <div className="linework" aria-hidden="true" />
+        <svg className="page-hero__arc" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 80 500 A 420 420 0 0 1 920 500" />
+        </svg>
+        <div className="container price-hero__grid">
+          <div className="price-hero__copy">
+            <p className="label page-hero__eyebrow" data-animate="fade-up">{pricing.eyebrow}</p>
+            <h1 className="display price-hero__title" id="pricing-title" data-animate="lines">
+              {pricing.title.map((l) => <span className="line-mask" key={l}><span>{l}</span></span>)}
+            </h1>
+            <p className="lede price-hero__lede" data-animate="fade-up">{pricing.lede}</p>
+            <ul className="checks price-hero__points" data-animate="stagger">
+              {pricing.points.map((p) => <li key={p}>{p}</li>)}
+            </ul>
+            <div className="price-hero__actions" data-animate="fade-up">
+              <a className="btn" href="#quote">Book a demo <span className="btn__arrow" aria-hidden="true">→</span></a>
+              <a className="btn btn--ghost" href="#plans">Compare plans</a>
             </div>
-            <div className="sizer__track">
-              <span className="sizer__zone" style={{ '--from': zoneFrom, '--to': zoneTo }} aria-hidden="true" />
-              <input
-                id={sliderId}
-                className="sizer__range"
-                type="range"
-                min={MIN}
-                max={MAX}
-                step={STEP}
-                value={students}
-                onChange={(e) => setStudents(Number(e.target.value))}
-                aria-valuetext={`${students} students: ${current.name} plan`}
-                style={{ '--fill': `${at(students) * 100}%` }}
-              />
-              <div className="sizer__scale" aria-hidden="true">
-                {capped.map((p) => (
-                  <span key={p.id} className={students > p.cap ? 'is-past' : undefined} style={{ '--at': at(p.cap) }}>
-                    {p.cap.toLocaleString('en-IN')}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <p className="sizer__result" aria-live="polite">
-              <span className="sizer__plan" key={current.id}>{current.name}</span>
-              {current.from ? (
-                <> · from <strong>{inr(price)}</strong> a year, quoted for your school</>
-              ) : (
-                <> · <strong>{inr(price)}</strong> a year, about <strong>{inr(perStudent)} per student</strong></>
-              )}
-            </p>
+            <p className="price-hero__terms" data-animate="fade-up">{pricing.terms}</p>
           </div>
+          <Estimator students={students} setStudents={setStudents} current={current} />
+        </div>
+      </section>
 
+      <section className="section plans-section" id="plans" data-theme="white" aria-labelledby="plans-title">
+        <div className="container">
+          <h2 className="display block-title block-title--center" id="plans-title" data-animate="fade-up">Four plans, by school size</h2>
           <ol className="plans" data-animate="stagger">
             {pricing.plans.map((p, i) => {
               const active = p.id === current.id;
@@ -237,7 +243,7 @@ export default function PricingPage() {
               <span className="line-mask"><span>Your cost per student falls.</span></span>
             </h2>
             <p className="lede scale__lede" data-animate="fade-up">
-              Each plan is one yearly price, not a charge for every child. Filled to its limit, each plan works out to:
+              Each plan is one yearly price, not a charge for every child. Filled to its limit, each plan works out to this much per student.
             </p>
           </div>
           <figure className="scale__chart" data-animate="in">
