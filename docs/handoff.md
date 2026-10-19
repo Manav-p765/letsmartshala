@@ -61,9 +61,16 @@ content questions live in `docs/content.md`.
   and no "sample data" line.
 - **Reveals:** `useReveal()` per section. Nothing is hidden by CSS.
   `data-animate="in"` adds `.is-in` through an IntersectionObserver.
-- **Pricing rule (owner, 2026-10-12):** never show prices or plan names anywhere
-  on the site. To learn pricing, a visitor fills in the form and books a
-  meeting. The Pricing page explains what pricing depends on and has the form.
+- **Pricing (2026-10-19, replaces the 2026-10-12 "never show prices" rule):**
+  `/pricing` shows the four plans from the owner's pricing and sales strategy
+  document (Starter ₹9,999, Growth ₹14,999, Premium ₹24,999, Enterprise from
+  ₹39,999 a year; ex-GST, billed annually in advance), with "no per-student
+  billing" as the positioning. Data lives in `data/pages.js` → `pricing`; the
+  home FAQ quotes the starting price. The page's signature moment is the
+  student-count slider that highlights the matching plan. Feature wording
+  follows the code, not the document: "principal and teacher apps" (no
+  parent app), "announcements to parents" (for "parent notifications"),
+  "SMS usage" in the extras (WhatsApp left off).
 - **Speed pass (2026-10-12):** the live site was sending an empty page (the
   prerender step could not start Chromium on Vercel), so nothing showed until
   all the JavaScript had run. Now: the build prerenders on Vercel with

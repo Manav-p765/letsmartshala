@@ -169,25 +169,43 @@ export const solutions = {
 };
 
 export const pricing = {
-  meta: 'SmartShala pricing depends on your school’s size. Book a meeting and we’ll walk you through it.',
+  meta: 'SmartShala pricing: a complete school ERP from ₹9,999 a year, with no per-student billing. Starter, Growth, Premium and Enterprise plans by school size.',
   eyebrow: 'Pricing',
-  title: ['Priced for your', 'school’s size.'],
-  lede: 'Pricing depends on how many students and staff your school has, so we share it in a short meeting rather than on a price list. Fill in the form and we’ll book one with you — no obligation.',
-  // Owner's rule (2026-10-12): prices and plan names are NEVER shown on the site.
-  // To learn pricing, a visitor fills in the form and books a meeting.
-  included: [
-    'Every module in your plan, on the web app',
-    'Principal and teacher apps',
-    'Your own separate database',
-    'Bulk import of your existing student lists',
-    'GST invoices for your subscription',
-    'Pay online by payment link'
+  title: ['Complete school ERP', 'from ₹9,999 a year.'],
+  lede: 'One yearly price for your school’s size, with no per-student billing. Pick the plan for the students you have on roll.',
+  terms: 'Prices are per year, exclude GST and are billed annually in advance.',
+  // From the owner's pricing and sales strategy document (2026-10-19).
+  // `cap` is the plan's top student count; null = no cap (Enterprise is quoted).
+  plans: [
+    { id: 'starter', name: 'Starter', price: 9999, min: 1, cap: 300, students: 'Up to 300 students', bestFor: 'Small schools' },
+    { id: 'growth', name: 'Growth', price: 14999, min: 301, cap: 700, students: '301–700 students', bestFor: 'Growing schools' },
+    { id: 'premium', name: 'Premium', price: 24999, min: 701, cap: 1500, students: '701–1,500 students', bestFor: 'Larger schools' },
+    { id: 'enterprise', name: 'Enterprise', price: 39999, from: true, min: 1501, cap: null, students: '1,501+ students', bestFor: 'Large schools or custom needs' }
   ],
-  factors: [
-    { icon: 'students', title: 'Number of students', text: 'Plans are sized by the students you have on roll.' },
-    { icon: 'staff', title: 'Number of staff', text: 'Teachers, office staff and everyone who signs in.' },
-    { icon: 'reports', title: 'Modules you need', text: 'Start with what your office uses today.' }
-  ]
+  // `plans` = where each feature is included. Wording follows what the ERP
+  // does (docs/content.md): the strategy doc's "parent and teacher mobile
+  // apps" is principal and teacher apps (no parent app in code), and
+  // "parent notifications" is announcements to parents.
+  features: [
+    { name: 'Admissions, student records and attendance', plans: ['starter', 'growth', 'premium', 'enterprise'] },
+    { name: 'Fees, receipts, exams and report cards', plans: ['starter', 'growth', 'premium', 'enterprise'] },
+    { name: 'Staff management', plans: ['starter', 'growth', 'premium', 'enterprise'] },
+    { name: 'Timetable and homework', plans: ['growth', 'premium', 'enterprise'] },
+    { name: 'Principal and teacher apps', plans: ['growth', 'premium', 'enterprise'] },
+    { name: 'Announcements to parents', plans: ['growth', 'premium', 'enterprise'] },
+    { name: 'Transport management', plans: ['premium', 'enterprise'] },
+    { name: 'Advanced analytics and priority support', plans: ['premium', 'enterprise'] }
+  ],
+  included: [
+    'Cloud hosting',
+    'Standard updates',
+    'Basic onboarding',
+    'Support during set hours',
+    'Your own separate database',
+    'GST invoices for your subscription'
+  ],
+  // WhatsApp is left off on purpose (owner, 2026-10-12).
+  extras: ['SMS usage', 'Payment gateway fees', 'Moving your historical data', 'Custom development']
 };
 
 export const contact = {

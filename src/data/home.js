@@ -114,6 +114,6 @@ export const faq = [
   },
   {
     q: 'How much does it cost?',
-    a: 'It depends on the size of your school, so we share pricing in a short meeting. Book a demo and we’ll walk you through it.'
+    a: 'Plans start at ₹9,999 a year for schools with up to 300 students, with no per-student billing. Prices exclude GST and are billed yearly. The pricing page lists every plan.'
   }
 ];
