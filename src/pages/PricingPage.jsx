@@ -15,14 +15,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 const inr = (n) => '₹' + n.toLocaleString('en-IN');
 const planFor = (students) => pricing.plans.find((p) => p.cap === null || students <= p.cap);
-// Features a plan adds over the one before it (the first plan that has them).
-const newIn = (id) => pricing.features.filter((f) => f.plans[0] === id).map((f) => f.name);
-const prevOf = (id) => pricing.plans[pricing.plans.findIndex((p) => p.id === id) - 1];
 const capped = pricing.plans.filter((p) => p.cap);
 const perStudentAtCap = (p) => Math.round(p.price / p.cap);
 
-// The size slider runs to just past the last cap, so every plan is reachable.
-const MIN = 50;
+// The size slider starts at Starter's 300 and runs past the last cap into
+// the custom plan.
+const MIN = 300;
 const MAX = 2500;
 const STEP = 10;
 const at = (n) => (n - MIN) / (MAX - MIN);
@@ -35,7 +33,7 @@ const jsonLd = {
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web, Android',
   url: site.siteUrl + '/pricing',
-  offers: pricing.plans.filter((p) => !p.from).map((p) => ({
+  offers: pricing.plans.filter((p) => p.price).map((p) => ({
     '@type': 'Offer',
     name: p.name,
     price: p.price,
@@ -89,10 +87,11 @@ function Amount({ value }) {
  */
 function Estimator({ students, setStudents, current }) {
   const sliderId = useId();
-  const price = useCountTo(current.price);
-  const perStudent = useCountTo(Math.round(current.price / students));
-  const prev = prevOf(current.id);
-  const adds = newIn(current.id);
+  const custom = !current.price;
+  // The custom plan shows no price; keep the count parked on Premium's so
+  // coming back down doesn't run up from zero.
+  const price = useCountTo(current.price ?? capped[capped.length - 1].price);
+  const perStudent = useCountTo(custom ? 0 : Math.round(current.price / students));
   return (
     <div className="est" data-animate="fade-up">
       <span className="est__tag est__tag--top" aria-hidden="true"><ModuleIcon name="students" /> No per-student billing</span>
@@ -132,25 +131,31 @@ function Estimator({ students, setStudents, current }) {
           <span className="est__badge" key={current.id}>{current.name}</span>
           <span className="est__for">{current.bestFor}</span>
         </div>
-        <div className="est__price">
-          {current.from && <span className="est__from">From</span>}
-          <strong>{inr(price)}</strong>
-          <span>/ year</span>
-        </div>
-        <p className="est__per">
-          {current.from ? 'Quoted for your school' : <>About <strong>{inr(perStudent)}</strong> per student a year</>}
-        </p>
+        {custom ? (
+          <>
+            <div className="est__price est__price--custom"><strong>Custom pricing</strong></div>
+            <p className="est__per">Planned around your school’s size and needs</p>
+          </>
+        ) : (
+          <>
+            <div className="est__price">
+              <strong>{inr(price)}</strong>
+              <span>/ year</span>
+            </div>
+            <p className="est__per">About <strong>{inr(perStudent)}</strong> per student a year</p>
+          </>
+        )}
       </div>
 
       <div className="est__includes">
-        <p>{prev ? `Everything in ${prev.name}, plus` : 'Includes'}</p>
-        <ul className="checks">
-          {(adds.length ? adds : ['Pricing and setup for your school’s size']).map((a) => <li key={a}>{a}</li>)}
+        <p>Every feature included</p>
+        <ul className="est__tags">
+          {pricing.featureTags.map((f) => <li key={f}>{f}</li>)}
         </ul>
       </div>
 
       <a className="btn est__cta" href="#quote">
-        {current.from ? 'Get a quote' : `Book a demo for ${current.name}`} <span className="btn__arrow" aria-hidden="true">→</span>
+        {custom ? 'Talk to us about a custom plan' : `Book a demo for ${current.name}`} <span className="btn__arrow" aria-hidden="true">→</span>
       </a>
     </div>
   );
@@ -201,9 +206,8 @@ export default function PricingPage() {
         <div className="container">
           <h2 className="display block-title block-title--center" id="plans-title" data-animate="fade-up">Four plans, by school size</h2>
           <ol className="plans" data-animate="stagger">
-            {pricing.plans.map((p, i) => {
+            {pricing.plans.map((p) => {
               const active = p.id === current.id;
-              const adds = newIn(p.id);
               return (
                 <li key={p.id} className={`card plan${active ? ' is-active' : ''}`} aria-current={active ? 'true' : undefined}>
                   <div className="plan__head">
@@ -211,20 +215,26 @@ export default function PricingPage() {
                     {active && <span className="plan__fit">Fits your school</span>}
                   </div>
                   <p className="plan__for">{p.bestFor} · {p.students}</p>
-                  <p className="plan__price">
-                    {p.from && <span className="plan__from">From</span>}
-                    <Amount value={p.price} />
-                    <span className="plan__per">/ year</span>
-                  </p>
-                  <p className="plan__note">
-                    {p.cap ? <>About {inr(perStudentAtCap(p))} per student at {p.cap.toLocaleString('en-IN')}</> : 'Quoted for your school'}
-                  </p>
-                  {i > 0 && <p className="plan__plus">Everything in {pricing.plans[i - 1].name}, plus</p>}
+                  {p.price ? (
+                    <>
+                      <p className="plan__price">
+                        <Amount value={p.price} />
+                        <span className="plan__per">/ year</span>
+                      </p>
+                      <p className="plan__note">About {inr(perStudentAtCap(p))} per student at {p.cap.toLocaleString('en-IN')}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="plan__price"><span className="plan__amount plan__amount--custom">Custom pricing</span></p>
+                      <p className="plan__note">Planned around your school</p>
+                    </>
+                  )}
                   <ul className="checks plan__list">
-                    {adds.length ? adds.map((a) => <li key={a}>{a}</li>) : <li>Pricing and setup for your school’s size</li>}
+                    <li>Every feature included</li>
+                    <li>{p.students}</li>
                   </ul>
                   <a className={`btn btn--small plan__cta${active ? '' : ' btn--ghost'}`} href="#quote">
-                    {p.from ? 'Get a quote' : 'Book a demo'}
+                    {p.price ? 'Book a demo' : 'Talk to us'}
                   </a>
                 </li>
               );
@@ -262,38 +272,9 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="section" data-theme="paper" aria-labelledby="compare-title">
+      <section className="section" data-theme="paper" aria-labelledby="terms-title">
         <div className="container">
-          <h2 className="display block-title" id="compare-title" data-animate="fade-up">Features by plan</h2>
-          <div className="compare" data-animate="in">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Feature</th>
-                  {pricing.plans.map((p) => (
-                    <th scope="col" key={p.id} className={p.id === current.id ? 'is-active' : undefined}>{p.name}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {pricing.features.map((f, r) => (
-                  <tr key={f.name} style={{ '--r': r }}>
-                    <th scope="row">{f.name}</th>
-                    {pricing.plans.map((p, c) => (
-                      <td key={p.id} className={p.id === current.id ? 'is-active' : undefined} style={{ '--c': c }}>
-                        {f.plans.includes(p.id) ? (
-                          <svg className="compare__yes" viewBox="0 0 16 16" role="img" aria-label="Included"><path d="M3 8.5l3.2 3L13 4.5" /></svg>
-                        ) : (
-                          <span className="compare__no" aria-label="Not included">—</span>
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
+          <h2 className="display block-title" id="terms-title" data-animate="fade-up">What comes with every plan</h2>
           <div className="price-terms" data-animate="stagger">
             <div className="card">
               <div className="price-terms__head">

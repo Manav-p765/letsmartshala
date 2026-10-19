@@ -169,34 +169,38 @@ export const solutions = {
 };
 
 export const pricing = {
-  meta: 'SmartShala pricing: a complete school ERP from ₹9,999 a year, with no per-student billing. Starter, Growth, Premium and Enterprise plans by school size.',
+  meta: 'SmartShala pricing: a complete school ERP from ₹9,999 a year, with every feature on every plan and no per-student billing. Custom plans for schools over 1,500 students.',
   eyebrow: 'Pricing',
   title: ['Complete school ERP', 'from ₹9,999 a year.'],
-  lede: 'Plans are sized by the students you have on roll. Move the slider to see yours, with everything it includes.',
+  lede: 'Every plan has every feature. You only pick the size: move the slider to the students you have on roll.',
   terms: 'Prices are per year, exclude GST and are billed annually in advance.',
-  points: ['One yearly price, no per-student billing', 'Every module in your plan, on the web app', 'GST invoice for your subscription'],
+  points: ['One yearly price, no per-student billing', 'Every feature on every plan', 'GST invoice for your subscription'],
   // From the owner's pricing and sales strategy document (2026-10-19).
-  // `cap` is the plan's top student count; null = no cap (Enterprise is quoted).
+  // Plans differ only by size (owner, 2026-10-19: every feature on every
+  // plan). `cap` is the plan's top student count. Over 1,500 is a custom plan
+  // with no price shown (price: null).
   plans: [
     { id: 'starter', name: 'Starter', price: 9999, min: 1, cap: 300, students: 'Up to 300 students', bestFor: 'Small schools' },
     { id: 'growth', name: 'Growth', price: 14999, min: 301, cap: 700, students: '301–700 students', bestFor: 'Growing schools' },
     { id: 'premium', name: 'Premium', price: 24999, min: 701, cap: 1500, students: '701–1,500 students', bestFor: 'Larger schools' },
-    { id: 'enterprise', name: 'Enterprise', price: 39999, from: true, min: 1501, cap: null, students: '1,501+ students', bestFor: 'Large schools or custom needs' }
+    { id: 'custom', name: 'Custom', price: null, min: 1501, cap: null, students: 'Over 1,500 students', bestFor: 'Large schools' }
   ],
-  // `plans` = where each feature is included. Wording follows what the ERP
-  // does (docs/content.md): the strategy doc's "parent and teacher mobile
-  // apps" is principal and teacher apps (no parent app in code), and
-  // "parent notifications" is announcements to parents.
+  // On every plan. Wording follows what the ERP does (docs/content.md): the
+  // strategy doc's "parent and teacher mobile apps" is principal and teacher
+  // apps (no parent app in code), and "parent notifications" is
+  // announcements to parents.
   features: [
-    { name: 'Admissions, student records and attendance', plans: ['starter', 'growth', 'premium', 'enterprise'] },
-    { name: 'Fees, receipts, exams and report cards', plans: ['starter', 'growth', 'premium', 'enterprise'] },
-    { name: 'Staff management', plans: ['starter', 'growth', 'premium', 'enterprise'] },
-    { name: 'Timetable and homework', plans: ['growth', 'premium', 'enterprise'] },
-    { name: 'Principal and teacher apps', plans: ['growth', 'premium', 'enterprise'] },
-    { name: 'Announcements to parents', plans: ['growth', 'premium', 'enterprise'] },
-    { name: 'Transport management', plans: ['premium', 'enterprise'] },
-    { name: 'Advanced analytics and priority support', plans: ['premium', 'enterprise'] }
+    'Admissions, student records and attendance',
+    'Fees, receipts, exams and report cards',
+    'Staff management',
+    'Timetable and homework',
+    'Principal and teacher apps',
+    'Announcements to parents',
+    'Transport management',
+    'Advanced analytics and priority support'
   ],
+  // The same list, short, for the tags in the hero's price card.
+  featureTags: ['Admissions', 'Attendance', 'Fees & receipts', 'Exams & report cards', 'Staff', 'Timetable', 'Homework', 'Principal & teacher apps', 'Parent announcements', 'Transport', 'Analytics', 'Priority support'],
   included: [
     'Cloud hosting',
     'Standard updates',

@@ -62,15 +62,19 @@ content questions live in `docs/content.md`.
 - **Reveals:** `useReveal()` per section. Nothing is hidden by CSS.
   `data-animate="in"` adds `.is-in` through an IntersectionObserver.
 - **Pricing (2026-10-19, replaces the 2026-10-12 "never show prices" rule):**
-  `/pricing` shows the four plans from the owner's pricing and sales strategy
-  document (Starter ₹9,999, Growth ₹14,999, Premium ₹24,999, Enterprise from
-  ₹39,999 a year; ex-GST, billed annually in advance), with "no per-student
-  billing" as the positioning. Data lives in `data/pages.js` → `pricing`; the
-  home FAQ quotes the starting price. The page's signature moment is the
-  hero's price card: a student-count slider that shows the plan, price, cost
-  per student and what it includes, and highlights that plan in the cards,
-  the per-student chart and the table below. (Cards hanging on strings in
-  the hero were tried and rejected by the owner, 2026-10-19.) Feature wording
+  `/pricing` shows the plans from the owner's pricing and sales strategy
+  document (Starter ₹9,999 up to 300 students, Growth ₹14,999 to 700,
+  Premium ₹24,999 to 1,500; ex-GST, billed annually in advance), with "no
+  per-student billing" as the positioning. Owner, 2026-10-19: every feature
+  is on every plan (plans differ only by size, so there is no features-by-
+  plan table); over 1,500 students is a **Custom** plan with no price shown
+  (the document's "Enterprise from ₹39,999" is not used); the slider starts
+  at 300. Data lives in `data/pages.js` → `pricing`; the home FAQ quotes the
+  starting price. The page's signature moment is the hero's price card: a
+  student-count slider that shows the plan, price and cost per student, and
+  highlights that plan in the cards and the per-student chart below. (Cards
+  hanging on strings in the hero were tried and rejected by the owner,
+  2026-10-19.) Feature wording
   follows the code, not the document: "principal and teacher apps" (no
   parent app), "announcements to parents" (for "parent notifications"),
   "SMS usage" in the extras (WhatsApp left off).
