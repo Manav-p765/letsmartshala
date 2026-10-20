@@ -154,10 +154,68 @@ function Estimator({ students, setStudents, current }) {
         </ul>
       </div>
 
-      <a className="btn est__cta" href="#quote">
+      <a className="btn est__cta" href={custom ? '#custom' : '#quote'}>
         {custom ? 'Talk to us about a custom plan' : `Book a demo for ${current.name}`} <span className="btn__arrow" aria-hidden="true">→</span>
       </a>
     </div>
+  );
+}
+
+/**
+ * The custom plan, as its own section under the cards: type your number of
+ * students and talk to us. "Talk to us" opens WhatsApp with the count already
+ * in the message; the hero slider fills the count when it's past 1,500.
+ */
+function CustomPlan({ students, active }) {
+  const inputId = useId();
+  const custom = pricing.plans.find((p) => !p.cap);
+  const [count, setCount] = useState('');
+  useEffect(() => { if (students >= custom.min) setCount(String(students)); }, [students, custom.min]);
+  const n = Number(count);
+  const fits = n > 0 && n < custom.min ? planFor(n) : null;
+  const message = `Hi SmartShala, I'd like a custom plan for my school${n >= custom.min ? ` with ${n.toLocaleString('en-IN')} students` : ''}.`;
+  return (
+    <section className={`section custom-plan${active ? ' is-active' : ''}`} id="custom" data-theme="navy" aria-labelledby="custom-title">
+      <div className="container custom-plan__grid">
+        <div>
+          <p className="label custom-plan__eyebrow" data-animate="fade-up">{pricing.custom.eyebrow}</p>
+          <h2 className="display block-title" id="custom-title" data-animate="lines">
+            {pricing.custom.title.map((l) => <span className="line-mask" key={l}><span>{l}</span></span>)}
+          </h2>
+          <p className="lede custom-plan__lede" data-animate="fade-up">{pricing.custom.lede}</p>
+          <ul className="checks custom-plan__points" data-animate="stagger">
+            {pricing.custom.points.map((p) => <li key={p}>{p}</li>)}
+          </ul>
+        </div>
+        <form className="custom-plan__card" data-animate="fade-up" onSubmit={(e) => { e.preventDefault(); window.open(`${site.contact.whatsapp.href}?text=${encodeURIComponent(message)}`, '_blank', 'noopener'); }}>
+          {active && <span className="plan__fit custom-plan__fit">Fits your school</span>}
+          <label className="custom-plan__label" htmlFor={inputId}>How many students do you have?</label>
+          <input
+            id={inputId}
+            className="custom-plan__input"
+            type="number"
+            inputMode="numeric"
+            min={custom.min}
+            step="1"
+            placeholder={`e.g. ${(2400).toLocaleString('en-IN')}`}
+            value={count}
+            onChange={(e) => setCount(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            aria-describedby={`${inputId}-hint`}
+          />
+          <p className="custom-plan__hint" id={`${inputId}-hint`} aria-live="polite">
+            {fits
+              ? <>For {n.toLocaleString('en-IN')} students, {fits.name} fits: {inr(fits.price)} a year. <a href="#plans">See plans</a></>
+              : 'Pricing is planned around your school. No obligation.'}
+          </p>
+          <button className="btn custom-plan__cta" type="submit">
+            Talk to us <span className="btn__arrow" aria-hidden="true">→</span>
+          </button>
+          <p className="custom-plan__alt">
+            Opens WhatsApp. Or call <a href={site.contact.phone.href}>{site.contact.phone.value}</a>
+          </p>
+        </form>
+      </div>
+    </section>
   );
 }
 
@@ -204,38 +262,28 @@ export default function PricingPage() {
 
       <section className="section plans-section" id="plans" data-theme="white" aria-labelledby="plans-title">
         <div className="container">
-          <h2 className="display block-title block-title--center" id="plans-title" data-animate="fade-up">Four plans, by school size</h2>
+          <h2 className="display block-title block-title--center" id="plans-title" data-animate="fade-up">Three plans, by school size</h2>
           <ol className="plans" data-animate="stagger">
-            {pricing.plans.map((p) => {
+            {capped.map((p) => {
               const active = p.id === current.id;
               return (
-                <li key={p.id} className={`card plan${active ? ' is-active' : ''}`} aria-current={active ? 'true' : undefined}>
+                <li key={p.id} className={`card plan${active ? ' is-active' : ''}${p.recommended ? ' is-recommended' : ''}`} aria-current={active ? 'true' : undefined}>
+                  {p.recommended && <span className="plan__ribbon">Recommended</span>}
                   <div className="plan__head">
                     <h3>{p.name}</h3>
                     {active && <span className="plan__fit">Fits your school</span>}
                   </div>
                   <p className="plan__for">{p.bestFor} · {p.students}</p>
-                  {p.price ? (
-                    <>
-                      <p className="plan__price">
-                        <Amount value={p.price} />
-                        <span className="plan__per">/ year</span>
-                      </p>
-                      <p className="plan__note">About {inr(perStudentAtCap(p))} per student at {p.cap.toLocaleString('en-IN')}</p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="plan__price"><span className="plan__amount plan__amount--custom">Custom pricing</span></p>
-                      <p className="plan__note">Planned around your school</p>
-                    </>
-                  )}
+                  <p className="plan__price">
+                    <Amount value={p.price} />
+                    <span className="plan__per">/ year</span>
+                  </p>
+                  <p className="plan__note">About {inr(perStudentAtCap(p))} per student at {p.cap.toLocaleString('en-IN')}</p>
                   <ul className="checks plan__list">
                     <li>Every feature included</li>
                     <li>{p.students}</li>
                   </ul>
-                  <a className={`btn btn--small plan__cta${active ? '' : ' btn--ghost'}`} href="#quote">
-                    {p.price ? 'Book a demo' : 'Talk to us'}
-                  </a>
+                  <a className={`btn btn--small plan__cta${active || p.recommended ? '' : ' btn--ghost'}`} href="#quote">Book a demo</a>
                 </li>
               );
             })}
@@ -243,6 +291,8 @@ export default function PricingPage() {
           <p className="plans__terms" data-animate="fade-up">{pricing.terms}</p>
         </div>
       </section>
+
+      <CustomPlan students={students} active={!current.cap} />
 
       <section className="section" data-theme="mist" aria-labelledby="scale-title">
         <div className="container scale">

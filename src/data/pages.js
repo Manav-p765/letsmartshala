@@ -181,10 +181,17 @@ export const pricing = {
   // with no price shown (price: null).
   plans: [
     { id: 'starter', name: 'Starter', price: 9999, min: 1, cap: 300, students: 'Up to 300 students', bestFor: 'Small schools' },
-    { id: 'growth', name: 'Growth', price: 14999, min: 301, cap: 700, students: '301–700 students', bestFor: 'Growing schools' },
+    { id: 'growth', name: 'Growth', price: 14999, min: 301, cap: 700, students: '301–700 students', bestFor: 'Growing schools', recommended: true },
     { id: 'premium', name: 'Premium', price: 24999, min: 701, cap: 1500, students: '701–1,500 students', bestFor: 'Larger schools' },
     { id: 'custom', name: 'Custom', price: null, min: 1501, cap: null, students: 'Over 1,500 students', bestFor: 'Large schools' }
   ],
+  // The custom plan gets its own section under the plan cards, not a card.
+  custom: {
+    eyebrow: 'Over 1,500 students',
+    title: ['A bigger school?', 'Let’s plan it together.'],
+    lede: 'Tell us how many students you have. We’ll call to understand your school and give you one yearly price for all of it.',
+    points: ['Every feature, the same as every plan', 'One yearly price, no per-student billing', 'Groups of schools and branches welcome']
+  },
   // On every plan. Wording follows what the ERP does (docs/content.md): the
   // strategy doc's "parent and teacher mobile apps" is principal and teacher
   // apps (no parent app in code), and "parent notifications" is
